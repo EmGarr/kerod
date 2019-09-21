@@ -1,0 +1,19 @@
+# Disable sudo to speed up the build
+sudo: false
+
+language: python
+
+python: 3.6
+
+install:
+  - make install
+  # Install the codecov pip dependency
+  - pip install codecov pytest pytest-cov
+
+# Run theunit test
+script:
+  - make tests 
+
+# Push the results back to codecov
+after_success:
+  - codecov
