@@ -7,5 +7,7 @@ Od is pure tensorflow2.0 implementation of object detection algorithm:
 - mask-rcnn
 - faster-rcnn
 
+TODO:
+- Add L2 regularization everywhere
 
 

@@ -1,4 +1,3 @@
 [style]
 based_on_style = google
 column_limit = 100
-DEDENT_CLOSING_BRACKETS = true

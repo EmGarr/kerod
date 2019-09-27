@@ -13,30 +13,27 @@ make tests
 - Interactif test mode:
 The interactif test mode, will upload a docker of testing with all the needed services. You will be able to edit your tests and src outside of the docker and running all the necessary tests from the docker.
 
-```bash
-make up-tests
-# From your test container prompt, run
-pytest -xvf "tests/<path_to_testfile.py>::function_you_want_to_test"
-```
-
 ## Developpers
 
 ### Code coverage
 
 Whenever you implement a new functionality you should reach a proper code coverage. Every pull requests will be rejected if the code coverage doesn't reach *90%*.
 
-However those repositories will increase their code coverage iteratively. Any decrease will lead to a rejected PR.
+### Docstring formatting
 
-### Docstring should follow the sphinx formatting
-
+The doc generation tool used is portray which handle markdown format
 ```python
 def func(a, b):
   """ Describe my function
-  :param a: A param a description
-  :param b: A param b description
-  :returns:
+
+  Arguments:
+  - a: A param a description
+  - b: A param b description
+
+  Returns:
   The sum of a + b
-  :raises: (If exception are raised)
+
+  Raises: (If exception are raised)
   Exception 1
   """
   return a + b
