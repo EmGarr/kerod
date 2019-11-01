@@ -8,12 +8,18 @@ python: 3.6
 install:
   - make install
   # Install the codecov pip dependency
-  - pip install codecov pytest pytest-cov
+  - pip install codecov pytest pytest-cov portray
 
-# Run theunit test
 script:
   - make tests 
+  - "portray as_html -m src/od -o docs --overwrite && mv docs/* ./ && rm -rf docs" 
 
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  on:
+    branch: master
 # Push the results back to codecov
 after_success:
   - codecov
