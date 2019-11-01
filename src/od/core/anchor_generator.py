@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def generate_anchors(stride, scales, ratios, tensor_shape):
+def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, tensor_shape: list):
     """Will generate a determistic grid based on the input images dimension.
 
     Arguments:

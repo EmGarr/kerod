@@ -5,4 +5,4 @@ install:
 tests:
 	pytest --cov od tests/
 
-.PHONY: tests docs
+.PHONY: tests

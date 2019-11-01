@@ -23,7 +23,7 @@ class AbstractDetectionHead(tfkl.Layer, metaclass=ABCMeta):
         Arguments:
 
         - *name*: The name of your object
-        - ùnum_classesù: Number of classes of the classification head (e.g: Your n classes +
+        - *num_classes*: Number of classes of the classification head (e.g: Your n classes +
                 the background class)
         - *classification_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
                 This object should have a reduction value to None and the parameter from_logits to True.

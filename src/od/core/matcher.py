@@ -19,9 +19,9 @@ matcher is to match row and column indices based on the similarity matrix and
 other optional parameters. Each column is matched to at most one row. There
 are three possibilities for the matching:
 
-.1 match: A column matches a row.
-.2 no_match: A column does not match any row.
-.3 ignore: A column that is neither 'match' nor no_match.
+1. match: A column matches a row.
+2. no_match: A column does not match any row.
+3. ignore: A column that is neither 'match' nor no_match.
 
 The ignore case is regularly encountered in object detection: when an anchor has
 a relatively small overlap with a ground-truth box, one neither wants to
@@ -46,10 +46,10 @@ class Match(object):
 
         Arguments:
 
-        - *match_results*: Integer tensor of shape [N] with (1) match_results[i]>=0,
-            meaning that column i is matched with row match_results[i].
-            (2) match_results[i]=-1, meaning that column i is not matched.
-            (3) match_results[i]=-2, meaning that column i is ignored.
+        - *match_results*: Integer tensor of shape [N] with:
+            1. match_results[i]>=0, meaning that column i is matched with row match_results[i].
+            2. match_results[i]=-1, meaning that column i is not matched.
+            3. match_results[i]=-2, meaning that column i is ignored.
 
         Raises:
 
@@ -192,6 +192,7 @@ class Match(object):
         and ignored_value.shape
 
         Arguments:
+
         - *input_tensor*: Tensor to gather values from.
         - *unmatched_value*: Constant tensor value for unmatched columns.
         - *ignored_value*: Constant tensor value for ignored columns.
@@ -226,6 +227,7 @@ class Matcher(metaclass=abc.ABCMeta):
         - *scope*: Op scope name. Defaults to 'Match' if None.
 
         Returns:
+
         A Match object with the results of matching.
         """
         with tf.name_scope('Match'):
@@ -245,6 +247,7 @@ class Matcher(metaclass=abc.ABCMeta):
             valid for matching.
 
         Returns:
+
         *match_results*: Integer tensor of shape [M]: match_results[i]>=0 means
             that column i is matched to row match_results[i], match_results[i]=-1
             means that the column is not matched. match_results[i]=-2 means that

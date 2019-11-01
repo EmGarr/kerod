@@ -27,7 +27,7 @@ class FastRCNN(AbstractDetectionHead):
         pyramid, boxes = inputs
         # Remove P6
         pyramid = pyramid[:-1]
-        boxe_tensors = multilevel_roi_align(pyramid, boxes, shape=(7, 7))
+        boxe_tensors = multilevel_roi_align(pyramid, boxes, crop_size=7)
         l = tfkl.Flatten()(boxe_tensors)
         l = tfkl.Dense(1024, kernel_initializer=VarianceScaling(), activation='relu')(l)
         l = tfkl.Dense(1024, kernel_initializer=VarianceScaling(), activation='relu')(l)
@@ -41,7 +41,7 @@ class FastRCNN(AbstractDetectionHead):
         return classification_head, localization_head
 
 
-def multilevel_roi_align(inputs, boxes, shape=(7, 7)):
+def multilevel_roi_align(inputs, boxes, image_shape, crop_size: int = 7):
     """Perform a batch multilevel roi_align on the inputs
 
     Arguments:
@@ -50,16 +50,19 @@ def multilevel_roi_align(inputs, boxes, shape=(7, 7)):
             representing the pyramid.
     - *boxes*: A tensor of type tf.float32 and shape [batch_size, num_boxes, (y1, x1, y2, x2)]
 
+    - *image_shape*: A tuple with the height and the width of the original image input image
+
     Returns:
 
-    - *boxe_tensors*: A tensor of type tf.float32 and shape [batch_size * num_boxes, 7, 7, channel]
-    - *mask_tensors*: A tensor of type tf.float32 and shape [batch_size * num_boxes, 14, 14, channel]
+    A tensor of type tf.float32 and shape [batch_size * num_boxes, 7, 7, channel]
     """
     boxes_per_level, box_indices_per_level, pos_per_level = match_boxes_to_their_pyramid_level(
         boxes, len(inputs))
+
     tensors_per_level = []
     for tensor, target_boxes, box_indices in zip(inputs, boxes_per_level, box_indices_per_level):
-        tensors_per_level.append(roi_align(tensor, target_boxes, box_indices, shape))
+        tensors_per_level.append(
+            roi_align(tensor, target_boxes, box_indices, image_shape, crop_size))
 
     tensors = tf.concat(values=tensors_per_level, axis=0)
     original_pos = tf.concat(values=pos_per_level, axis=0)

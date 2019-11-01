@@ -1,6 +1,7 @@
 import tensorflow as tf
 
-def transform_fpcoor_for_tf(boxes, image_shape, crop_shape) -> tf.Tensor:
+
+def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: tuple) -> tf.Tensor:
     """The way tf.image.crop_and_resize works (with normalized box):
     Initial point (the value of output[0]): x0_box * (W_img - 1)
     Spacing: w_box * (W_img - 1) / (W_crop - 1)
@@ -18,53 +19,79 @@ def transform_fpcoor_for_tf(boxes, image_shape, crop_shape) -> tf.Tensor:
 
     Arguments:
 
-    - *boxes*:
-    - *image_shape*:
+    - *normalized_boxes*:  A Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]. These
+    boxes have already been normalized in the feature space. The coordinates are not in
+    the input image space.
+    - *tensor_shape*:
     - *crop_shape*:
 
     Returns:
-        normalized_boxes: 
+
+    A tensor of float32 and shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]
     """
-    y0, x0, y1, x1 = tf.split(boxes, 4, axis=-1)
+    y_min, x_min, y_max, x_max = tf.split(boxes, 4, axis=-1)
 
-    spacing_w = (x1 - x0) / tf.cast(crop_shape[1], tf.float32)
-    spacing_h = (y1 - y0) / tf.cast(crop_shape[0], tf.float32)
+    spacing_w = (x_max - x_min) / tf.cast(crop_shape[1], tf.float32)
+    spacing_h = (y_max - y_min) / tf.cast(crop_shape[0], tf.float32)
 
-    image_shape = [tf.cast(image_shape[0] - 1, tf.float32), tf.cast(image_shape[1] - 1, tf.float32)]
-    nx0 = (x0 + spacing_w / 2 - 0.5) / image_shape[1]
-    ny0 = (y0 + spacing_h / 2 - 0.5) / image_shape[0]
+    tensor_shape = [tf.cast(tensor_shape[0] - 1, tf.float32), tf.cast(tensor_shape[1] - 1, tf.float32)]
+    ny0 = (y_min + spacing_h / 2 - 0.5) / tensor_shape[0]
+    nx0 = (x_min + spacing_w / 2 - 0.5) / tensor_shape[1]
 
-    nw = spacing_w * tf.cast(crop_shape[1] - 1, tf.float32) / image_shape[1]
-    nh = spacing_h * tf.cast(crop_shape[0] - 1, tf.float32) / image_shape[0]
+    nw = spacing_w * tf.cast(crop_shape[1] - 1, tf.float32) / tensor_shape[1]
+    nh = spacing_h * tf.cast(crop_shape[0] - 1, tf.float32) / tensor_shape[0]
 
     return tf.concat([ny0, nx0, ny0 + nh, nx0 + nw], axis=1)
 
 
-def compute_area(boxes) -> tf.Tensor:
+def convert_to_center_coordinates(boxes: tf.Tensor) -> tf.Tensor:
+    """Convert boxes to their center coordinates
+
+    y_min, x_min, y_max, x_max -> y_cent, x_cent, h, w
+
+    Arguments:
+
+    - *boxes*: A Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
+
+    Returns:
+
+    A tensor of float32 and shape [N, ..., num_boxes, (ycenter, xcenter, height, width)]
+    """
+    y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=-1)
+    width = x_max - x_min
+    height = y_max - y_min
+    ycenter = y_min + height / 2.
+    xcenter = x_min + width / 2.
+    return tf.concat([ycenter, xcenter, height, width], axis=-1)
+
+
+def compute_area(boxes: tf.Tensor) -> tf.Tensor:
     """Compute the area of boxes.
 
-    Arugments:
+    Arguments:
 
-    - *boxes*: Tensor of float32 and shape [N, ..., (y1,x1,y2,x2)]
+    - *boxes*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max_,x_max)]
 
-    Returns: 
-        A tensor of float32 and shape [N, ..., num_boxes]
+    Returns:
+
+    A tensor of float32 and shape [N, ..., num_boxes]
     """
     with tf.name_scope('Area'):
         y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=1)
         return tf.squeeze((y_max - y_min) * (x_max - x_min), [1])
 
 
-def compute_intersection(boxes1, boxes2) -> tf.Tensor:
+def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
     """Compute pairwise intersection areas between boxes.
 
     Arguments:
 
-    - *boxes1*: Tensor of float32 and shape [N, ..., (y1,x1,y2,x2)]
-    - *boxes2*: Tensor of float32 and shape [N, ..., (y1,x1,y2,x2)]
+    - *boxes1*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes2*: Tensor of float32 and shape [N, ..., (y_max,x_max,y_max,x_max)]
 
     Returns:
-        A tensor with shape [N, M] representing pairwise intersections
+
+    A tensor with shape [N, M] representing pairwise intersections
     """
     with tf.name_scope('Intersection'):
         y_min1, x_min1, y_max1, x_max1 = tf.split(value=boxes1, num_or_size_splits=4, axis=1)
@@ -78,16 +105,17 @@ def compute_intersection(boxes1, boxes2) -> tf.Tensor:
         return intersect_heights * intersect_widths
 
 
-def compute_iou(boxes1, boxes2) -> tf.Tensor:
+def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
     """Computes pairwise intersection-over-union between box collections.
 
     Arguments:
 
-    - *boxes1*: Tensor of float32 and shape [N, ..., (y1,x1,y2,x2)]
-    - *boxes2*: Tensor of float32 and shape [N, ..., (y1,x1,y2,x2)]
+    - *boxes1*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes2*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
 
     Returns:
-        A tensor with shape [N, M] representing pairwise iou scores.
+
+    A tensor with shape [N, M] representing pairwise iou scores.
     """
     with tf.name_scope('IOU'):
         intersections = compute_intersection(boxes1, boxes2)
@@ -96,3 +124,24 @@ def compute_iou(boxes1, boxes2) -> tf.Tensor:
         unions = (tf.expand_dims(areas1, 1) + tf.expand_dims(areas2, 0) - intersections)
         return tf.where(tf.equal(intersections, 0.0), tf.zeros_like(intersections),
                         tf.truediv(intersections, unions))
+
+
+def normalize_box_coordinates(boxes, height: int, width: int):
+    """ Normalize the boxes coordinates with image shape and transpose the coordinates
+
+    Arguments:
+
+    - *boxes*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *height*: An integer
+    - *width*: An integer
+    """
+
+    y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=1)
+    y_min = y_min / height
+    x_min = x_min / width
+    y_max = y_max / height
+    x_max = x_max / width
+
+    # Won't be backpropagated to rois anyway, but to save time
+    boxes = tf.stop_gradient(tf.concat([y_min, x_min, x_max, y_max], axis=-1))
+    return boxes

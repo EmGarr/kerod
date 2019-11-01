@@ -52,8 +52,8 @@ class ArgMaxMatcher(matcher.Matcher):
 
     def __init__(
             self,
-            matched_threshold,
-            unmatched_threshold=None,
+            matched_threshold: float,
+            unmatched_threshold: float=None,
             negatives_lower_than_unmatched=True,
             force_match_for_each_row=False,
     ):
