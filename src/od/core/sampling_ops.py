@@ -68,14 +68,14 @@ def sample_balanced_positive_negative(indicator, sample_size, labels, positive_f
 
     Arguments:
 
-    - *positive_fraction*: desired fraction of positive examples (scalar in [0,1])
-        in the batch.
     - *indicator*: boolean tensor of shape [N] whose True entries can be sampled.
     - *sample_size*: desired batch size. If None, keeps all positive samples and
         randomly selects negative samples so that the positive sample fraction
         matches positive_fraction.
     - *labels*: boolean tensor of shape [N] denoting positive(=True) and negative
         (=False) examples.
+    - *positive_fraction*: desired fraction of positive examples (scalar in [0,1])
+        in the batch.
 
     Returns:
 

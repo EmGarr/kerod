@@ -77,8 +77,8 @@ def compute_area(boxes: tf.Tensor) -> tf.Tensor:
     A tensor of float32 and shape [N, ..., num_boxes]
     """
     with tf.name_scope('Area'):
-        y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=1)
-        return tf.squeeze((y_max - y_min) * (x_max - x_min), [1])
+        y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=-1)
+        return tf.squeeze((y_max - y_min) * (x_max - x_min), -1)
 
 
 def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
@@ -94,8 +94,8 @@ def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
     A tensor with shape [N, M] representing pairwise intersections
     """
     with tf.name_scope('Intersection'):
-        y_min1, x_min1, y_max1, x_max1 = tf.split(value=boxes1, num_or_size_splits=4, axis=1)
-        y_min2, x_min2, y_max2, x_max2 = tf.split(value=boxes2, num_or_size_splits=4, axis=1)
+        y_min1, x_min1, y_max1, x_max1 = tf.split(value=boxes1, num_or_size_splits=4, axis=-1)
+        y_min2, x_min2, y_max2, x_max2 = tf.split(value=boxes2, num_or_size_splits=4, axis=-1)
         all_pairs_min_ymax = tf.minimum(y_max1, tf.transpose(y_max2))
         all_pairs_max_ymin = tf.maximum(y_min1, tf.transpose(y_min2))
         intersect_heights = tf.maximum(0.0, all_pairs_min_ymax - all_pairs_max_ymin)
@@ -121,7 +121,7 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
         intersections = compute_intersection(boxes1, boxes2)
         areas1 = compute_area(boxes1)
         areas2 = compute_area(boxes2)
-        unions = (tf.expand_dims(areas1, 1) + tf.expand_dims(areas2, 0) - intersections)
+        unions = (tf.expand_dims(areas1, -1) + tf.expand_dims(areas2, 0) - intersections)
         return tf.where(tf.equal(intersections, 0.0), tf.zeros_like(intersections),
                         tf.truediv(intersections, unions))
 
@@ -136,7 +136,7 @@ def normalize_box_coordinates(boxes, height: int, width: int):
     - *width*: An integer
     """
 
-    y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=1)
+    y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=-1)
     y_min = y_min / height
     x_min = x_min / width
     y_max = y_max / height
