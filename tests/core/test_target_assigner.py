@@ -49,7 +49,7 @@ class TargetAssignerTest(tf.test.TestCase):
         groundtruth_box_corners = np.array([[0.0, 0.0, 0.5, 0.5], [0.5, 0.5, 0.9, 0.9]],
                                            dtype=np.float32)
         exp_cls_targets = [[1], [1], [0]]
-        exp_cls_weights = [[1], [1], [1]]
+        exp_cls_weights = [1, 1, 1]
         exp_reg_targets = [[0, 0, 0, 0], [0, 0, -1, 1], [0, 0, 0, 0]]
         exp_reg_weights = [1, 1, 0]
 
@@ -88,7 +88,7 @@ class TargetAssignerTest(tf.test.TestCase):
         groundtruth_box_corners = np.array([[0.0, 0.0, 0.5, 0.5], [0.5, 0.5, 0.9, 0.9]],
                                            dtype=np.float32)
         exp_cls_targets = [[1], [1], [0]]
-        exp_cls_weights = [[1], [1], [0]]
+        exp_cls_weights = [1, 1, 0]
         exp_reg_targets = [[0, 0, 0, 0], [0, 0, -1, 1], [0, 0, 0, 0]]
         exp_reg_weights = [1, 1, 0]
         (cls_targets_out, cls_weights_out, reg_targets_out,
@@ -132,8 +132,7 @@ class TargetAssignerTest(tf.test.TestCase):
 
         exp_cls_targets = [[0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 0], [1, 0, 0, 0, 0, 0, 0],
                            [0, 0, 0, 1, 0, 0, 0]]
-        exp_cls_weights = [[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1],
-                           [1, 1, 1, 1, 1, 1, 1]]
+        exp_cls_weights = [1, 1, 1, 1]
         exp_reg_targets = [[0, 0, 0, 0], [0, 0, -1, 1], [0, 0, 0, 0], [0, 0, -.5, .2]]
         exp_reg_weights = [1, 1, 0, 1]
 
@@ -180,8 +179,7 @@ class TargetAssignerTest(tf.test.TestCase):
         groundtruth_weights = np.array([0.3, 0., 0.5], dtype=np.float32)
 
         # background class gets weight of 1.
-        exp_cls_weights = [[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3], [0, 0, 0, 0, 0, 0, 0],
-                           [1, 1, 1, 1, 1, 1, 1], [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]]
+        exp_cls_weights = [0.3, 0., 1, 0.5]
         exp_reg_weights = [0.3, 0., 0., 0.5]  # background class gets weight of 0.
 
         (cls_weights_out, reg_weights_out) = graph_fn(anchor_means, groundtruth_box_corners,
@@ -220,7 +218,7 @@ class TargetAssignerTest(tf.test.TestCase):
                                       np.float32)
 
         exp_cls_targets = [[[0, 1], [1, 0]], [[1, 0], [0, 1]], [[0, 0], [0, 0]], [[0, 1], [1, .5]]]
-        exp_cls_weights = [[[1, 1], [1, 1]], [[1, 1], [1, 1]], [[1, 1], [1, 1]], [[1, 1], [1, 1]]]
+        exp_cls_weights = [1, 1, 1, 1]
         exp_reg_targets = [[0, 0, 0, 0], [0, 0, -1, 1], [0, 0, 0, 0], [0, 0, -.5, .2]]
         exp_reg_weights = [1, 1, 0, 1]
         (cls_targets_out, cls_weights_out, reg_targets_out,
@@ -259,7 +257,7 @@ class TargetAssignerTest(tf.test.TestCase):
             [[0.0, 0.0, 0.5, 0.5], [0.5, 0.5, 1.0, 0.8], [0, 0.5, .5, 1.0], [.75, 0, 1.0, .25]],
             dtype=np.float32)
         exp_cls_targets = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
-        exp_cls_weights = [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]]
+        exp_cls_weights = [1, 1, 1, 1]
         exp_reg_targets = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
         exp_reg_weights = [0, 0, 0, 0]
         (cls_targets_out, cls_weights_out, reg_targets_out,
@@ -329,7 +327,7 @@ class BatchTargetAssignerTest(tf.test.TestCase):
             [[0, 0, .25, .25], [0, .25, 1, 1], [0, .1, .5, .5], [.75, .75, 1, 1]], dtype=np.float32)
 
         exp_cls_targets = [[[1], [0], [0], [0]], [[0], [1], [1], [0]]]
-        exp_cls_weights = [[[1], [1], [1], [1]], [[1], [1], [1], [1]]]
+        exp_cls_weights = [[1, 1, 1, 1], [1, 1, 1, 1]]
         exp_reg_targets = [[[0, 0, -0.5, -0.5], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
                            [[0, 0, 0, 0], [0, 0.01231521, 0, 0],
                             [0.15789001, -0.01500003, 0.57889998, -1.15799987], [0, 0, 0, 0]]]
@@ -374,8 +372,7 @@ class BatchTargetAssignerTest(tf.test.TestCase):
             [[0, 0, .25, .25], [0, .25, 1, 1], [0, .1, .5, .5], [.75, .75, 1, 1]], dtype=np.float32)
         exp_cls_targets = [[[0, 1, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]],
                            [[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [1, 0, 0, 0]]]
-        exp_cls_weights = [[[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]],
-                           [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]]
+        exp_cls_weights = [[1, 1, 1, 1], [1, 1, 1, 1]]
         exp_reg_targets = [[[0, 0, -0.5, -0.5], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
                            [[0, 0, 0, 0], [0, 0.01231521, 0, 0],
                             [0.15789001, -0.01500003, 0.57889998, -1.15799987], [0, 0, 0, 0]]]
@@ -433,8 +430,7 @@ class BatchTargetAssignerTest(tf.test.TestCase):
 
         exp_cls_targets = [[[0, 1, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]],
                            [[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [1, 0, 0, 0]]]
-        exp_cls_weights = [[[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]],
-                           [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]]
+        exp_cls_weights = [[1, 1, 1, 1], [1, 1, 1, 1]]
         exp_reg_targets = [[[0, 0, -0.5, -0.5], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
                            [[0, 0, 0, 0], [0, 0.01231521, 0, 0],
                             [0.15789001, -0.01500003, 0.57889998, -1.15799987], [0, 0, 0, 0]]]
@@ -484,10 +480,9 @@ class BatchTargetAssignerTest(tf.test.TestCase):
                             [[0., 0., 0.], [0., 0., 0.]], [[0., 0., 0.], [0., 0., 0.]]],
                            [[[0., 0., 0.], [0., 0., 0.]], [[0., 1., 1.], [1., 1., 0.]],
                             [[0., 0., 1.], [0., 0., 1.]], [[0., 0., 0.], [0., 0., 0.]]]]
-        exp_cls_weights = [[[[1., 1., 1.], [1., 1., 1.]], [[1., 1., 1.], [1., 1., 1.]],
-                            [[1., 1., 1.], [1., 1., 1.]], [[1., 1., 1.], [1., 1., 1.]]],
-                           [[[1., 1., 1.], [1., 1., 1.]], [[1., 1., 1.], [1., 1., 1.]],
-                            [[1., 1., 1.], [1., 1., 1.]], [[1., 1., 1.], [1., 1., 1.]]]]
+
+        exp_cls_weights = [[1, 1, 1, 1], [1, 1, 1, 1]]
+
         exp_reg_targets = [[[0, 0, -0.5, -0.5], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
                            [[0, 0, 0, 0], [0, 0.01231521, 0, 0],
                             [0.15789001, -0.01500003, 0.57889998, -1.15799987], [0, 0, 0, 0]]]
@@ -526,7 +521,7 @@ class BatchTargetAssignerTest(tf.test.TestCase):
         groundtruth_box_corners = np.zeros((0, 4), dtype=np.float32)
         anchor_means = np.array([[0, 0, .25, .25], [0, .25, 1, 1]], dtype=np.float32)
         exp_cls_targets = [[[1, 0, 0, 0], [1, 0, 0, 0]]]
-        exp_cls_weights = [[[1, 1, 1, 1], [1, 1, 1, 1]]]
+        exp_cls_weights = [[1, 1]]
         exp_reg_targets = [[[0, 0, 0, 0], [0, 0, 0, 0]]]
         exp_reg_weights = [[0, 0]]
         num_classes = 3

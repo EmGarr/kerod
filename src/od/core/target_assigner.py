@@ -102,8 +102,8 @@ class TargetAssigner(object):
         - cls_targets: a float32 tensor with shape [num_anchors, d_1, d_2 ... d_k],
             where the subshape [d_1, ..., d_k] is compatible with groundtruth_labels
             which has shape [num_gt_boxes, d_1, d_2, ... d_k].
-        - cls_weights: a float32 tensor with shape [num_anchors, d_1, d_2 ... d_k],
-            representing weights for each element in cls_targets.
+        - cls_weights: a float32 tensor with shape [num_anchors],
+            representing weights for each anchors.
         - reg_targets: a float32 tensor with shape [num_anchors, box_code_dimension]
         - reg_weights: a float32 tensor with shape [num_anchors]
         - match: an int32 tensor of shape [num_anchors] containing result of anchor
@@ -143,13 +143,6 @@ class TargetAssigner(object):
         reg_weights = self._create_regression_weights(match, groundtruth_weights)
 
         cls_weights = self._create_classification_weights(match, groundtruth_weights)
-        # convert cls_weights from per-anchor to per-class.
-        class_label_shape = tf.shape(cls_targets)[1:]
-        weights_shape = tf.shape(cls_weights)
-        weights_multiple = tf.concat([tf.ones_like(weights_shape), class_label_shape], axis=0)
-        for _ in range(len(cls_targets.get_shape()[1:])):
-            cls_weights = tf.expand_dims(cls_weights, -1)
-        cls_weights = tf.tile(cls_weights, weights_multiple)
 
         num_anchors = tf.shape(anchors[BoxField.BOXES])[0]
         if num_anchors is not None:
@@ -335,8 +328,9 @@ def batch_assign_targets(target_assigner: TargetAssigner,
     """
     if not isinstance(anchors_batch, list):
         anchors_batch = len(gt_box_batch) * [anchors_batch]
+
     if not all(isinstance(anchors, dict) for anchors in anchors_batch):
-        raise ValueError('anchors_batch must be a BoxList or list of BoxLists.')
+        raise ValueError('anchors_batch must be a dict.')
 
     cls_targets_list = []
     cls_weights_list = []
@@ -351,6 +345,7 @@ def batch_assign_targets(target_assigner: TargetAssigner,
         reg_targets_list.append(reg_targets)
         reg_weights_list.append(reg_weights)
         match_list.append(match)
+
     cls_targets = tf.stack(cls_targets_list)
     cls_weights = tf.stack(cls_weights_list)
     reg_targets = tf.stack(reg_targets_list)
