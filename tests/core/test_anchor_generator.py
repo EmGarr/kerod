@@ -59,7 +59,7 @@ def test_generate_anchors():
     scales = [8, 16, 32]
     feature_map_shape = 8
     anchors_tensorpack = get_all_anchors(stride, scales, ratios,
-                                         stride * feature_map_shape).reshape((1, -1, 4))
+                                         stride * feature_map_shape).reshape((-1, 4))
 
     anchors_od = generate_anchors(stride, tf.constant(scales, tf.float32),
                                   tf.constant(ratios, tf.float32),

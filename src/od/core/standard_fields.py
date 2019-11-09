@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class BoxField(Enum):
+class BoxField():
     BOXES = 'boxes'
     KEYPOINTS = 'keypoints'
     LABELS = 'labels'
@@ -10,7 +10,7 @@ class BoxField(Enum):
     SCORES = 'scores'
     WEIGHTS = 'weights'
 
-class LossField(Enum):
+class LossField():
     CLASSIFICATION = 'classification'
     INSTANCE_SEGMENTATION = 'instance_segmentation'
     LOCALIZATION = 'localization'

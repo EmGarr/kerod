@@ -15,11 +15,11 @@ def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, tensor_s
 
     Returns:
 
-    A tensor of float32 and shape [batch_size, num_scales * num_ratios * height * width, 4].
+    A tensor of float32 and shape [num_scales * num_ratios * height * width, 4].
     The anchors have the format [y_min, x_min, y_max, x_max].
 
     """
-    batch_size, tensor_height, tensor_width, _ = tensor_shape
+    _, tensor_height, tensor_width, _ = tensor_shape
     ratios_grid,  scales_grid = tf.meshgrid(ratios, scales)
     scales = tf.reshape(scales_grid, [-1])
     ratios = tf.reshape(ratios_grid, [-1])
@@ -38,6 +38,5 @@ def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, tensor_s
     shifts = tf.stack([x_centers, y_centers, x_centers, y_centers], axis=1)
 
     anchors = tf.expand_dims(base_anchors, 0) + tf.expand_dims(shifts, 1)
-    anchors = tf.reshape(anchors, shape=(1, -1, 4))
-    anchors = tf.tile(anchors, [batch_size, 1, 1])
+    anchors = tf.reshape(anchors, shape=(-1, 4))
     return tf.gather(anchors, [1, 0, 3, 2], axis=-1)
