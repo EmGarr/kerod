@@ -2,16 +2,9 @@
 
 ## Tests
 
-If you want to test your package you have 2 modes of testing:
-
-- complete test of your package (used by the CI):
-
 ```bash
 make tests
 ```
-
-- Interactif test mode:
-The interactif test mode, will upload a docker of testing with all the needed services. You will be able to edit your tests and src outside of the docker and running all the necessary tests from the docker.
 
 ## Developpers
 
@@ -22,22 +15,26 @@ Whenever you implement a new functionality you should reach a proper code covera
 ### Docstring formatting
 
 The doc generation tool used is portray which handle markdown format
+
 ```python
 def func(a, b):
-  """ Describe my function
+  """Describe my function
 
   Arguments:
-  - a: A param a description
-  - b: A param b description
+
+  - *a*: A param a description
+  - *b*: A param b description
 
   Returns:
+
   The sum of a + b
 
   Raises: (If exception are raised)
-  Exception 1
+
+  Exceptions:
+  1
   """
   return a + b
-
 ```
 
 ### The code formatting used is yapf
