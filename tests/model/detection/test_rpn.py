@@ -1,7 +1,17 @@
-import tensorflow as tf
+from unittest import mock
+
 import numpy as np
-from od.model.detection.rpn import RegionProposalNetwork
+import tensorflow as tf
+
 from od.core.standard_fields import BoxField
+from od.model.detection.rpn import RegionProposalNetwork
+
+
+def mocked_random_shuffle(indices):
+    """In the methods subsample_indicator a tf.random.shuffle is used we want it to return its
+    input.
+    """
+    return indices
 
 
 def test_rpn():
@@ -20,7 +30,10 @@ def test_rpn():
     rpn([features])
 
 
-def test_compute_loss_rpn():
+@mock.patch('tensorflow.random.shuffle')
+def test_compute_loss_rpn(mock_shuffle):
+    # The mocking allows to make the test deterministic
+    mock_shuffle.side_effect = mocked_random_shuffle
     localization_pred = tf.constant(
         [[[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]],
         tf.float32)

@@ -13,7 +13,7 @@ from od.core.target_assigner import TargetAssigner, batch_assign_targets
 from od.model.detection.abstract_detection_head import AbstractDetectionHead
 
 SAMPLING_SIZE = 256
-SAMPLING_RATIO = 0.5
+SAMPLING_POSITIVE_RATIO = 0.5
 
 
 class RegionProposalNetwork(AbstractDetectionHead):
@@ -136,7 +136,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         sample_idx = batch_sample_balanced_positive_negative(weights[LossField.CLASSIFICATION],
                                                              SAMPLING_SIZE,
                                                              labels,
-                                                             positive_fraction=SAMPLING_RATIO)
+                                                             positive_fraction=SAMPLING_POSITIVE_RATIO)
         # Create one_hot encoding [batch_size, num_anchors, 1] -> [batch_size, num_anchors, 2]
         y_true[LossField.CLASSIFICATION] = tf.one_hot(tf.cast(
             y_true[LossField.CLASSIFICATION][:, :, 0], tf.int32),
