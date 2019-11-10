@@ -157,8 +157,10 @@ class AbstractDetectionHead(tfkl.Layer):
         classification_loss = _compute_loss(self._classification_loss,
                                             self._classification_loss_weight,
                                             LossField.CLASSIFICATION)
+        tf.summary.scalar(f'{self.name}_classification_loss', classification_loss)
 
         localization_loss = _compute_loss(self._localization_loss, self._localization_loss_weight,
                                           LossField.LOCALIZATION)
+        tf.summary.scalar(f'{self.name}_localization_loss', classification_loss)
 
         return classification_loss, localization_loss
