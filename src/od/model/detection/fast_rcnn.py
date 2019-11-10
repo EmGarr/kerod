@@ -1,36 +1,62 @@
+from typing import List
+
+import gin
 import tensorflow as tf
 import tensorflow.keras.layers as tfkl
-from tensorflow.keras.initializers import VarianceScaling
-from od.core.box_ops import compute_area
-from od.core.losses import SmoothL1Localization, CategoricalCrossentropy
+from tensorflow.keras import initializers
+
+from od.core.argmax_matcher import ArgMaxMatcher
+from od.core.box_coder import encode_boxes_faster_rcnn
+from od.core.box_ops import compute_iou
+from od.core.losses import CategoricalCrossentropy, SmoothL1Localization
+from od.core.sampling_ops import batch_sample_balanced_positive_negative
+from od.core.standard_fields import BoxField, LossField
+from od.core.target_assigner import TargetAssigner, batch_assign_targets
 from od.model.detection.abstract_detection_head import AbstractDetectionHead
-from od.model.detection.pooling_ops import roi_align
+from od.model.detection.pooling_ops import multilevel_roi_align
 
 
 class FastRCNN(AbstractDetectionHead):
+    """Build the Fast-RCNN on top of the FPN. The parameters used
+    are from [Feature Pyramidal Networks for Object Detection](https://arxiv.org/abs/1612.03144).
 
-    def __init__(self, num_classes):
-        """Constructor of the FastRCNN head. It will build
+    Arguments:
 
-        Arguments:
+    - *num_classes*: The number of classes that predict the classification head (N+1).
+    """
 
-        - *num_classes*: The number of classes that predict the classification head (N+1).
-        """
+    def __init__(self, num_classes, **kwargs):
+        matcher = ArgMaxMatcher(0.5)
+        target_assigner = TargetAssigner(compute_iou, matcher, encode_boxes_faster_rcnn)
+
         super().__init__(
-            'fast_rcnn',
             num_classes,
-            SmoothL1Localization(),
+            target_assigner,
             CategoricalCrossentropy(),
-        )
+            SmoothL1Localization(),
+            kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
+            kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.001),
+            **kwargs)
 
-    def call(self, inputs):
-        pyramid, boxes = inputs
+        self.denses = [
+            tfkl.Dense(1024, kernel_initializer=initializers.VarianceScaling(), activation='relu')
+            for _ in range(2)
+        ]
+
+    def call(self, inputs, training=None):
+        if training:
+            pyramid, boxes, image_shape, ground_truths = inputs
+            y_true, weights = self.sample_boxes(boxes, ground_truths)
+            boxes = y_true[LossField.LOCALIZATION]
+        else:
+            pyramid, boxes, image_shape = inputs
+
         # Remove P6
         pyramid = pyramid[:-1]
-        boxe_tensors = multilevel_roi_align(pyramid, boxes, crop_size=7)
+        boxe_tensors = multilevel_roi_align(pyramid, boxes, image_shape, crop_size=7)
         l = tfkl.Flatten()(boxe_tensors)
-        l = tfkl.Dense(1024, kernel_initializer=VarianceScaling(), activation='relu')(l)
-        l = tfkl.Dense(1024, kernel_initializer=VarianceScaling(), activation='relu')(l)
+        for dense in self.denses:
+            l = dense(l)
 
         classification_head, localization_head = self.build_detection_head(
             tf.reshape(l, (-1, 1, 1, 1024)))
@@ -38,93 +64,137 @@ class FastRCNN(AbstractDetectionHead):
         classification_head = tf.reshape(classification_head, (batch_size, -1, self._num_classes))
         localization_head = tf.reshape(localization_head,
                                        (batch_size, -1, (self._num_classes - 1) * 4))
+
+        if training:
+            losses = self.compute_loss(y_true, weights, classification_head, localization_head)
+            self.add_loss(losses)
+
         return classification_head, localization_head
 
+    @gin.configurable()
+    def sample_boxes(self,
+                     batch_boxes: tf.Tensor,
+                     ground_truths: List[dict],
+                     sampling_size: int = 512,
+                     sampling_positive_ratio: float = 0.25):
+        """Perform the sampling of the target boxes. During the training a set of RoIs is
+        detected by the RPN. However, you do not want to analyse all the set. You only want
+        to analyse the boxes that you sampled with this method.
 
-def multilevel_roi_align(inputs, boxes, image_shape, crop_size: int = 7):
-    """Perform a batch multilevel roi_align on the inputs
+        Arguments:
 
-    Arguments:
+        - *batch_boxes*: A tensor of float32 and shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+        - *ground_truths*: A list of dict objects with length batch_size
+        representing groundtruth boxes for each image in the batch and their labels, weights
+        - *sampling_size*: Desired sampling size. If None, keeps all positive samples and
+        randomly selects negative samples so that the positive sample fraction
+        matches positive_fraction.
+        - *sampling_positive_ratio*: Desired fraction of positive examples (scalar in [0,1])
+        in the batch.
 
-    - *inputs*: A list of tensors of type tf.float32 and shape [batch_size, width, height, channel]
-            representing the pyramid.
-    - *boxes*: A tensor of type tf.float32 and shape [batch_size, num_boxes, (y1, x1, y2, x2)]
+        Returns:
 
-    - *image_shape*: A tuple with the height and the width of the original image input image
+        - *y_true*: A dict with :
+            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
+            num_classes],
+            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors,
+            box_code_dimension]
 
-    Returns:
+        - *weights*: A dict with:
+            * *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
+            num_classes],
+            * *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors],
 
-    A tensor of type tf.float32 and shape [batch_size * num_boxes, 7, 7, channel]
-    """
-    boxes_per_level, box_indices_per_level, pos_per_level = match_boxes_to_their_pyramid_level(
-        boxes, len(inputs))
+        Raises:
 
-    tensors_per_level = []
-    for tensor, target_boxes, box_indices in zip(inputs, boxes_per_level, box_indices_per_level):
-        tensors_per_level.append(
-            roi_align(tensor, target_boxes, box_indices, image_shape, crop_size))
+        - *ValueError*: If your sampling size is superior to the number of boxes in input.
+        - *ValueError*: If the batch_size between your ground_truths and the boxes does not match.
+        """
+        boxes = [{BoxField.BOXES: boxes} for boxes in tf.unstack(batch_boxes)]
 
-    tensors = tf.concat(values=tensors_per_level, axis=0)
-    original_pos = tf.concat(values=pos_per_level, axis=0)
+        if tf.shape(batch_boxes)[1] < sampling_size:
+            raise ValueError('Your sampling size should be inferior or equal to the number '
+                             'of boxes in input. Inspect the num_boxes dimension for batch_boxes'
+                             'with [batch_size, num_boxes, 4]')
+        if len(boxes) != len(ground_truths):
+            raise ValueError(f'Length of boxes is {len(boxes)} and length of ground_truths is '
+                             f'{len(ground_truths)} should be the same.')
 
-    # Reorder the tensor per batch
-    indices_to_reorder_boxes = tf.math.invert_permutation(original_pos)
-    tensors = tf.gather(tensors, indices_to_reorder_boxes)
-    return tensors
+        unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], tf.float32)
+        y_true, weights, _ = batch_assign_targets(self.target_assigner, boxes, ground_truths,
+                                                  unmatched_class_label)
 
+        # Here we have a tensor of shape [batch_size, num_anchors, num_classes]. We want
+        # to know all the foreground boxes for sampling.
+        # [0, 0, 0, 1] -> [1]
+        # [1, 0, 0, 0] -> [0]
+        labels = tf.logical_not(tf.cast(y_true[LossField.CLASSIFICATION][:, :, 0], dtype=bool))
+        sample_idx = batch_sample_balanced_positive_negative(
+            weights[LossField.CLASSIFICATION],
+            sampling_size,
+            labels,
+            positive_fraction=sampling_positive_ratio)
 
-def match_boxes_to_their_pyramid_level(boxes, num_level):
-    """Match the boxes to the proper level based on their area
+        weights[LossField.CLASSIFICATION] = tf.multiply(sample_idx,
+                                                        weights[LossField.CLASSIFICATION])
+        weights[LossField.LOCALIZATION] = tf.multiply(sample_idx, weights[LossField.LOCALIZATION])
 
-    Arguments:
+        selected_boxes_idx = tf.where(tf.equal(sample_idx, 1))
 
-    - *boxes*: A tensor of type tf.float32 and shape [batch_size, num_boxes, 4]
-    - *num_level*: Number of level of the target pyramid
+        batch_size = tf.shape(sample_idx)[0]
 
-    Returns:
+        # Extract the selected boxes corresponding boxes
+        # tf.gather_nd collaps the batch_together so we reshape with the proper batch_size
+        y_true[LossField.LOCALIZATION] = tf.reshape(
+            tf.gather_nd(y_true[LossField.LOCALIZATION], selected_boxes_idx), (batch_size, -1, 4))
 
-    - *boxes_per_level*
-    - *box_indices_per_level*
-    - *original_pos_per_level*
+        y_true[LossField.CLASSIFICATION] = tf.reshape(
+            tf.gather_nd(y_true[LossField.CLASSIFICATION], selected_boxes_idx),
+            (batch_size, -1, self._num_classes))
 
-    """
+        for key in y_true.keys():
+            weights[key] = tf.reshape(tf.gather_nd(weights[key], selected_boxes_idx),
+                                      (batch_size, -1))
+            weights[key] = tf.stop_gradient(weights[key])
+            y_true[key] = tf.stop_gradient(y_true[key])
+        return y_true, weights
 
-    batch_size, num_boxes, _ = tf.shape(boxes)
-    boxes = tf.reshape(boxes, (-1, 4))
+    def compute_loss(self, y_true: dict, weights: dict, classification_pred: tf.Tensor,
+                     localization_pred: tf.Tensor):
+        """Compute the loss of the FastRCNN
 
-    box_levels = assign_pyramid_level_to_boxes(boxes, num_level)
-    box_indices = tf.tile(tf.expand_dims(tf.range(0, batch_size), 1), [1, num_boxes])
-    box_indices = tf.reshape(box_indices, (-1,))
-    box_original_pos = tf.range(batch_size * num_boxes)
+        Arguments:
 
-    levels = [tf.squeeze(tf.where(tf.equal(box_levels, i))) for i in range(num_level)]
-    boxes_per_level = [tf.gather(boxes, selected_level) for selected_level in levels]
-    box_indices_per_level = [tf.gather(box_indices, selected_level) for selected_level in levels]
-    original_pos_per_level = [
-        tf.gather(box_original_pos, selected_level) for selected_level in levels
-    ]
-    return boxes_per_level, box_indices_per_level, original_pos_per_level
+        - *y_true*: A dict with :
+            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors, num_classes]
+            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors, 4]
+        - *weights*: A dict with:
+            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors, num_classes]
+            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors]
+        - *classification_pred*: A tensorf of float32 and shape
+        [batch_size, num_anchors, num_classes]
+        - *localization_pred*: A tensorf of float32 and shape
+        [batch_size, num_anchors, (num_classes - 1) * 4]
 
+        Returns:
 
-def assign_pyramid_level_to_boxes(boxes, num_level, level_target=2):
-    """Compute the pyramid level of an RoI
+        - *classification_loss*: A scalar in tf.float32
+        - *localization_loss*: A scalar in tf.float32
+        """
 
-    Arguments:
+        # y_true[LossField.CLASSIFICATION] is just 1 and 0 we are using it as mask to extract
+        # the corresponding target boxes
+        batch_size = tf.shape(classification_pred)[0]
+        targets = tf.reshape(y_true[LossField.CLASSIFICATION], [-1])
 
-    - *boxes*: A tensor of type float32 and shape
-            [nb_batches * nb_boxes, 4]
-    - *num_level*: Assign all the boxes mapped to a superior level to the num_level.
-        level_target: Will affect all the boxes of area 224^2 to the level_target of the pyramid.
+        # We need to insert a fake background classes at the position 0
+        localization_pred = tf.pad(localization_pred, [[0, 0], [0, 0], [4, 0]])
+        localization_pred = tf.reshape(localization_pred, [-1, 4])
 
-    Returns:
-
-    A 2-D tensor of type int32 and shape [nb_batches * nb_boxes]
-    corresponding to the target level of the pyramid.
-    """
-
-    area = compute_area(boxes)
-    k = level_target + tf.math.log(tf.sqrt(area) / 224 + 1e-6) * 1. / tf.math.log(2.0)
-    k = tf.clip_by_value(k, 0, num_level - 1)
-    k = tf.cast(k, tf.int32)
-    k = tf.reshape(k, [-1])
-    return k
+        extracted_localization_pred = tf.boolean_mask(localization_pred, tf.greater(targets, 0))
+        extracted_localization_pred = tf.reshape(extracted_localization_pred, (batch_size, -1, 4))
+        y_pred = {
+            LossField.CLASSIFICATION: classification_pred,
+            LossField.LOCALIZATION: extracted_localization_pred
+        }
+        return self.compute_losses(y_true, y_pred, weights)

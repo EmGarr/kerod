@@ -1,74 +1,150 @@
+from unittest import mock
+
+import numpy as np
 import pytest
 import tensorflow as tf
-import numpy as np
-from od.model.detection.fast_rcnn import assign_pyramid_level_to_boxes, match_boxes_to_their_pyramid_level, multilevel_roi_align
+
+from od.core.standard_fields import BoxField, LossField
+from od.model.detection.fast_rcnn import FastRCNN
 
 
-@pytest.mark.parametrize("level_target,max_level,expected_target",
-                         [[2, 4, [0, 0, 0, 3, 2, 3, 1]], [2, 7, [0, 0, 0, 6, 2, 3, 1]]])
-def test_assign_pyramid_level_to_boxes(level_target, max_level, expected_target):
-    boxes = tf.constant([[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10], [0, 0, 10000, 10000],
-                         [0, 0, 250, 250], [0, 0, 500, 500], [0, 0, 112, 112]],
-                        dtype=tf.float32)
-    pyramid_level = assign_pyramid_level_to_boxes(boxes, max_level, level_target=level_target)
-    assert np.array_equal(pyramid_level.numpy(), np.array(expected_target, dtype=np.int32))
+def mocked_random_shuffle(indices):
+    """In the methods subsample_indicator a tf.random.shuffle is used we want it to return its
+    input.
+    """
+    return indices
 
 
-def test_match_boxes_to_their_pyramid_level():
-    boxes = tf.constant([[[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10], [0, 0, 1000, 1000],
-                          [0, 0, 250, 250], [0, 0, 500, 500], [0, 0, 112, 112]],
-                         [[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10], [0, 0, 10000, 10000],
-                          [0, 0, 250, 250], [0, 0, 500, 500], [0, 0, 112, 112]]],
-                        dtype=tf.float32)
-    exp_boxes_per_level = [
-        [[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10], [0, 0, 100, 100], [0, 0, 1, 1],
-         [0, 0, 10, 10]],
-        [[0, 0, 112, 112], [0, 0, 112, 112]],
-        [[0, 0, 250, 250], [0, 0, 250, 250]],
-        [[0, 0, 1000, 1000], [0, 0, 500, 500], [0, 0, 10000, 10000], [0, 0, 500, 500]],
-    ]
-    exp_indices_per_level = [[0, 0, 0, 1, 1, 1], [0, 1], [0, 1], [0, 0, 1, 1]]
-    exp_original_pos_per_level = [[0, 1, 2, 7, 8, 9], [6, 13], [4, 11], [3, 5, 10, 12]]
+def test_fast_rcnn_full_inference_and_training():
+    # args callable
+    pyramid = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20, 20]]
+    boxes = [[0, 0, i, i] for i in range(1, 1000)]
+    boxes = tf.constant([boxes, boxes], tf.float32)
+    image_shape = (800., 800.)
 
-    boxes_plvl, box_indices_plvl, original_pos_plvl = match_boxes_to_their_pyramid_level(boxes, 4)
+    ground_truths = [{
+        BoxField.BOXES: tf.constant([[0, 0, 1, 1], [0, 0, 2, 2]], tf.float32),
+        BoxField.LABELS: tf.constant([[0, 0, 1], [0, 1, 0]], tf.float32),
+        BoxField.WEIGHTS: tf.constant([1, 0], tf.float32)
+    }, {
+        BoxField.BOXES: tf.constant([[0, 0, 3, 3]], tf.float32),
+        BoxField.LABELS: tf.constant([[0, 0, 1]], tf.float32)
+    }]
 
-    for exp, out in zip(exp_boxes_per_level, boxes_plvl):
-        assert np.array_equal(np.array(exp, dtype=np.float32), out.numpy())
+    num_classes = 3
+    fast_rcnn = FastRCNN(num_classes)
 
-    for exp, out in zip(exp_indices_per_level, box_indices_plvl):
-        assert np.array_equal(np.array(exp, dtype=np.float32), out.numpy())
-
-    for exp, out in zip(exp_original_pos_per_level, original_pos_plvl):
-        assert np.array_equal(np.array(exp, dtype=np.float32), out.numpy())
+    fast_rcnn([pyramid, boxes, image_shape, ground_truths], training=True)
+    fast_rcnn([pyramid, boxes, image_shape])
 
 
-def test_multilevel_roi_align():
-    boxes = tf.constant([[[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10], [0, 0, 1000, 1000],
-                          [0, 0, 250, 250], [0, 0, 500, 500], [0, 0, 112, 112]],
-                         [[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10], [0, 0, 1000, 1000],
-                          [0, 0, 250, 250], [0, 0, 500, 500], [0, 0, 112, 112]]],
-                        dtype=tf.float32)
-    inputs_lvl1 = np.ones((2, 100, 100, 1))
-    inputs_lvl1[1] *= -1
-    inputs_lvl2 = np.ones((2, 50, 50, 1)) * 2
-    inputs_lvl2[1] *= -1
-    inputs_lvl3 = np.ones((2, 25, 25, 1)) * 3
-    inputs_lvl3[1] *= -1
-    inputs_lvl4 = np.ones((2, 50, 50, 1)) * 4
-    inputs_lvl4[1] *= -1
-    output = multilevel_roi_align([inputs_lvl1, inputs_lvl2, inputs_lvl3, inputs_lvl4], boxes,
-                                  (1000, 1000), 7)
+@mock.patch('tensorflow.random.shuffle')
+def test_fast_rcnn_sample_boxes(mock_shuffle):
+    # The mocking allows to make the test deterministic
+    mock_shuffle.side_effect = mocked_random_shuffle
 
-    # expected box position per level [[0, 1, 2, 7, 8, 9], [6, 13], [4, 11], [3, 5, 10, 12]]
-    tensor = np.ones((14, 7, 7, 1), dtype=np.float32)
-    tensor[7:] *= -1  # tensor from the pos 2 in the batch
-    tensor[6] *= 2
-    tensor[13] *= 2
-    tensor[4] *= 3
-    tensor[11] *= 3
-    tensor[3] *= 4
-    tensor[5] *= 4
-    tensor[10] *= 4
-    tensor[12] *= 4
+    boxes = [[0, 0, i, i] for i in range(1, 21)]
+    boxes = tf.constant([boxes, boxes], tf.float32)
 
-    np.testing.assert_array_equal(output.numpy(), tensor)
+    num_classes = 3
+    ground_truths = [{
+        BoxField.BOXES: tf.constant([[0, 0, 1, 1], [0, 0, 2, 2]], tf.float32),
+        BoxField.LABELS: tf.constant([[0, 0, 1], [0, 1, 0]], tf.float32),
+        BoxField.WEIGHTS: tf.constant([1, 0], tf.float32)
+    }, {
+        BoxField.BOXES: tf.constant([[0, 0, 3, 3]], tf.float32),
+        BoxField.LABELS: tf.constant([[0, 0, 1]], tf.float32)
+    }]
+
+    fast_rcnn = FastRCNN(num_classes)
+    sampling_size = 10
+    y_true, weights = fast_rcnn.sample_boxes(boxes,
+                                             ground_truths,
+                                             sampling_size=sampling_size,
+                                             sampling_positive_ratio=0.2)
+
+    expected_y_true_classification = np.zeros((2, sampling_size, 3))
+    expected_y_true_classification[:, :, 0] = 1
+    expected_y_true_classification[0, 0] = [0, 0, 1]
+    expected_y_true_classification[1, 2] = [0, 0, 1]
+    # boxes 4 does match with 3: iou([0, 0, 3, 3], [0, 0, 4, 4]) = 0.5625 > 0.5
+    expected_y_true_classification[1, 3] = [0, 0, 1]
+
+    expected_y_true_localization = np.zeros((2, sampling_size, 4))
+
+    # boxe num 4 does match with num 3: iou([0, 0, 3, 3], [0, 0, 4, 4]) = 0.5625 > 0.5
+    # You can recompute the encoding with this methods
+    # encode_boxes_faster_rcnn(tf.constant([0, 0, 3, 3], tf.float32), tf.constant([0, 0, 4, 4], tf.float32))
+    expected_y_true_localization[1, 3] = [-1.25, -1.25, -1.4384104, -1.4384104]
+
+    expected_weights_classification = np.ones((2, sampling_size))
+    expected_weights_localization = np.zeros((2, sampling_size))
+    expected_weights_localization[0, 0] = 1
+    expected_weights_localization[1, 2] = 1
+    expected_weights_localization[1, 3] = 1
+
+    np.testing.assert_array_equal(expected_y_true_classification, y_true[LossField.CLASSIFICATION])
+    np.testing.assert_array_almost_equal(expected_y_true_localization,
+                                         y_true[LossField.LOCALIZATION])
+    np.testing.assert_array_equal(expected_weights_classification,
+                                  weights[LossField.CLASSIFICATION])
+    np.testing.assert_array_equal(expected_weights_localization, weights[LossField.LOCALIZATION])
+
+
+def test_fast_rcnn_sample_boxes_value_error():
+    # The mocking allows to make the test deterministic
+    boxes = [[0, 0, i, i] for i in range(1, 21)]
+    boxes = tf.constant([boxes], tf.float32)
+
+    num_classes = 3
+    ground_truths = [{
+        BoxField.BOXES: tf.constant([[0, 0, 1, 1], [0, 0, 2, 2]], tf.float32),
+        BoxField.LABELS: tf.constant([[0, 0, 1], [0, 1, 0]], tf.float32),
+        BoxField.WEIGHTS: tf.constant([1, 0], tf.float32)
+    }, {
+        BoxField.BOXES: tf.constant([[0, 0, 3, 3]], tf.float32),
+        BoxField.LABELS: tf.constant([[0, 0, 1]], tf.float32)
+    }]
+
+    fast_rcnn = FastRCNN(num_classes)
+    with pytest.raises(ValueError):
+        fast_rcnn.sample_boxes(boxes, ground_truths, sampling_size=10)
+    with pytest.raises(ValueError):
+        fast_rcnn.sample_boxes(boxes, ground_truths, sampling_size=100)
+
+
+def test_fast_rcnn_compute_loss():
+    localization_pred = tf.constant([
+        [
+            [0, 0, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+        ],
+        [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 2, 2, 2, 2],
+            [1, 1, 1, 1, 0, 0, 0, 0],
+        ],
+    ], tf.float32)
+
+    classification_pred = tf.constant([[[-100, 100, -100], [100, -100, -100], [100, -100, -100]],
+                                       [[100, -100, -100], [-100, -100, 100], [-100, -100, 100]]],
+                                      tf.float32)
+
+    y_true_cls = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0]], [[0, 0, 1], [0, 0, 1], [0, 1, 0]]])
+    y_true_loc = tf.constant([[[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+                              [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]])
+
+    y_true = {LossField.CLASSIFICATION: y_true_cls, LossField.LOCALIZATION: y_true_loc}
+    weights = {
+        LossField.CLASSIFICATION: tf.ones((2, 3), tf.float32),
+        LossField.LOCALIZATION: tf.constant([[1, 0, 0], [0, 1, 1]], tf.float32)
+    }
+    num_classes = 3
+    fast_rcnn = FastRCNN(num_classes)
+
+    loss_cls, loss_loc = fast_rcnn.compute_loss(y_true, weights, classification_pred,
+                                                localization_pred)
+
+    assert loss_cls == 400/3/2
+    assert loss_loc == 2 * 8/3/2
