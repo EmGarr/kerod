@@ -71,17 +71,6 @@ class Match(object):
         """
         return self._match_results
 
-    def matched_column_indices(self):
-        """Returns column indices that match to some row.
-
-        The indices returned by this op are always sorted in increasing order.
-
-        Returns:
-
-            *column_indices*: int32 tensor of shape [K] with column indices.
-        """
-        return self._reshape_and_cast(tf.where(tf.greater(self._match_results, -1)))
-
     def matched_column_indicator(self):
         """Returns column indices that are matched.
 
@@ -91,20 +80,6 @@ class Match(object):
         """
         return tf.greater_equal(self._match_results, 0)
 
-    def num_matched_columns(self):
-        """Returns number (int32 scalar tensor) of matched columns."""
-        return tf.size(self.matched_column_indices())
-
-    def unmatched_column_indices(self):
-        """Returns column indices that do not match any row.
-
-        The indices returned by this op are always sorted in increasing order.
-
-        Returns:
-
-        *column_indices*: int32 tensor of shape [K] with column indices.
-        """
-        return self._reshape_and_cast(tf.where(tf.equal(self._match_results, -1)))
 
     def unmatched_column_indicator(self):
         """Returns column indices that are unmatched.
@@ -114,68 +89,6 @@ class Match(object):
         *column_indices*: int32 tensor of shape [K] with column indices.
         """
         return tf.equal(self._match_results, -1)
-
-    def num_unmatched_columns(self):
-        """Returns number (int32 scalar tensor) of unmatched columns."""
-        return tf.size(self.unmatched_column_indices())
-
-    def ignored_column_indices(self):
-        """Returns column indices that are ignored (neither Matched nor Unmatched).
-
-        The indices returned by this op are always sorted in increasing order.
-
-        Returns:
-
-        *column_indices*: int32 tensor of shape [K] with column indices.
-        """
-        return self._reshape_and_cast(tf.where(self.ignored_column_indicator()))
-
-    def ignored_column_indicator(self):
-        """Returns boolean column indicator where True means the colum is ignored.
-
-        Returns:
-
-        *column_indicator*: boolean vector which is True for all ignored column
-        indices.
-        """
-        return tf.equal(self._match_results, -2)
-
-    def num_ignored_columns(self):
-        """Returns number (int32 scalar tensor) of matched columns."""
-        return tf.size(self.ignored_column_indices())
-
-    def unmatched_or_ignored_column_indices(self):
-        """Returns column indices that are unmatched or ignored.
-
-        The indices returned by this op are always sorted in increasing order.
-
-        Returns:
-
-        *column_indices*: int32 tensor of shape [K] with column indices.
-        """
-        return self._reshape_and_cast(tf.where(tf.greater(0, self._match_results)))
-
-    def matched_row_indices(self):
-        """Returns row indices that match some column.
-
-        The indices returned by this op are ordered so as to be in correspondence
-        with the output of matched_column_indicator().  For example if
-        self.matched_column_indicator() is [0,2], and self.matched_row_indices() is
-        [7, 3], then we know that column 0 was matched to row 7 and column 2 was
-        matched to row 3.
-
-        Returns:
-
-        *row_indices*: int32 tensor of shape [K] with row indices.
-        """
-        return self._reshape_and_cast(
-            tf.gather(tf.cast(self._match_results, dtype=tf.float32),
-                      self.matched_column_indices()))
-
-    def num_matched_rows(self):
-        """Returns number (int32 scalar tensor) of matched rows."""
-        unique_rows, _ = tf.unique(self.matched_row_indices())
-        return tf.size(unique_rows)
 
     def _reshape_and_cast(self, t):
         return tf.cast(tf.reshape(t, [-1]), tf.int32)
