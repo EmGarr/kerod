@@ -1,7 +1,9 @@
 from unittest import mock
 
 import numpy as np
+import pytest
 import tensorflow as tf
+from tensorflow.keras import backend as K
 
 from od.core.standard_fields import BoxField
 from od.model.detection.rpn import RegionProposalNetwork
@@ -14,7 +16,9 @@ def mocked_random_shuffle(indices):
     return indices
 
 
-def test_rpn():
+@pytest.mark.parametrize("float_type", ['float16', 'float32'])
+def test_rpn(float_type):
+    # K.set_floatx(float_type)
     rpn = RegionProposalNetwork()
     features = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20]]
     boxes = np.array([[-3.5, -3.5, 3.5, 3.5]])

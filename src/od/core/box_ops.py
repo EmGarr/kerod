@@ -19,7 +19,7 @@ def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: t
 
     Arguments:
 
-    - *normalized_boxes*:  A Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]. These
+    - *normalized_boxes*:  A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]. These
     boxes have already been normalized in the feature space. The coordinates are not in
     the input image space.
     - *tensor_shape*:
@@ -27,19 +27,22 @@ def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: t
 
     Returns:
 
-    A tensor of float32 and shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]
+    A tensor of shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]
     """
     y_min, x_min, y_max, x_max = tf.split(boxes, 4, axis=-1)
 
-    spacing_w = (x_max - x_min) / tf.cast(crop_shape[1], tf.float32)
-    spacing_h = (y_max - y_min) / tf.cast(crop_shape[0], tf.float32)
+    spacing_w = (x_max - x_min) / tf.cast(crop_shape[1], boxes.dtype)
+    spacing_h = (y_max - y_min) / tf.cast(crop_shape[0], boxes.dtype)
 
-    tensor_shape = [tf.cast(tensor_shape[0] - 1, tf.float32), tf.cast(tensor_shape[1] - 1, tf.float32)]
+    tensor_shape = [
+        tf.cast(tensor_shape[0] - 1, boxes.dtype),
+        tf.cast(tensor_shape[1] - 1, boxes.dtype)
+    ]
     ny0 = (y_min + spacing_h / 2 - 0.5) / tensor_shape[0]
     nx0 = (x_min + spacing_w / 2 - 0.5) / tensor_shape[1]
 
-    nw = spacing_w * tf.cast(crop_shape[1] - 1, tf.float32) / tensor_shape[1]
-    nh = spacing_h * tf.cast(crop_shape[0] - 1, tf.float32) / tensor_shape[0]
+    nw = spacing_w * tf.cast(crop_shape[1] - 1, boxes.dtype) / tensor_shape[1]
+    nh = spacing_h * tf.cast(crop_shape[0] - 1, boxes.dtype) / tensor_shape[0]
 
     return tf.concat([ny0, nx0, ny0 + nh, nx0 + nw], axis=1)
 
@@ -51,11 +54,11 @@ def convert_to_center_coordinates(boxes: tf.Tensor) -> tf.Tensor:
 
     Arguments:
 
-    - *boxes*: A Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes*: A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
 
     Returns:
 
-    A tensor of float32 and shape [N, ..., num_boxes, (ycenter, xcenter, height, width)]
+    A tensor of shape [N, ..., num_boxes, (ycenter, xcenter, height, width)]
     """
     y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=-1)
     width = x_max - x_min
@@ -70,11 +73,11 @@ def compute_area(boxes: tf.Tensor) -> tf.Tensor:
 
     Arguments:
 
-    - *boxes*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max_,x_max)]
+    - *boxes*: Tensor of shape [N, ..., (y_min,x_min,y_max_,x_max)]
 
     Returns:
 
-    A tensor of float32 and shape [N, ..., num_boxes]
+    A tensor of shape [N, ..., num_boxes]
     """
     with tf.name_scope('Area'):
         y_min, x_min, y_max, x_max = tf.split(value=boxes, num_or_size_splits=4, axis=-1)
@@ -86,8 +89,8 @@ def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
 
     Arguments:
 
-    - *boxes1*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
-    - *boxes2*: Tensor of float32 and shape [N, ..., (y_max,x_max,y_max,x_max)]
+    - *boxes1*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes2*: Tensor of shape [N, ..., (y_max,x_max,y_max,x_max)]
 
     Returns:
 
@@ -110,8 +113,8 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
 
     Arguments:
 
-    - *boxes1*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
-    - *boxes2*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes1*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes2*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
 
     Returns:
 
@@ -131,7 +134,7 @@ def normalize_box_coordinates(boxes, height: int, width: int):
 
     Arguments:
 
-    - *boxes*: Tensor of float32 and shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
     - *height*: An integer
     - *width*: An integer
     """

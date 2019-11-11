@@ -26,6 +26,7 @@ Note: matchers are used in TargetAssigners. There is a create_target_assigner
 factory function for popular implementations.
 """
 import tensorflow as tf
+from tensorflow.keras import backend as K
 
 from od.core import matcher
 
@@ -53,7 +54,7 @@ class ArgMaxMatcher(matcher.Matcher):
     def __init__(
             self,
             matched_threshold: float,
-            unmatched_threshold: float=None,
+            unmatched_threshold: float = None,
             negatives_lower_than_unmatched=True,
             force_match_for_each_row=False,
     ):
@@ -161,9 +162,10 @@ class ArgMaxMatcher(matcher.Matcher):
             if self._force_match_for_each_row:
                 similarity_matrix_shape = tf.shape(similarity_matrix)
                 force_match_column_ids = tf.argmax(similarity_matrix, 1, output_type=tf.int32)
-                force_match_column_indicators = (
-                    tf.one_hot(force_match_column_ids, depth=similarity_matrix_shape[1]) *
-                    tf.cast(tf.expand_dims(valid_rows, axis=-1), dtype=tf.float32))
+                force_match_column_indicators = (tf.one_hot(
+                    force_match_column_ids, depth=similarity_matrix_shape[1], dtype=K.floatx()) *
+                                                 tf.cast(tf.expand_dims(valid_rows, axis=-1),
+                                                         dtype=K.floatx()))
                 force_match_row_ids = tf.argmax(force_match_column_indicators,
                                                 0,
                                                 output_type=tf.int32)

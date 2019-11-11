@@ -1,5 +1,5 @@
 import tensorflow as tf
-import tensorflow.keras.layers as tfkl
+import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 
 from od.core.anchor_generator import generate_anchors
@@ -43,22 +43,21 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         self._anchor_strides = (4, 8, 16, 32, 64)
         self._anchor_ratios = anchor_ratios
-        self.rpn_conv2d = tfkl.Conv2D(
-            512, (3, 3),
-            padding='same',
-            kernel_initializer=self._kernel_initializer_classification_head,
-            kernel_regularizer=self._kernel_regularizer)
+        self.rpn_conv2d = KL.Conv2D(512, (3, 3),
+                                    padding='same',
+                                    kernel_initializer=self._kernel_initializer_classification_head,
+                                    kernel_regularizer=self._kernel_regularizer)
 
     def build_rpn_head(self, inputs):
         """Predictions for the classification and the regression
 
         Arguments:
 
-        - *inputs*: A tensor of float32 and shape [batch_size, width, height, channel]
+        - *inputs*: A tensor of  shape [batch_size, width, height, channel]
 
         Returns:
 
-        A tuple of tensors of float32 and shape ([batch_size, num_anchors, 2], [batch_size, num_anchors, 4])
+        A tuple of tensors of shape ([batch_size, num_anchors, 2], [batch_size, num_anchors, 4])
         """
 
         batch_size = tf.shape(inputs)[0]
@@ -94,9 +93,10 @@ class RegionProposalNetwork(AbstractDetectionHead):
         rpn_predictions = [self.build_rpn_head(tensor) for tensor in input_tensors]
         rpn_anchors = []
         for tensor, anchor_stride in zip(input_tensors, self._anchor_strides):
-            anchors = generate_anchors(anchor_stride, tf.constant([8], tf.float32),
-                                       tf.constant(self._anchor_ratios, tf.float32),
+            anchors = generate_anchors(anchor_stride, tf.constant([8], tensor.dtype),
+                                       tf.constant(self._anchor_ratios, tensor.dtype),
                                        tf.shape(tensor))
+            # TODO clipping to investigate
             rpn_anchors.append(anchors)
         localization_pred = tf.concat([prediction[1] for prediction in rpn_predictions], 1)
         classification_pred = tf.concat([prediction[0] for prediction in rpn_predictions], 1)
@@ -133,10 +133,12 @@ class RegionProposalNetwork(AbstractDetectionHead):
         # y_true[LossField.CLASSIFICATION] is a [batch_size, num_anchors, 1]
         labels = tf.cast(y_true[LossField.CLASSIFICATION][:, :, 0], dtype=bool)
 
-        sample_idx = batch_sample_balanced_positive_negative(weights[LossField.CLASSIFICATION],
-                                                             SAMPLING_SIZE,
-                                                             labels,
-                                                             positive_fraction=SAMPLING_POSITIVE_RATIO)
+        sample_idx = batch_sample_balanced_positive_negative(
+            weights[LossField.CLASSIFICATION],
+            SAMPLING_SIZE,
+            labels,
+            positive_fraction=SAMPLING_POSITIVE_RATIO,
+            dtype=localization_pred.dtype)
         # Create one_hot encoding [batch_size, num_anchors, 1] -> [batch_size, num_anchors, 2]
         y_true[LossField.CLASSIFICATION] = tf.one_hot(tf.cast(
             y_true[LossField.CLASSIFICATION][:, :, 0], tf.int32),

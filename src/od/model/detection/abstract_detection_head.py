@@ -1,12 +1,13 @@
-import tensorflow as tf
-import tensorflow.keras.layers as tfkl
-from od.core.standard_fields import LossField
 from typing import Dict
-from tensorflow.keras import regularizers
-from tensorflow.keras import initializers
+
+import tensorflow as tf
+import tensorflow.keras.layers as KL
+from tensorflow.keras import initializers, regularizers
+
+from od.core.standard_fields import LossField
 
 
-class AbstractDetectionHead(tfkl.Layer):
+class AbstractDetectionHead(KL.Layer):
     """Abstract object detector. It encapsulates the main functions of an object detector.
         The build of the detection head, the segmentation head, the post_processing.
 
@@ -65,14 +66,14 @@ class AbstractDetectionHead(tfkl.Layer):
         else:
             self._kernel_regularizer = regularizers.get()
 
-        self._conv_classification_head = tfkl.Conv2D(
+        self._conv_classification_head = KL.Conv2D(
             multiples * self._num_classes, (1, 1),
             padding='valid',
             activation=None,
             kernel_initializer=self._kernel_initializer_classification_head,
             kernel_regularizer=self._kernel_regularizer,
             name=f'{self.name}classification_head')
-        self._conv_box_prediction_head = tfkl.Conv2D(
+        self._conv_box_prediction_head = KL.Conv2D(
             (self._num_classes - 1) * multiples * 4, (1, 1),
             padding='valid',
             activation=None,
@@ -85,25 +86,25 @@ class AbstractDetectionHead(tfkl.Layer):
 
         Arguments:
 
-        - *inputs*: A tensor of type float32 and shape [N, H, W, C]
+        - *inputs*: A tensor of  shape [N, H, W, C]
                 num_convs:
         - *dim*: Default to 256. Is the channel size
 
         Returns:
 
-        A tensor of float32 and shape [N, H*2, W*2, num_classes - 1]
+        A tensor and shape [N, H*2, W*2, num_classes - 1]
         """
 
         layer = inputs
         for _ in range(num_convs):
-            layer = tfkl.Conv2D(dim, (3, 3),
+            layer = KL.Conv2D(dim, (3, 3),
                                 padding='valid',
                                 activation='relu',
                                 kernel_initializer=initializers.VarianceScaling(scale=2.,
                                                                                 mode='fan_out'),
                                 kernel_regularizer=self._kernel_regularizer)(layer)
 
-        layer = tfkl.Conv2DTranspose(dim, (2, 2),
+        layer = KL.Conv2DTranspose(dim, (2, 2),
                                      strides=(2, 2),
                                      padding='valid',
                                      activation='relu',
@@ -111,7 +112,7 @@ class AbstractDetectionHead(tfkl.Layer):
                                          scale=2., mode='fan_out'),
                                      kernel_regularizer=self._kernel_regularizer)(layer)
 
-        return tfkl.Conv2D(self._num_classes, (3, 3),
+        return KL.Conv2D(self._num_classes, (3, 3),
                            padding='valid',
                            activation='relu',
                            kernel_initializer=initializers.VarianceScaling(scale=2.,
@@ -123,7 +124,7 @@ class AbstractDetectionHead(tfkl.Layer):
 
         Arguments:
 
-        - *inputs*: A tensor of float32 and shape [batch_size, H, W, C]
+        - *inputs*: A tensor of shape [batch_size, H, W, C]
         """
         classification_head = self._conv_classification_head(inputs)
 
@@ -138,14 +139,14 @@ class AbstractDetectionHead(tfkl.Layer):
 
         Arguments:
 
-        - *y_pred*: A dict of tensors of type float32 and shape [N, nb_boxes, num_output].
-        - *y_true*: A dict of tensors of type float32 and shape [N, nb_boxes, num_output].
-        - *weights*: A dict of tensors of type float32 and shape [N, nb_boxes, num_output].
+        - *y_pred*: A dict of tensors of shape [N, nb_boxes, num_output].
+        - *y_true*: A dict of tensors of shape [N, nb_boxes, num_output].
+        - *weights*: A dict of tensors ofshape [N, nb_boxes, num_output].
                 This tensor is composed of one hot vectors.
 
         Returns:
 
-        A scalar of type float32
+        A scalar
         """
 
         def _compute_loss(loss, loss_weight, target):

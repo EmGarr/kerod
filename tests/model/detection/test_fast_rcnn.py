@@ -3,6 +3,7 @@ from unittest import mock
 import numpy as np
 import pytest
 import tensorflow as tf
+import tensorflow.keras.backend as K
 
 from od.core.standard_fields import BoxField, LossField
 from od.model.detection.fast_rcnn import FastRCNN

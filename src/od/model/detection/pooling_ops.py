@@ -1,5 +1,6 @@
 import tensorflow as tf
-import tensorflow.keras.layers as tfkl
+import tensorflow.keras.layers as KL
+from tensorflow.keras import backend as K
 
 from od.core.box_ops import (compute_area, normalize_box_coordinates, transform_fpcoor_for_tf)
 
@@ -48,7 +49,7 @@ def _crop_and_resize(tensor, boxes, box_indices, crop_size: int, pad_border=True
     boxes = transform_fpcoor_for_tf(boxes, tensor_shape, [crop_size, crop_size])
 
     ret = tf.image.crop_and_resize(image,
-                                   boxes,
+                                   tf.cast(boxes, tf.float32), # crop and resize needs float32
                                    tf.cast(box_indices, tf.int32),
                                    crop_size=[crop_size, crop_size])
     return ret
@@ -85,7 +86,7 @@ def roi_align(inputs, boxes, box_indices, image_shape, crop_size: int):
     """
     normalized_boxes = normalize_box_coordinates(boxes, image_shape[0], image_shape[1])
     ret = _crop_and_resize(inputs, normalized_boxes, box_indices, crop_size * 2)
-    return tfkl.AveragePooling2D(padding='same')(ret)
+    return KL.AveragePooling2D(padding='same')(ret)
 
 
 def multilevel_roi_align(inputs, boxes, image_shape, crop_size: int = 7):
@@ -93,15 +94,15 @@ def multilevel_roi_align(inputs, boxes, image_shape, crop_size: int = 7):
 
     Arguments:
 
-    - *inputs*: A list of tensors of type tf.float32 and shape [batch_size, width, height, channel]
+    - *inputs*: A list of tensors of shape [batch_size, width, height, channel]
             representing the pyramid.
-    - *boxes*: A tensor of type tf.float32 and shape [batch_size, num_boxes, (y1, x1, y2, x2)]
+    - *boxes*: A tensor  and shape [batch_size, num_boxes, (y1, x1, y2, x2)]
 
     - *image_shape*: A tuple with the height and the width of the original image input image
 
     Returns:
 
-    A tensor of type tf.float32 and shape [batch_size * num_boxes, 7, 7, channel]
+    A tensor and shape [batch_size * num_boxes, 7, 7, channel]
     """
     boxes_per_level, box_indices_per_level, pos_per_level = match_boxes_to_their_pyramid_level(
         boxes, len(inputs))
@@ -125,7 +126,7 @@ def match_boxes_to_their_pyramid_level(boxes, num_level):
 
     Arguments:
 
-    - *boxes*: A tensor of type tf.float32 and shape [batch_size, num_boxes, 4]
+    - *boxes*: A tensor of shape [batch_size, num_boxes, 4]
     - *num_level*: Number of level of the target pyramid
 
     Returns:
@@ -158,7 +159,7 @@ def assign_pyramid_level_to_boxes(boxes, num_level, level_target=2):
 
     Arguments:
 
-    - *boxes*: A tensor of type float32 and shape
+    - *boxes*: A tensor of shape
             [nb_batches * nb_boxes, 4]
     - *num_level*: Assign all the boxes mapped to a superior level to the num_level.
         level_target: Will affect all the boxes of area 224^2 to the level_target of the pyramid.
@@ -169,9 +170,11 @@ def assign_pyramid_level_to_boxes(boxes, num_level, level_target=2):
     corresponding to the target level of the pyramid.
     """
 
+    denominator = tf.constant(224, dtype=boxes.dtype)
     area = compute_area(boxes)
-    k = level_target + tf.math.log(tf.sqrt(area) / 224 + 1e-6) * 1. / tf.math.log(2.0)
-    k = tf.clip_by_value(k, 0, num_level - 1)
+    k = level_target + tf.math.log(tf.sqrt(area) / denominator + K.epsilon()) * tf.cast(
+        1. / tf.math.log(2.0), dtype=boxes.dtype)
     k = tf.cast(k, tf.int32)
+    k = tf.clip_by_value(k, 0, num_level - 1)
     k = tf.reshape(k, [-1])
     return k

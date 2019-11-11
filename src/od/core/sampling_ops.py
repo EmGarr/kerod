@@ -30,6 +30,7 @@ when number of examples set to True in indicator is less than sample_size.
 """
 
 import tensorflow as tf
+
 from od.utils import ops
 
 
@@ -104,7 +105,11 @@ def sample_balanced_positive_negative(indicator, sample_size, labels, positive_f
     return tf.logical_or(sampled_pos_idx, sampled_neg_idx)
 
 
-def batch_sample_balanced_positive_negative(indicators, sample_size, labels, positive_fraction=0.5):
+def batch_sample_balanced_positive_negative(indicators,
+                                            sample_size,
+                                            labels,
+                                            positive_fraction=0.5,
+                                            dtype=tf.float32):
     """Subsamples minibatches to a desired balance of positives and negatives.
 
     Arguments:
@@ -130,8 +135,8 @@ def batch_sample_balanced_positive_negative(indicators, sample_size, labels, pos
                                                  tf.cast(targets, tf.bool),
                                                  positive_fraction=positive_fraction)
 
-    return tf.cast(
-        tf.map_fn(_minibatch_subsample_fn, [indicators, labels],
-                  dtype=tf.bool,
-                  parallel_iterations=16,
-                  back_prop=True), tf.float32)
+    return tf.cast(tf.map_fn(_minibatch_subsample_fn, [indicators, labels],
+                             dtype=tf.bool,
+                             parallel_iterations=16,
+                             back_prop=True),
+                   dtype=dtype)

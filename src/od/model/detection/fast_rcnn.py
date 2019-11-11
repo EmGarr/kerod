@@ -2,7 +2,7 @@ from typing import List
 
 import gin
 import tensorflow as tf
-import tensorflow.keras.layers as tfkl
+import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 
 from od.core.argmax_matcher import ArgMaxMatcher
@@ -39,7 +39,7 @@ class FastRCNN(AbstractDetectionHead):
             **kwargs)
 
         self.denses = [
-            tfkl.Dense(1024, kernel_initializer=initializers.VarianceScaling(), activation='relu')
+            KL.Dense(1024, kernel_initializer=initializers.VarianceScaling(), activation='relu')
             for _ in range(2)
         ]
 
@@ -54,7 +54,7 @@ class FastRCNN(AbstractDetectionHead):
         # Remove P6
         pyramid = pyramid[:-1]
         boxe_tensors = multilevel_roi_align(pyramid, boxes, image_shape, crop_size=7)
-        l = tfkl.Flatten()(boxe_tensors)
+        l = KL.Flatten()(boxe_tensors)
         for dense in self.denses:
             l = dense(l)
 
@@ -83,7 +83,7 @@ class FastRCNN(AbstractDetectionHead):
 
         Arguments:
 
-        - *batch_boxes*: A tensor of float32 and shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+        - *batch_boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
         - *ground_truths*: A list of dict objects with length batch_size
         representing groundtruth boxes for each image in the batch and their labels, weights
         - *sampling_size*: Desired sampling size. If None, keeps all positive samples and
@@ -120,7 +120,7 @@ class FastRCNN(AbstractDetectionHead):
             raise ValueError(f'Length of boxes is {len(boxes)} and length of ground_truths is '
                              f'{len(ground_truths)} should be the same.')
 
-        unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], tf.float32)
+        unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], batch_boxes.dtype)
         y_true, weights, _ = batch_assign_targets(self.target_assigner, boxes, ground_truths,
                                                   unmatched_class_label)
 
@@ -133,7 +133,8 @@ class FastRCNN(AbstractDetectionHead):
             weights[LossField.CLASSIFICATION],
             sampling_size,
             labels,
-            positive_fraction=sampling_positive_ratio)
+            positive_fraction=sampling_positive_ratio,
+            dtype=batch_boxes.dtype)
 
         weights[LossField.CLASSIFICATION] = tf.multiply(sample_idx,
                                                         weights[LossField.CLASSIFICATION])
@@ -171,15 +172,15 @@ class FastRCNN(AbstractDetectionHead):
         - *weights*: A dict with:
             - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors, num_classes]
             - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors]
-        - *classification_pred*: A tensorf of float32 and shape
+        - *classification_pred*: A tensor and shape
         [batch_size, num_anchors, num_classes]
-        - *localization_pred*: A tensorf of float32 and shape
+        - *localization_pred*: A tensor and shape
         [batch_size, num_anchors, (num_classes - 1) * 4]
 
         Returns:
 
-        - *classification_loss*: A scalar in tf.float32
-        - *localization_loss*: A scalar in tf.float32
+        - *classification_loss*: A scalar
+        - *localization_loss*: A scalar
         """
 
         # y_true[LossField.CLASSIFICATION] is just 1 and 0 we are using it as mask to extract

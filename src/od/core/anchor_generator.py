@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.keras import backend as K
 
 
 def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, tensor_shape: list):
@@ -15,12 +16,12 @@ def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, tensor_s
 
     Returns:
 
-    A tensor of float32 and shape [num_scales * num_ratios * height * width, 4].
+    A tensor of shape [num_scales * num_ratios * height * width, 4].
     The anchors have the format [y_min, x_min, y_max, x_max].
 
     """
     _, tensor_height, tensor_width, _ = tensor_shape
-    ratios_grid,  scales_grid = tf.meshgrid(ratios, scales)
+    ratios_grid, scales_grid = tf.meshgrid(ratios, scales)
     scales = tf.reshape(scales_grid, [-1])
     ratios = tf.reshape(ratios_grid, [-1])
 
@@ -29,8 +30,8 @@ def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, tensor_s
     heights = ratios * widths
     base_anchors = tf.stack([-widths, -heights, widths, heights], axis=1) * 0.5
 
-    y_centers = tf.cast(tf.range(tensor_height), dtype=tf.float32) * stride
-    x_centers = tf.cast(tf.range(tensor_width), dtype=tf.float32) * stride
+    y_centers = tf.cast(tf.range(tensor_height), dtype=scales.dtype) * stride
+    x_centers = tf.cast(tf.range(tensor_width), dtype=scales.dtype) * stride
     x_centers, y_centers = tf.meshgrid(x_centers, y_centers)
     x_centers = tf.reshape(x_centers, [-1])
     y_centers = tf.reshape(y_centers, [-1])

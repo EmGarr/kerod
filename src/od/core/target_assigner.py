@@ -34,6 +34,7 @@ images must be handled externally.
 from typing import List, Callable
 
 import tensorflow as tf
+from tensorflow.keras import backend as K
 
 from od.core import matcher as mat
 from od.core.standard_fields import BoxField, LossField
@@ -90,7 +91,7 @@ class TargetAssigner(object):
 
         - *anchors*: a dict representing N anchors
         - *groundtruth_boxes*: a dict representing M groundtruth boxes
-        - *unmatched_class_label*: a float32 tensor with shape [d_1, d_2, ..., d_k]
+        - *unmatched_class_label*: A tensor of shape [d_1, d_2, ..., d_k]
             which is consistent with the classification target for each
             anchor (and can be empty for scalar targets).  This shape must thus be
             compatible with the groundtruth labels that are passed to the "assign"
@@ -99,13 +100,13 @@ class TargetAssigner(object):
 
         Returns:
 
-        - cls_targets: a float32 tensor with shape [num_anchors, d_1, d_2 ... d_k],
+        - cls_targets: A tensor of shape [num_anchors, d_1, d_2 ... d_k],
             where the subshape [d_1, ..., d_k] is compatible with groundtruth_labels
             which has shape [num_gt_boxes, d_1, d_2, ... d_k].
-        - cls_weights: a float32 tensor with shape [num_anchors],
+        - cls_weights: A tensor with shape [num_anchors],
             representing weights for each anchors.
-        - reg_targets: a float32 tensor with shape [num_anchors, box_code_dimension]
-        - reg_weights: a float32 tensor with shape [num_anchors]
+        - reg_targets: A tensor with shape [num_anchors, box_code_dimension]
+        - reg_weights: A tensor with shape [num_anchors]
         - match: an int32 tensor of shape [num_anchors] containing result of anchor
         groundtruth_boxes matching. Each position in the tensor indicates an anchor
             and holds the following meaning:
@@ -116,18 +117,18 @@ class TargetAssigner(object):
         """
 
         if unmatched_class_label is None:
-            unmatched_class_label = tf.constant([0], tf.float32)
+            unmatched_class_label = tf.constant([0], K.floatx())
 
         num_gt_boxes = tf.shape(groundtruth_boxes[BoxField.BOXES])[0]
 
         groundtruth_labels = groundtruth_boxes.get(BoxField.LABELS)
         if groundtruth_labels is None:
-            groundtruth_labels = tf.ones(tf.expand_dims(num_gt_boxes, 0))
+            groundtruth_labels = tf.ones(tf.expand_dims(num_gt_boxes, 0), dtype=K.floatx())
             groundtruth_labels = tf.expand_dims(groundtruth_labels, -1)
 
         groundtruth_weights = groundtruth_boxes.get(BoxField.WEIGHTS)
         if groundtruth_weights is None:
-            groundtruth_weights = tf.ones([num_gt_boxes], dtype=tf.float32)
+            groundtruth_weights = tf.ones([num_gt_boxes], dtype=K.floatx())
 
         # set scores on the gt boxes
         scores = 1 - groundtruth_labels[:, 0]
@@ -186,14 +187,15 @@ class TargetAssigner(object):
         *reg_targets*: a float32 tensor with shape [N, box_code_dimension]
         """
         matched_gt_boxes = match.gather_based_on_match(groundtruth_boxes[BoxField.BOXES],
-                                                       unmatched_value=tf.zeros(4),
-                                                       ignored_value=tf.zeros(4))
+                                                       unmatched_value=tf.zeros(4,
+                                                                                dtype=K.floatx()),
+                                                       ignored_value=tf.zeros(4, dtype=K.floatx()))
 
         matched_reg_targets = self._box_encoder(matched_gt_boxes, anchors[BoxField.BOXES])
         match_results_shape = tf.shape(match.match_results)
 
         # Zero out the unmatched and ignored regression targets.
-        unmatched_ignored_reg_targets = tf.tile(tf.constant([4 * [0]], tf.float32),
+        unmatched_ignored_reg_targets = tf.tile(tf.constant([4 * [0]], K.floatx()),
                                                 [match_results_shape[0], 1])
         matched_anchors_mask = tf.expand_dims(match.matched_column_indicator(), axis=-1)
         reg_targets = tf.where(matched_anchors_mask,
@@ -213,7 +215,7 @@ class TargetAssigner(object):
         - *groundtruth_labels*:  a tensor of shape [num_gt_boxes, d_1, ... d_k]
             with labels for each of the ground_truth boxes. The subshape
             [d_1, ... d_k] can be empty (corresponding to scalar labels).
-        - *unmatched_class_label*: a float32 tensor with shape [d_1, d_2, ..., d_k]
+        - *unmatched_class_label*: A tensor of shape [d_1, d_2, ..., d_k]
             which is consistent with the classification target for each
             anchor (and can be empty for scalar targets).  This shape must thus be
             compatible with the groundtruth labels that are passed to the "assign"
@@ -223,7 +225,7 @@ class TargetAssigner(object):
 
         Returns:
 
-        A float32 tensor with shape [num_anchors, d_1, d_2 ... d_k], where the
+        A tensor of shape [num_anchors, d_1, d_2 ... d_k], where the
         subshape [d_1, ..., d_k] is compatible with groundtruth_labels which has
         shape [num_gt_boxes, d_1, d_2, ... d_k].
         """
@@ -247,11 +249,11 @@ class TargetAssigner(object):
 
         Returns:
 
-        A float32 tensor with shape [num_anchors] representing regression weights.
+        A tensor of shape [num_anchors] representing regression weights.
         """
         return match.gather_based_on_match(groundtruth_weights,
-                                           ignored_value=0.,
-                                           unmatched_value=0.)
+                                           ignored_value=tf.constant(0, groundtruth_weights.dtype),
+                                           unmatched_value=tf.constant(0, groundtruth_weights.dtype))
 
     def _create_classification_weights(self, match: mat.Matcher, groundtruth_weights: tf.Tensor):
         """Create classification weights for each anchor.
@@ -272,12 +274,14 @@ class TargetAssigner(object):
 
         Returns:
 
-        1 float32 tensor with shape [num_anchors] representing classification
+        A tensor of shape [num_anchors] representing classification
         weights.
         """
         return match.gather_based_on_match(groundtruth_weights,
-                                           ignored_value=0.,
-                                           unmatched_value=self._negative_class_weight)
+                                           ignored_value=tf.constant(
+                                               0, dtype=groundtruth_weights.dtype),
+                                           unmatched_value=tf.cast(self._negative_class_weight,
+                                                                   dtype=groundtruth_weights.dtype))
 
 
 def batch_assign_targets(target_assigner: TargetAssigner,
@@ -293,7 +297,7 @@ def batch_assign_targets(target_assigner: TargetAssigner,
         with length batch_size representing anchor sets.
     - *gt_box_batch*: a list of dict objects with length batch_size
         representing groundtruth boxes for each image in the batch and their labels, weights
-    - *unmatched_class_label*: a float32 tensor with shape [d_1, d_2, ..., d_k]
+    - *unmatched_class_label*: A tensor of shape [d_1, d_2, ..., d_k]
         which is consistent with the classification target for each
         anchor (and can be empty for scalar y_true).  This shape must thus be
         compatible with the groundtruth labels that are passed to the "assign"

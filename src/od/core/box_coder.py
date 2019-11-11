@@ -78,7 +78,7 @@ def decode_boxes_faster_rcnn(rel_codes, anchors, scale_factors=(10.0, 10.0, 5.0,
     Arguments:
 
     - *rel_codes*: a tensor representing N anchor-encoded boxes.
-    - *anchors*: Tensor of float32 and shape [N, ..., (y_max,x_max,y2,x2)].
+    - *anchors*: Tensor of shape [N, ..., (y_max,x_max,y2,x2)].
 
     Returns:
 
