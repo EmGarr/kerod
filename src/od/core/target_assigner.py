@@ -284,7 +284,7 @@ def batch_assign_targets(target_assigner: TargetAssigner,
                          anchors_batch: List[dict],
                          gt_box_batch: List[dict],
                          unmatched_class_label=None):
-    """Batched assignment of classification and regression targets.
+    """Batched assignment of classification and regression y_true.
 
     Arguments:
 
@@ -295,22 +295,22 @@ def batch_assign_targets(target_assigner: TargetAssigner,
         representing groundtruth boxes for each image in the batch and their labels, weights
     - *unmatched_class_label*: a float32 tensor with shape [d_1, d_2, ..., d_k]
         which is consistent with the classification target for each
-        anchor (and can be empty for scalar targets).  This shape must thus be
+        anchor (and can be empty for scalar y_true).  This shape must thus be
         compatible with the groundtruth labels that are passed to the "assign"
         function (which have shape [num_gt_boxes, d_1, d_2, ..., d_k]).
 
     Returns:
 
-    - *targets*: A dict with :
+    - *y_true*: A dict with :
         - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
         num_classes],
         - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors,
         box_code_dimension]
 
     - *weights*: A dict with:
-        * *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
+        - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
         num_classes],
-        * *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors],
+        - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors],
 
     - *match*: an int32 tensor of shape [batch_size, num_anchors] containing result
         of anchor groundtruth matching. Each position in the tensor indicates an
@@ -352,7 +352,7 @@ def batch_assign_targets(target_assigner: TargetAssigner,
     reg_weights = tf.stack(reg_weights_list)
     match = tf.stack(match_list)
 
-    targets = {LossField.CLASSIFICATION: cls_targets, LossField.LOCALIZATION: reg_targets}
+    y_true = {LossField.CLASSIFICATION: cls_targets, LossField.LOCALIZATION: reg_targets}
     weights = {LossField.CLASSIFICATION: cls_weights, LossField.LOCALIZATION: reg_weights}
 
-    return targets, weights, match
+    return y_true, weights, match
