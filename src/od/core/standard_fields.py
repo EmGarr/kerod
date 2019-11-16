@@ -1,10 +1,7 @@
-from enum import Enum
-
-
 class BoxField():
-    BOXES = 'boxes'
+    BOXES = 'bbox'
     KEYPOINTS = 'keypoints'
-    LABELS = 'labels'
+    LABELS = 'label'
     MASKS = 'masks'
     NUM_BOXES = 'num_boxes'
     SCORES = 'scores'

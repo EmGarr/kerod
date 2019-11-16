@@ -78,11 +78,14 @@ def decode_boxes_faster_rcnn(rel_codes, anchors, scale_factors=(10.0, 10.0, 5.0,
     Arguments:
 
     - *rel_codes*: a tensor representing N anchor-encoded boxes.
-    - *anchors*: Tensor of shape [N, ..., (y_max,x_max,y2,x2)].
+    - *anchors*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)].
+    - *scale_factors*: List of 4 positive scalars to scale ty, tx, th and tw.
+        If set to None, does not perform scaling. For Faster RCNN,
+        the open-source implementation recommends using [10.0, 10.0, 5.0, 5.0].
 
     Returns:
 
-    - *boxes*: BoxList holding N bounding boxes.
+    - *boxes*: A Tensor of shape [N, ..., (y_max,x_max,y2,x2)].
     """
     anchors = box_ops.convert_to_center_coordinates(anchors)
     ycenter_a, xcenter_a, ha, wa = tf.split(value=anchors, num_or_size_splits=4, axis=-1)

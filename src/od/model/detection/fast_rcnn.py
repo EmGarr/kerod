@@ -14,6 +14,7 @@ from od.core.standard_fields import BoxField, LossField
 from od.core.target_assigner import TargetAssigner, batch_assign_targets
 from od.model.detection.abstract_detection_head import AbstractDetectionHead
 from od.model.detection.pooling_ops import multilevel_roi_align
+from od.model.post_processing import post_process_fast_rcnn_boxes
 
 
 class FastRCNN(AbstractDetectionHead):
@@ -27,7 +28,9 @@ class FastRCNN(AbstractDetectionHead):
 
     def __init__(self, num_classes, **kwargs):
         matcher = ArgMaxMatcher(0.5)
-        target_assigner = TargetAssigner(compute_iou, matcher, encode_boxes_faster_rcnn)
+        target_assigner = TargetAssigner(compute_iou,
+                                         matcher,
+                                         encode_boxes_faster_rcnn)
 
         super().__init__(
             num_classes,
@@ -45,31 +48,34 @@ class FastRCNN(AbstractDetectionHead):
 
     def call(self, inputs, training=None):
         if training:
-            pyramid, boxes, image_shape, ground_truths = inputs
-            y_true, weights = self.sample_boxes(boxes, ground_truths)
-            boxes = y_true[LossField.LOCALIZATION]
+            pyramid, anchors, image_shape, image_information, ground_truths = inputs
+            y_true, weights = self.sample_boxes(anchors, ground_truths)
+            anchors = y_true[LossField.LOCALIZATION]
         else:
-            pyramid, boxes, image_shape = inputs
+            pyramid, anchors, image_shape, image_information = inputs
 
         # Remove P6
         pyramid = pyramid[:-1]
-        boxe_tensors = multilevel_roi_align(pyramid, boxes, image_shape, crop_size=7)
+        boxe_tensors = multilevel_roi_align(pyramid, anchors, image_shape, crop_size=7)
         l = KL.Flatten()(boxe_tensors)
         for dense in self.denses:
             l = dense(l)
 
-        classification_head, localization_head = self.build_detection_head(
+        classification_pred, localization_pred = self.build_detection_head(
             tf.reshape(l, (-1, 1, 1, 1024)))
-        batch_size = tf.shape(boxes)[0]
-        classification_head = tf.reshape(classification_head, (batch_size, -1, self._num_classes))
-        localization_head = tf.reshape(localization_head,
+        batch_size = tf.shape(anchors)[0]
+        classification_pred = tf.reshape(classification_pred, (batch_size, -1, self._num_classes))
+        localization_pred = tf.reshape(localization_pred,
                                        (batch_size, -1, (self._num_classes - 1) * 4))
 
         if training:
-            losses = self.compute_loss(y_true, weights, classification_head, localization_head)
+            losses = self.compute_loss(y_true, weights, classification_pred, localization_pred)
             self.add_loss(losses)
 
-        return classification_head, localization_head
+        classification_pred = tf.nn.softmax(classification_pred)
+
+        return post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
+                                        image_information, self._num_classes)
 
     @gin.configurable()
     def sample_boxes(self,
@@ -77,15 +83,15 @@ class FastRCNN(AbstractDetectionHead):
                      ground_truths: List[dict],
                      sampling_size: int = 512,
                      sampling_positive_ratio: float = 0.25):
-        """Perform the sampling of the target boxes. During the training a set of RoIs is
+        """Perform the sampling of the target anchors. During the training a set of RoIs is
         detected by the RPN. However, you do not want to analyse all the set. You only want
-        to analyse the boxes that you sampled with this method.
+        to analyse the anchors that you sampled with this method.
 
         Arguments:
 
         - *batch_boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
         - *ground_truths*: A list of dict objects with length batch_size
-        representing groundtruth boxes for each image in the batch and their labels, weights
+        representing groundtruth anchors for each image in the batch and their labels, weights
         - *sampling_size*: Desired sampling size. If None, keeps all positive samples and
         randomly selects negative samples so that the positive sample fraction
         matches positive_fraction.
@@ -107,25 +113,25 @@ class FastRCNN(AbstractDetectionHead):
 
         Raises:
 
-        - *ValueError*: If your sampling size is superior to the number of boxes in input.
-        - *ValueError*: If the batch_size between your ground_truths and the boxes does not match.
+        - *ValueError*: If your sampling size is superior to the number of anchors in input.
+        - *ValueError*: If the batch_size between your ground_truths and the anchors does not match.
         """
-        boxes = [{BoxField.BOXES: boxes} for boxes in tf.unstack(batch_boxes)]
+        anchors = [{BoxField.BOXES: anchors} for anchors in tf.unstack(batch_boxes)]
 
         if tf.shape(batch_boxes)[1] < sampling_size:
             raise ValueError('Your sampling size should be inferior or equal to the number '
-                             'of boxes in input. Inspect the num_boxes dimension for batch_boxes'
+                             'of anchors in input. Inspect the num_boxes dimension for batch_boxes'
                              'with [batch_size, num_boxes, 4]')
-        if len(boxes) != len(ground_truths):
-            raise ValueError(f'Length of boxes is {len(boxes)} and length of ground_truths is '
+        if len(anchors) != len(ground_truths):
+            raise ValueError(f'Length of anchors is {len(anchors)} and length of ground_truths is '
                              f'{len(ground_truths)} should be the same.')
 
         unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], batch_boxes.dtype)
-        y_true, weights, _ = batch_assign_targets(self.target_assigner, boxes, ground_truths,
+        y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths,
                                                   unmatched_class_label)
 
         # Here we have a tensor of shape [batch_size, num_anchors, num_classes]. We want
-        # to know all the foreground boxes for sampling.
+        # to know all the foreground anchors for sampling.
         # [0, 0, 0, 1] -> [1]
         # [1, 0, 0, 0] -> [0]
         labels = tf.logical_not(tf.cast(y_true[LossField.CLASSIFICATION][:, :, 0], dtype=bool))
@@ -144,7 +150,7 @@ class FastRCNN(AbstractDetectionHead):
 
         batch_size = tf.shape(sample_idx)[0]
 
-        # Extract the selected boxes corresponding boxes
+        # Extract the selected anchors corresponding anchors
         # tf.gather_nd collaps the batch_together so we reshape with the proper batch_size
         y_true[LossField.LOCALIZATION] = tf.reshape(
             tf.gather_nd(y_true[LossField.LOCALIZATION], selected_boxes_idx), (batch_size, -1, 4))
@@ -184,7 +190,7 @@ class FastRCNN(AbstractDetectionHead):
         """
 
         # y_true[LossField.CLASSIFICATION] is just 1 and 0 we are using it as mask to extract
-        # the corresponding target boxes
+        # the corresponding target anchors
         batch_size = tf.shape(classification_pred)[0]
         targets = tf.reshape(y_true[LossField.CLASSIFICATION], [-1])
 

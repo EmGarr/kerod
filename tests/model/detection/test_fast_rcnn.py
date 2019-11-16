@@ -23,6 +23,8 @@ def test_fast_rcnn_full_inference_and_training():
     boxes = tf.constant([boxes, boxes], tf.float32)
     image_shape = (800., 800.)
 
+    image_information = [[800., 700.], [700., 800.]]
+
     ground_truths = [{
         BoxField.BOXES: tf.constant([[0, 0, 1, 1], [0, 0, 2, 2]], tf.float32),
         BoxField.LABELS: tf.constant([[0, 0, 1], [0, 1, 0]], tf.float32),
@@ -35,8 +37,8 @@ def test_fast_rcnn_full_inference_and_training():
     num_classes = 3
     fast_rcnn = FastRCNN(num_classes)
 
-    fast_rcnn([pyramid, boxes, image_shape, ground_truths], training=True)
-    fast_rcnn([pyramid, boxes, image_shape])
+    fast_rcnn([pyramid, boxes, image_shape, image_information, ground_truths], training=True)
+    fast_rcnn([pyramid, boxes, image_shape, image_information])
 
 
 @mock.patch('tensorflow.random.shuffle')
@@ -147,5 +149,6 @@ def test_fast_rcnn_compute_loss():
     loss_cls, loss_loc = fast_rcnn.compute_loss(y_true, weights, classification_pred,
                                                 localization_pred)
 
-    assert loss_cls == 400/3/2
-    assert loss_loc == 2 * 8/3/2
+    assert loss_cls == 400 / 3 / 2
+    assert loss_loc == 2 * 8 / 3 / 2
+

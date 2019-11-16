@@ -25,7 +25,7 @@ def test_transform_fpcoor_for_tf():
 def test_convert_to_center_coordinates():
     boxes = tf.constant([[10.0, 10.0, 20.0, 15.0], [0.2, 0.1, 0.5, 0.4]])
     centers_sizes = box_ops.convert_to_center_coordinates(boxes)
-    expected_centers_sizes = np.array([[15, 12.5, 10,5 ], [0.35, 0.25, 0.3, 0.3]])
+    expected_centers_sizes = np.array([[15, 12.5, 10, 5], [0.35, 0.25, 0.3, 0.3]])
     np.testing.assert_allclose(centers_sizes, expected_centers_sizes)
 
 
@@ -62,3 +62,13 @@ def test_compute_iou_works_on_empty_inputs():
     np.testing.assert_array_equal(iou_empty_1.shape, (2, 0))
     np.testing.assert_array_equal(iou_empty_2.shape, (0, 3))
     np.testing.assert_array_equal(iou_empty_3.shape, (0, 0))
+
+
+def test_clip_boxes():
+    boxes = tf.constant([[[-1, -1, 2, 1], [-1, 0, 2, 1]], [[-1, -1, 2, 1], [-1, 0, 2, 1]]],
+                        tf.float32)
+    image_shape = tf.constant([[1, 2], [2, 1]])
+    expected_boxes = [[[0, 0, 1, 1], [0, 0, 1, 1]], [[0, 0, 2, 1], [0, 0, 2, 1]]]
+
+    clipped_boxes = box_ops.clip_boxes(boxes, image_shape)
+    np.testing.assert_array_equal(clipped_boxes, expected_boxes)

@@ -148,3 +148,21 @@ def normalize_box_coordinates(boxes, height: int, width: int):
     # Won't be backpropagated to rois anyway, but to save time
     boxes = tf.stop_gradient(tf.concat([y_min, x_min, x_max, y_max], axis=-1))
     return boxes
+
+
+def clip_boxes(boxes: tf.Tensor, window: tf.Tensor) -> tf.Tensor:
+    """Perform a clipping according to a window on the boxes.
+
+    Arguments:
+
+    - *boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+    - *window*: A tensor of shape [batch_size, h, w]
+
+    Returns:
+
+    A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+    """
+    boxes = tf.maximum(boxes, 0.0)
+    m = tf.tile(tf.expand_dims(window, axis=1), [1, 1, 2])
+    boxes = tf.minimum(boxes, tf.cast(m, boxes.dtype))
+    return boxes

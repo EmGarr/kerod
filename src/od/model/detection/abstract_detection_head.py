@@ -98,26 +98,25 @@ class AbstractDetectionHead(KL.Layer):
         layer = inputs
         for _ in range(num_convs):
             layer = KL.Conv2D(dim, (3, 3),
-                                padding='valid',
-                                activation='relu',
-                                kernel_initializer=initializers.VarianceScaling(scale=2.,
-                                                                                mode='fan_out'),
-                                kernel_regularizer=self._kernel_regularizer)(layer)
+                              padding='valid',
+                              activation='relu',
+                              kernel_initializer=initializers.VarianceScaling(scale=2.,
+                                                                              mode='fan_out'),
+                              kernel_regularizer=self._kernel_regularizer)(layer)
 
         layer = KL.Conv2DTranspose(dim, (2, 2),
-                                     strides=(2, 2),
-                                     padding='valid',
-                                     activation='relu',
-                                     kernel_initializer=initializers.VarianceScaling(
-                                         scale=2., mode='fan_out'),
-                                     kernel_regularizer=self._kernel_regularizer)(layer)
+                                   strides=(2, 2),
+                                   padding='valid',
+                                   activation='relu',
+                                   kernel_initializer=initializers.VarianceScaling(scale=2.,
+                                                                                   mode='fan_out'),
+                                   kernel_regularizer=self._kernel_regularizer)(layer)
 
         return KL.Conv2D(self._num_classes, (3, 3),
-                           padding='valid',
-                           activation='relu',
-                           kernel_initializer=initializers.VarianceScaling(scale=2.,
-                                                                           mode='fan_out'),
-                           kernel_regularizer=self._kernel_regularizer)(layer)
+                         padding='valid',
+                         activation='relu',
+                         kernel_initializer=initializers.VarianceScaling(scale=2., mode='fan_out'),
+                         kernel_regularizer=self._kernel_regularizer)(layer)
 
     def build_detection_head(self, inputs):
         """ Build a detection head composed 

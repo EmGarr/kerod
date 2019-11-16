@@ -11,6 +11,7 @@ from od.core.sampling_ops import batch_sample_balanced_positive_negative
 from od.core.standard_fields import BoxField, LossField
 from od.core.target_assigner import TargetAssigner, batch_assign_targets
 from od.model.detection.abstract_detection_head import AbstractDetectionHead
+from od.model.post_processing import post_process_rpn
 
 SAMPLING_SIZE = 256
 SAMPLING_POSITIVE_RATIO = 0.5
@@ -86,9 +87,9 @@ class RegionProposalNetwork(AbstractDetectionHead):
         """
 
         if training:
-            input_tensors, ground_truths = inputs
+            input_tensors, image_information, ground_truths = inputs
         else:
-            input_tensors = inputs[0]
+            input_tensors, image_information = inputs
 
         rpn_predictions = [self.build_rpn_head(tensor) for tensor in input_tensors]
         rpn_anchors = []
@@ -101,12 +102,23 @@ class RegionProposalNetwork(AbstractDetectionHead):
         localization_pred = tf.concat([prediction[1] for prediction in rpn_predictions], 1)
         classification_pred = tf.concat([prediction[0] for prediction in rpn_predictions], 1)
         anchors = tf.concat([anchors for anchors in rpn_anchors], 0)
+        classification_prob = tf.nn.softmax(classification_pred)
 
         if training:
             loss = self.compute_loss(localization_pred, classification_pred, anchors, ground_truths)
             self.add_loss(loss)
-
-        return localization_pred, classification_pred, anchors
+            return post_process_rpn(classification_prob,
+                                    localization_pred,
+                                    anchors,
+                                    image_information,
+                                    pre_nms_topk=12000,
+                                    post_nms_topk=2000)
+        return post_process_rpn(classification_prob,
+                                localization_pred,
+                                anchors,
+                                image_information,
+                                pre_nms_topk=6000,
+                                post_nms_topk=1000)
 
     def compute_loss(self, localization_pred, classification_pred, anchors, ground_truths):
         """Compute the loss

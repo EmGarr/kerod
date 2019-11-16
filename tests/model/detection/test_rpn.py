@@ -18,8 +18,11 @@ def mocked_random_shuffle(indices):
 
 @pytest.mark.parametrize("float_type", ['float16', 'float32'])
 def test_rpn(float_type):
+    # Deactivated because tf.image.combined_non_max_suppression needs float32 
+    # TODO provide support for float16
     # K.set_floatx(float_type)
     rpn = RegionProposalNetwork()
+    image_information = tf.constant([[200, 200], [200, 200]])
     features = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20]]
     boxes = np.array([[-3.5, -3.5, 3.5, 3.5]])
     labels = np.array([1])
@@ -30,8 +33,12 @@ def test_rpn(float_type):
         BoxField.BOXES: boxes,
         BoxField.LABELS: labels
     }]
-    rpn([features, ground_truths], training=True)
-    rpn([features])
+    boxes, scores = rpn([features, image_information, ground_truths], training=True)
+    assert (2, 2000, 4) == boxes.shape
+    assert (2, 2000) == scores.shape
+    boxes, scores = rpn([features, image_information])
+    assert (2, 1000, 4) == boxes.shape
+    assert (2, 1000) == scores.shape
 
 
 @mock.patch('tensorflow.random.shuffle')
