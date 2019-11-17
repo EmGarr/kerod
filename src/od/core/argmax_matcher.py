@@ -57,6 +57,7 @@ class ArgMaxMatcher(matcher.Matcher):
             unmatched_threshold: float = None,
             negatives_lower_than_unmatched=True,
             force_match_for_each_row=False,
+            dtype=None
     ):
         """Construct ArgMaxMatcher.
 
@@ -103,6 +104,10 @@ class ArgMaxMatcher(matcher.Matcher):
                                      self._matched_threshold, self._unmatched_threshold))
         self._force_match_for_each_row = force_match_for_each_row
         self._negatives_lower_than_unmatched = negatives_lower_than_unmatched
+        if dtype is None:
+            dtype = K.floatx()
+        self.dtype = dtype
+
 
     def _match(self, similarity_matrix, valid_rows):
         """Tries to match each column of the similarity matrix to a row.
@@ -163,9 +168,9 @@ class ArgMaxMatcher(matcher.Matcher):
                 similarity_matrix_shape = tf.shape(similarity_matrix)
                 force_match_column_ids = tf.argmax(similarity_matrix, 1, output_type=tf.int32)
                 force_match_column_indicators = (tf.one_hot(
-                    force_match_column_ids, depth=similarity_matrix_shape[1], dtype=K.floatx()) *
+                    force_match_column_ids, depth=similarity_matrix_shape[1], dtype=self.dtype) *
                                                  tf.cast(tf.expand_dims(valid_rows, axis=-1),
-                                                         dtype=K.floatx()))
+                                                         dtype=self.dtype))
                 force_match_row_ids = tf.argmax(force_match_column_indicators,
                                                 0,
                                                 output_type=tf.int32)

@@ -15,7 +15,6 @@ class AbstractDetectionHead(KL.Layer):
 
         - *num_classes*: Number of classes of the classification head (e.g: Your n classes +
                 the background class)
-        - *target_assigner*: An object od.core.target_assigner.TargetAssigner
         - *classification_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
                 This object should have a reduction value to None and the parameter from_y_pred to True.
         - *localization_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
@@ -38,7 +37,6 @@ class AbstractDetectionHead(KL.Layer):
 
     def __init__(self,
                  num_classes,
-                 target_assigner,
                  classification_loss,
                  localization_loss,
                  classification_loss_weight=1.0,
@@ -52,8 +50,6 @@ class AbstractDetectionHead(KL.Layer):
         super().__init__(**kwargs)
 
         self._num_classes = num_classes
-        self.target_assigner = target_assigner
-
         self._classification_loss = classification_loss
         self._localization_loss = localization_loss
         self._classification_loss_weight = classification_loss_weight

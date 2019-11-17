@@ -27,20 +27,19 @@ class FastRCNN(AbstractDetectionHead):
     """
 
     def __init__(self, num_classes, **kwargs):
-        matcher = ArgMaxMatcher(0.5)
-        target_assigner = TargetAssigner(compute_iou,
-                                         matcher,
-                                         encode_boxes_faster_rcnn)
-
         super().__init__(
             num_classes,
-            target_assigner,
             CategoricalCrossentropy(),
             SmoothL1Localization(),
             kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.001),
             **kwargs)
 
+        matcher = ArgMaxMatcher(0.5, dtype=self.dtype)
+        self.target_assigner = TargetAssigner(compute_iou,
+                                              matcher,
+                                              encode_boxes_faster_rcnn,
+                                              dtype=self.dtype)
         self.denses = [
             KL.Dense(1024, kernel_initializer=initializers.VarianceScaling(), activation='relu')
             for _ in range(2)

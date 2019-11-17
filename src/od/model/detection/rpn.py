@@ -29,18 +29,20 @@ class RegionProposalNetwork(AbstractDetectionHead):
     """
 
     def __init__(self, anchor_ratios=(0.5, 1, 2), **kwargs):
-
-        matcher = ArgMaxMatcher(0.7, 0.3, force_match_for_each_row=True)
-        target_assigner = TargetAssigner(compute_iou, matcher, encode_boxes_faster_rcnn)
         super().__init__(
             2,
-            target_assigner,
             CategoricalCrossentropy(),
             SmoothL1Localization(),
             multiples=len(anchor_ratios),
             kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.01),
             **kwargs)
+
+        matcher = ArgMaxMatcher(0.7, 0.3, force_match_for_each_row=True, dtype=self.dtype)
+        self.target_assigner = TargetAssigner(compute_iou,
+                                         matcher,
+                                         encode_boxes_faster_rcnn,
+                                         dtype=self.dtype)
 
         self._anchor_strides = (4, 8, 16, 32, 64)
         self._anchor_ratios = anchor_ratios

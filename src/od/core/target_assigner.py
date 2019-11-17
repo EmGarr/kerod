@@ -47,7 +47,8 @@ class TargetAssigner(object):
                  similarity_calc: Callable,
                  matcher: mat.Matcher,
                  box_encoder: Callable,
-                 negative_class_weight=1.0):
+                 negative_class_weight=1.0,
+                 dtype=None):
         """Construct Object Detection Target Assigner.
 
         Arguments:
@@ -71,6 +72,9 @@ class TargetAssigner(object):
         self._matcher = matcher
         self._box_encoder = box_encoder
         self._negative_class_weight = negative_class_weight
+        if dtype is None:
+            dtype = K.floatx()
+        self.dtype = dtype
 
     @property
     def box_encoder(self):
@@ -117,18 +121,18 @@ class TargetAssigner(object):
         """
 
         if unmatched_class_label is None:
-            unmatched_class_label = tf.constant([0], K.floatx())
+            unmatched_class_label = tf.constant([0], self.dtype)
 
         num_gt_boxes = tf.shape(groundtruth_boxes[BoxField.BOXES])[0]
 
         groundtruth_labels = groundtruth_boxes.get(BoxField.LABELS)
         if groundtruth_labels is None:
-            groundtruth_labels = tf.ones(tf.expand_dims(num_gt_boxes, 0), dtype=K.floatx())
+            groundtruth_labels = tf.ones(tf.expand_dims(num_gt_boxes, 0), dtype=self.dtype)
             groundtruth_labels = tf.expand_dims(groundtruth_labels, -1)
 
         groundtruth_weights = groundtruth_boxes.get(BoxField.WEIGHTS)
         if groundtruth_weights is None:
-            groundtruth_weights = tf.ones([num_gt_boxes], dtype=K.floatx())
+            groundtruth_weights = tf.ones([num_gt_boxes], dtype=self.dtype)
 
         # set scores on the gt boxes
         scores = 1 - groundtruth_labels[:, 0]
@@ -188,14 +192,14 @@ class TargetAssigner(object):
         """
         matched_gt_boxes = match.gather_based_on_match(groundtruth_boxes[BoxField.BOXES],
                                                        unmatched_value=tf.zeros(4,
-                                                                                dtype=K.floatx()),
-                                                       ignored_value=tf.zeros(4, dtype=K.floatx()))
+                                                                                dtype=self.dtype),
+                                                       ignored_value=tf.zeros(4, dtype=self.dtype))
 
         matched_reg_targets = self._box_encoder(matched_gt_boxes, anchors[BoxField.BOXES])
         match_results_shape = tf.shape(match.match_results)
 
         # Zero out the unmatched and ignored regression targets.
-        unmatched_ignored_reg_targets = tf.tile(tf.constant([4 * [0]], K.floatx()),
+        unmatched_ignored_reg_targets = tf.tile(tf.constant([4 * [0]], self.dtype),
                                                 [match_results_shape[0], 1])
         matched_anchors_mask = tf.expand_dims(match.matched_column_indicator(), axis=-1)
         reg_targets = tf.where(matched_anchors_mask,
@@ -253,7 +257,8 @@ class TargetAssigner(object):
         """
         return match.gather_based_on_match(groundtruth_weights,
                                            ignored_value=tf.constant(0, groundtruth_weights.dtype),
-                                           unmatched_value=tf.constant(0, groundtruth_weights.dtype))
+                                           unmatched_value=tf.constant(
+                                               0, groundtruth_weights.dtype))
 
     def _create_classification_weights(self, match: mat.Matcher, groundtruth_weights: tf.Tensor):
         """Create classification weights for each anchor.
