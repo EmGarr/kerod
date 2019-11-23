@@ -29,74 +29,8 @@ def test_smooth_L1_loss():
                           [[3.5, 0, 0, 0], [0, .4, 0, .9], [0, 0, 1.5, 0]]], tf.float32)
     y_true = tf.zeros([batch_size, num_anchors, code_size])
     sample_weight = tf.constant([[2, 1, 1], [0, 3, 0]], tf.float32)
-    loss_op = losses.SmoothL1Localization()
+    loss_op = losses.SmoothL1Localization(delta=1.0)
     loss = loss_op(y_true, y_pred, sample_weight=sample_weight)
     loss = tf.reduce_sum(loss)
     exp_loss = 7.695
     np.testing.assert_array_almost_equal(loss, exp_loss)
-
-
-def test_binary_cross_entropy():
-    y_pred = tf.constant([[[-100, 100, -100], [100, -100, -100], [100, 0, -100], [-100, -100, 100]],
-                          [[-100, 0, 100], [-100, 100, -100], [100, 100, 100], [0, 0, -1]]],
-                         tf.float32)
-    y_true = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0], [0, 0, 1]],
-                          [[0, 0, 1], [0, 1, 0], [1, 1, 1], [1, 0, 0]]], tf.float32)
-    sample_weight = tf.constant([[1, 1, 1, 1], [1, 1, 1, 0]], tf.float32)
-    loss_op = losses.BinaryCrossentropy()
-    loss = loss_op(y_true, y_pred, sample_weight=sample_weight)
-    loss = tf.reduce_sum(loss)
-
-    exp_loss = -2 * math.log(.5) / 3
-    np.testing.assert_array_almost_equal(loss, exp_loss)
-
-
-def test_binary_cross_entropy_anchor_wise():
-    y_pred = tf.constant([[[-100, 100, -100], [100, -100, -100], [100, 0, -100], [-100, -100, 100]],
-                          [[-100, 0, 100], [-100, 100, -100], [100, 100, 100], [0, 0, -1]]],
-                         tf.float32)
-    y_true = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0], [0, 0, 1]],
-                          [[0, 0, 1], [0, 1, 0], [1, 1, 1], [1, 0, 0]]], tf.float32)
-
-    sample_weight = tf.constant([[1, 1, 1, 1], [1, 1, 1, 0]], tf.float32)
-
-    loss_op = losses.BinaryCrossentropy()
-
-    loss = loss_op(y_true, y_pred, sample_weight=sample_weight)
-
-    exp_loss = np.array([[0, 0, -math.log(.5) / 3, 0], [-math.log(.5) / 3, 0, 0, 0]])
-    np.testing.assert_array_almost_equal(loss, exp_loss)
-
-
-def test_categorical_cross_entropy():
-    y_pred = tf.constant([[[-100, 100, -100], [100, -100, -100], [0, 0, -100], [-100, -100, 100]],
-                          [[-100, 0, 0], [-100, 100, -100], [-100, 100, -100], [100, -100, -100]]],
-                         tf.float32)
-    y_true = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0], [0, 0, 1]],
-                          [[0, 0, 1], [0, 1, 0], [0, 1, 0], [1, 0, 0]]], tf.float32)
-    sample_weight = tf.constant([[1, 1, 0.5, 1], [1, 1, 1, 0]], tf.float32)
-    loss_op = losses.CategoricalCrossentropy()
-    loss = loss_op(y_true, y_pred, sample_weight=sample_weight)
-    loss = tf.reduce_sum(loss)
-
-    exp_loss = -1.5 * math.log(.5)
-    np.testing.assert_array_almost_equal(loss, exp_loss)
-
-
-def test_categorical_cross_entropy_anchor_wise():
-    y_pred = tf.constant([[[-100, 100, -100], [100, -100, -100], [0, 0, -100], [-100, -100, 100]],
-                          [[-100, 0, 0], [-100, 100, -100], [-100, 100, -100], [100, -100, -100]]],
-                         tf.float32)
-    y_true = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0], [0, 0, 1]],
-                          [[0, 0, 1], [0, 1, 0], [0, 1, 0], [1, 0, 0]]], tf.float32)
-    sample_weight = tf.constant([[1, 1, 0.5, 1], [1, 1, 1, 0]], tf.float32)
-    loss_op = losses.CategoricalCrossentropy()
-    loss = loss_op(y_true, y_pred, sample_weight=sample_weight)
-
-    exp_loss = np.array([[0, 0, -0.5 * math.log(.5), 0], [-math.log(.5), 0, 0, 0]])
-
-    np.testing.assert_array_almost_equal(loss, exp_loss)
-
-
-if __name__ == '__main__':
-    tf.test.main()

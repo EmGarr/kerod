@@ -5,7 +5,7 @@ from od.core import box_ops
 EPSILON = 1e-8
 
 
-def encode_boxes_faster_rcnn(boxes, anchors, scale_factors=(10.0, 10.0, 5.0, 5.0)):
+def encode_boxes_faster_rcnn(boxes, anchors, scale_factors=None):
     """Encode a box collection with respect to anchor collection according to the
     [Faster RCNN paper](http://arxiv.org/abs/1506.01497).
 
@@ -59,7 +59,7 @@ def encode_boxes_faster_rcnn(boxes, anchors, scale_factors=(10.0, 10.0, 5.0, 5.0
     return tf.concat([ty, tx, th, tw], axis=-1)
 
 
-def decode_boxes_faster_rcnn(rel_codes, anchors, scale_factors=(10.0, 10.0, 5.0, 5.0)):
+def decode_boxes_faster_rcnn(rel_codes, anchors, scale_factors=None):
     """Decode relative codes to boxes according to the
     [Faster RCNN paper](http://arxiv.org/abs/1506.01497).
 

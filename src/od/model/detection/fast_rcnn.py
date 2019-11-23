@@ -3,12 +3,13 @@ from typing import List
 import gin
 import tensorflow as tf
 import tensorflow.keras.layers as KL
+
 from tensorflow.keras import initializers
+from tensorflow.keras.losses import CategoricalCrossentropy, MeanAbsoluteError
 
 from od.core.argmax_matcher import ArgMaxMatcher
 from od.core.box_coder import encode_boxes_faster_rcnn
 from od.core.box_ops import compute_iou
-from od.core.losses import CategoricalCrossentropy, SmoothL1Localization
 from od.core.sampling_ops import batch_sample_balanced_positive_negative
 from od.core.standard_fields import BoxField, LossField
 from od.core.target_assigner import TargetAssigner, batch_assign_targets
@@ -29,8 +30,8 @@ class FastRCNN(AbstractDetectionHead):
     def __init__(self, num_classes, **kwargs):
         super().__init__(
             num_classes,
-            CategoricalCrossentropy(),
-            SmoothL1Localization(),
+            CategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE, from_logits=True),
+            MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE),  # like in tensorpack
             kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.001),
             **kwargs)
@@ -74,7 +75,7 @@ class FastRCNN(AbstractDetectionHead):
         classification_pred = tf.nn.softmax(classification_pred)
 
         return post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
-                                        image_information, self._num_classes)
+                                            image_information, self._num_classes)
 
     @gin.configurable()
     def sample_boxes(self,

@@ -61,7 +61,7 @@ def test_compute_loss_rpn(mock_shuffle):
         BoxField.BOXES: tf.constant([[0, 0, 3, 3]], tf.float32),
     }]
 
-    rpn = RegionProposalNetwork(classification_loss_weight=1.0, localization_loss_weight=2.0)
+    rpn = RegionProposalNetwork(classification_loss_weight=1.0)
     classification_loss, localization_loss = rpn.compute_loss(localization_pred,
                                                               classification_pred, anchors,
                                                               ground_truths)

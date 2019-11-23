@@ -1,12 +1,13 @@
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
+from tensorflow.keras.losses import CategoricalCrossentropy
 
 from od.core.anchor_generator import generate_anchors
 from od.core.argmax_matcher import ArgMaxMatcher
 from od.core.box_coder import encode_boxes_faster_rcnn
 from od.core.box_ops import compute_iou
-from od.core.losses import CategoricalCrossentropy, SmoothL1Localization
+from od.core.losses import SmoothL1Localization
 from od.core.sampling_ops import batch_sample_balanced_positive_negative
 from od.core.standard_fields import BoxField, LossField
 from od.core.target_assigner import TargetAssigner, batch_assign_targets
@@ -29,20 +30,24 @@ class RegionProposalNetwork(AbstractDetectionHead):
     """
 
     def __init__(self, anchor_ratios=(0.5, 1, 2), **kwargs):
+        # Hyper parameter from tensorpack
+        delta = 1. / 9
         super().__init__(
             2,
-            CategoricalCrossentropy(),
-            SmoothL1Localization(),
+            CategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE, from_logits=True),
+            SmoothL1Localization(delta),
+            localization_loss_weight=1. / delta,
             multiples=len(anchor_ratios),
             kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.01),
             **kwargs)
 
+        # TODO check force_match_for_each_row
         matcher = ArgMaxMatcher(0.7, 0.3, force_match_for_each_row=True, dtype=self.dtype)
         self.target_assigner = TargetAssigner(compute_iou,
-                                         matcher,
-                                         encode_boxes_faster_rcnn,
-                                         dtype=self.dtype)
+                                              matcher,
+                                              encode_boxes_faster_rcnn,
+                                              dtype=self.dtype)
 
         self._anchor_strides = (4, 8, 16, 32, 64)
         self._anchor_ratios = anchor_ratios
@@ -83,9 +88,10 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         Returns:
 
-        - *localization_pred*: A tensor of shape [batch_size, num_anchors, 4]
-        - *classification_pred*: A tensor of shape [batch_size, num_anchors, 2]
-        - *anchors*: A tensor of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
+        - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]
+        containing the non-max suppressed boxes.
+        - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
+        the scores for the boxes.
         """
 
         if training:

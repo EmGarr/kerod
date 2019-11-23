@@ -40,7 +40,7 @@ class AbstractDetectionHead(KL.Layer):
                  classification_loss,
                  localization_loss,
                  classification_loss_weight=1.0,
-                 localization_loss_weight=2.0,
+                 localization_loss_weight=1.0,
                  multiples=1,
                  kernel_initializer_classification_head=None,
                  kernel_initializer_box_prediction_head=None,

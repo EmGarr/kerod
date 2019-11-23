@@ -64,8 +64,6 @@ def post_process_rpn(classification_pred: tf.Tensor,
       containing the non-max suppressed boxes.
     - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
       the scores for the boxes.
-    - *nmsed_classes*: A Tensor of shape [batch_size, max_detections] 
-      containing the class for boxes.
     """
 
     batch_size = tf.shape(classification_pred)[0]
