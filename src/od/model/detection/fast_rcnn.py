@@ -46,7 +46,34 @@ class FastRCNN(AbstractDetectionHead):
             for _ in range(2)
         ]
 
+    @tf.function
     def call(self, inputs, training=None):
+        """Build the computational graph of the fast RCNN HEAD.
+
+        Arguments:
+
+        - *inputs*: A list with the following schema:
+          - *pyramid*: A List of tensors the output of the pyramid
+          - *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+          - *image_informations*: A Tensor of shape [batch_size, (height, width)]
+            The height and the width are without the padding.
+          - *ground_truths*: If the training is true, The  which is a list of dict with
+          BoxField as key and a tensor as value.
+        - *training*: Boolean
+
+        Returns:
+
+        - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]
+        containing the non-max suppressed boxes.
+        - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
+        the scores for the boxes.
+        - *nmsed_classes*: A Tensor of shape [batch_size, max_detections] 
+        containing the class for boxes.
+        - *valid_detections*: A [batch_size] int32 tensor indicating the number of
+        valid detections per batch item. Only the top valid_detections[i] entries
+        in nms_boxes[i], nms_scores[i] and nms_class[i] are valid. The rest of the
+        entries are zero paddings.
+        """
         if training:
             pyramid, anchors, image_shape, image_information, ground_truths = inputs
             y_true, weights = self.sample_boxes(anchors, ground_truths)
@@ -79,7 +106,7 @@ class FastRCNN(AbstractDetectionHead):
 
     @gin.configurable()
     def sample_boxes(self,
-                     batch_boxes: tf.Tensor,
+                     anchors: tf.Tensor,
                      ground_truths: List[dict],
                      sampling_size: int = 512,
                      sampling_positive_ratio: float = 0.25):
@@ -89,7 +116,7 @@ class FastRCNN(AbstractDetectionHead):
 
         Arguments:
 
-        - *batch_boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+        - *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
         - *ground_truths*: A list of dict objects with length batch_size
         representing groundtruth anchors for each image in the batch and their labels, weights
         - *sampling_size*: Desired sampling size. If None, keeps all positive samples and
@@ -107,26 +134,27 @@ class FastRCNN(AbstractDetectionHead):
             box_code_dimension]
 
         - *weights*: A dict with:
-            * *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
+            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
             num_classes],
-            * *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors],
+            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors],
 
         Raises:
 
-        - *ValueError*: If your sampling size is superior to the number of anchors in input.
+        - *ValueError*: If the batch_size is None.
         - *ValueError*: If the batch_size between your ground_truths and the anchors does not match.
         """
-        anchors = [{BoxField.BOXES: anchors} for anchors in tf.unstack(batch_boxes)]
+        # In graph mode unstack need to be aware of the batch_shape
+        batch_size = anchors.get_shape().as_list()[0]
+        if batch_size is None:
+            raise ValueError("In training the batch size cannot be None. You should specify it"
+                             " in tf.Keras.layers.Input using the argument batch_size.")
+        anchors = [{BoxField.BOXES: anchor} for anchor in tf.unstack(anchors)]
 
-        if tf.shape(batch_boxes)[1] < sampling_size:
-            raise ValueError('Your sampling size should be inferior or equal to the number '
-                             'of anchors in input. Inspect the num_boxes dimension for batch_boxes'
-                             'with [batch_size, num_boxes, 4]')
         if len(anchors) != len(ground_truths):
             raise ValueError(f'Length of anchors is {len(anchors)} and length of ground_truths is '
                              f'{len(ground_truths)} should be the same.')
 
-        unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], batch_boxes.dtype)
+        unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], self.dtype)
         y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths,
                                                   unmatched_class_label)
 
@@ -140,7 +168,7 @@ class FastRCNN(AbstractDetectionHead):
             sampling_size,
             labels,
             positive_fraction=sampling_positive_ratio,
-            dtype=batch_boxes.dtype)
+            dtype=self.dtype)
 
         weights[LossField.CLASSIFICATION] = tf.multiply(sample_idx,
                                                         weights[LossField.CLASSIFICATION])

@@ -137,7 +137,8 @@ def match_boxes_to_their_pyramid_level(boxes, num_level):
 
     """
 
-    batch_size, num_boxes, _ = tf.shape(boxes)
+    batch_size = tf.shape(boxes)[0]
+    num_boxes = tf.shape(boxes)[1]
     boxes = tf.reshape(boxes, (-1, 4))
 
     box_levels = assign_pyramid_level_to_boxes(boxes, num_level)

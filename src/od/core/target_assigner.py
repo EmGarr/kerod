@@ -134,10 +134,6 @@ class TargetAssigner(object):
         if groundtruth_weights is None:
             groundtruth_weights = tf.ones([num_gt_boxes], dtype=self.dtype)
 
-        # set scores on the gt boxes
-        scores = 1 - groundtruth_labels[:, 0]
-        groundtruth_boxes[BoxField] = scores
-
         match_quality_matrix = self._similarity_calc(groundtruth_boxes[BoxField.BOXES],
                                                      anchors[BoxField.BOXES])
         match = self._matcher.match(match_quality_matrix,
@@ -149,32 +145,7 @@ class TargetAssigner(object):
 
         cls_weights = self._create_classification_weights(match, groundtruth_weights)
 
-        num_anchors = tf.shape(anchors[BoxField.BOXES])[0]
-        if num_anchors is not None:
-            reg_targets = self._reset_target_shape(reg_targets, num_anchors)
-            cls_targets = self._reset_target_shape(cls_targets, num_anchors)
-            reg_weights = self._reset_target_shape(reg_weights, num_anchors)
-            cls_weights = self._reset_target_shape(cls_weights, num_anchors)
-
         return (cls_targets, cls_weights, reg_targets, reg_weights, match.match_results)
-
-    def _reset_target_shape(self, target, num_anchors):
-        """Sets the static shape of the target.
-
-        Arguments:
-
-        - *target*: the target tensor. Its first dimension will be overwritten.
-        - *num_anchors*: the number of anchors, which is used to override the target's
-            first dimension.
-
-        Returns:
-
-        A tensor with the shape info filled in.
-        """
-        target_shape = target.get_shape().as_list()
-        target_shape[0] = num_anchors
-        target.set_shape(target_shape)
-        return target
 
     def _create_regression_targets(self, anchors: dict, groundtruth_boxes: dict,
                                    match: mat.Match) -> tf.Tensor:

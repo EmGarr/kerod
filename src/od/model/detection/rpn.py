@@ -75,14 +75,17 @@ class RegionProposalNetwork(AbstractDetectionHead):
         localization_head = tf.reshape(localization_head, (batch_size, -1, 4))
         return classification_head, localization_head
 
+    @tf.function
     def call(self, inputs, training=None):
-        """Does the rpn inference
+        """Create the computation graph for the rpn inference
 
         Arguments:
 
         - *inputs*: A list with the following schema:
-          1. A List of tensors the output of the pyramid
-          2. If training is true, The ground_truths which is a list of dict with
+          - *input_tensors*: A List of tensors the output of the pyramid
+          - *image_informations*A Tensor of shape [batch_size, (height, width)]
+            The height and the width are without the padding.
+          - *ground_truths*: If the training is true, The ground_truths which is a list of dict with
           BoxField as key and a tensor as value.
         - *training*: Boolean
 
@@ -102,8 +105,8 @@ class RegionProposalNetwork(AbstractDetectionHead):
         rpn_predictions = [self.build_rpn_head(tensor) for tensor in input_tensors]
         rpn_anchors = []
         for tensor, anchor_stride in zip(input_tensors, self._anchor_strides):
-            anchors = generate_anchors(anchor_stride, tf.constant([8], tensor.dtype),
-                                       tf.constant(self._anchor_ratios, tensor.dtype),
+            anchors = generate_anchors(anchor_stride, tf.constant([8], self.dtype),
+                                       tf.constant(self._anchor_ratios, self.dtype),
                                        tf.shape(tensor))
             # TODO clipping to investigate
             rpn_anchors.append(anchors)
@@ -158,7 +161,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
             SAMPLING_SIZE,
             labels,
             positive_fraction=SAMPLING_POSITIVE_RATIO,
-            dtype=localization_pred.dtype)
+            dtype=self.dtype)
         # Create one_hot encoding [batch_size, num_anchors, 1] -> [batch_size, num_anchors, 2]
         y_true[LossField.CLASSIFICATION] = tf.one_hot(tf.cast(
             y_true[LossField.CLASSIFICATION][:, :, 0], tf.int32),
