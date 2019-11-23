@@ -1,10 +1,8 @@
+import gin
 import tensorflow as tf
 import tensorflow.keras.layers as tfkl
-import gin
-
-from tensorflow.keras.initializers import VarianceScaling
-
 from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.initializers import VarianceScaling
 
 
 @gin.configurable
@@ -42,9 +40,4 @@ def build_fpn(features, dim=256):
 
     p6 = tfkl.MaxPool2D()(lateral_connection_2345[-1])
     return lateral_connection_2345 + [p6]
-
-
-def fpn(inputs):
-    base_model = ResNet50(include_top=False)
-    return build_fpn([base_model.layers[i] for i in [38, 80, 142, 174]])
 
