@@ -46,7 +46,6 @@ class FastRCNN(AbstractDetectionHead):
             for _ in range(2)
         ]
 
-    @tf.function
     def call(self, inputs, training=None):
         """Build the computational graph of the fast RCNN HEAD.
 

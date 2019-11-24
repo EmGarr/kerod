@@ -16,12 +16,16 @@ def mocked_random_shuffle(indices):
     return indices
 
 
-@pytest.mark.parametrize("float_type", ['float16', 'float32'])
-def test_rpn(float_type):
-    # Deactivated because tf.image.combined_non_max_suppression needs float32 
-    # TODO provide support for float16
-    # K.set_floatx(float_type)
-    rpn = RegionProposalNetwork()
+class RegionProposalNetworkGraphSupport(RegionProposalNetwork):
+
+    @tf.function
+    def call(self, inputs, training=None):
+        return super().call(inputs, training=training)
+
+
+@pytest.mark.parametrize("rpn_class", [RegionProposalNetwork, RegionProposalNetworkGraphSupport])
+def test_rpn(rpn_class):
+    rpn = rpn_class()
     image_information = tf.constant([[200, 200], [200, 200]])
     features = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20]]
     boxes = np.array([[-3.5, -3.5, 3.5, 3.5]])

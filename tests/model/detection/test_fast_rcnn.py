@@ -16,7 +16,15 @@ def mocked_random_shuffle(indices):
     return indices
 
 
-def test_fast_rcnn_full_inference_and_training():
+class FastRCNNGraphSupport(FastRCNN):
+
+    @tf.function
+    def call(self, inputs, training=None):
+        return super().call(inputs, training=training)
+
+
+@pytest.mark.parametrize("fast_rcnn_class", [FastRCNN, FastRCNNGraphSupport])
+def test_fast_rcnn_full_inference_and_training(fast_rcnn_class):
     # args callable
     pyramid = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20, 20]]
     boxes = [[0, 0, i, i] for i in range(1, 1000)]
@@ -35,7 +43,7 @@ def test_fast_rcnn_full_inference_and_training():
     }]
 
     num_classes = 3
-    fast_rcnn = FastRCNN(num_classes)
+    fast_rcnn = fast_rcnn_class(num_classes)
 
     fast_rcnn([pyramid, boxes, image_shape, image_information, ground_truths], training=True)
     fast_rcnn([pyramid, boxes, image_shape, image_information])
