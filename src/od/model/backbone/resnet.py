@@ -10,10 +10,8 @@ import tensorflow as tf
 from tensorflow.keras import layers as KL
 from tensorflow.keras import backend as K
 from tensorflow.keras import utils
+from tensorflow.keras.applications.resnet import preprocess_input
 
-WEIGHTS_PATH = ('https://github.com/fchollet/deep-learning-models/'
-                'releases/download/v0.2/'
-                'resnet50_weights_tf_dim_ordering_tf_kernels.h5')
 WEIGHTS_PATH_NO_TOP = ('https://github.com/fchollet/deep-learning-models/'
                        'releases/download/v0.2/'
                        'resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5')
@@ -174,7 +172,8 @@ def ResNet50(weights='imagenet', input_tensor=None, input_shape=None):
     else:
         bn_axis = 1
 
-    x = KL.ZeroPadding2D(padding=(3, 3), name='conv1_pad')(img_input)
+    x = preprocess_input(img_input)
+    x = KL.ZeroPadding2D(padding=(3, 3), name='conv1_pad')(x)
     x = KL.Conv2D(64, (7, 7),
                   strides=(2, 2),
                   padding='valid',
