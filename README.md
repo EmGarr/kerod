@@ -13,14 +13,24 @@ Od is pure tensorflow2.0 implementation of object detection algorithms aiming pr
 
 It is still ongoing but aims to build a clear, reusable, tested, simple and documented codebase.
 
-Implementation:
+## Installation
+
+Support python: 3.6, 3.7.
+
+```bash
+pip install git+https://github.com/EmGarr/od.git
+```
+
+## WIP
+
+### Implementation
 
 - [x] base network in eager
 - [x] base network in graph mode
 - [ ] training
 - [ ] evaluation (MAP)
 
-Algorithms:
+### Algorithms
 
 - [x] [Feature Pyramidal Network](https://arxiv.org/abs/1612.03144) 
 - [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (easy to implement)
