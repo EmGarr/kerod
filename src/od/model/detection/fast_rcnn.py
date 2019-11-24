@@ -51,13 +51,29 @@ class FastRCNN(AbstractDetectionHead):
 
         Arguments:
 
-        - *inputs*: A list with the following schema:
-          - *pyramid*: A List of tensors the output of the pyramid
-          - *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
-          - *image_informations*: A Tensor of shape [batch_size, (height, width)]
-            The height and the width are without the padding.
-          - *ground_truths*: If the training is true, The  which is a list of dict with
-          BoxField as key and a tensor as value.
+        *inputs*: A list with the following schema:
+
+        1. *pyramid*: A List of tensors the output of the pyramid
+        2. *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+        3. *image_informations*: A Tensor of shape [batch_size, (height, width)]
+        The height and the width are without the padding.
+        4. *ground_truths*: If the training is true, a dict with
+
+        ```python
+        ground_truths = {
+            BoxField.BOXES:
+                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+            BoxField.LABELS:
+                tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+            BoxField.WEIGHTS:
+                tf.constant([[1, 0], [1, 1]], tf.float32),
+            BoxField.NUM_BOXES:
+                tf.constant([2, 1], tf.int32)
+        }
+        ```
+
+        where `NUM_BOXES` allows to remove the padding created by tf.Data.
+
         - *training*: Boolean
 
         Returns:
@@ -116,8 +132,22 @@ class FastRCNN(AbstractDetectionHead):
         Arguments:
 
         - *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
-        - *ground_truths*: A list of dict objects with length batch_size
-        representing groundtruth anchors for each image in the batch and their labels, weights
+        - *ground_truths*: A dict with the following format:
+
+        ```python
+        ground_truths = {
+            BoxField.BOXES:
+                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+            BoxField.LABELS:
+                tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+            BoxField.WEIGHTS:
+                tf.constant([[1, 0], [1, 1]], tf.float32),
+            BoxField.NUM_BOXES:
+                tf.constant([2, 1], tf.int32)
+        }
+        ```
+        where `NUM_BOXES` allows to remove the padding created by tf.Data.
+
         - *sampling_size*: Desired sampling size. If None, keeps all positive samples and
         randomly selects negative samples so that the positive sample fraction
         matches positive_fraction.
@@ -149,9 +179,19 @@ class FastRCNN(AbstractDetectionHead):
                              " in tf.Keras.layers.Input using the argument batch_size.")
         anchors = [{BoxField.BOXES: anchor} for anchor in tf.unstack(anchors)]
 
-        if len(anchors) != len(ground_truths):
-            raise ValueError(f'Length of anchors is {len(anchors)} and length of ground_truths is '
-                             f'{len(ground_truths)} should be the same.')
+        # Remove the padding and convert the ground_truths to the format
+        # expected by the target_assigner
+        gt_boxes = tf.unstack(ground_truths[BoxField.BOXES])
+        gt_labels = tf.unstack(ground_truths[BoxField.LABELS])
+        gt_weights = tf.unstack(ground_truths[BoxField.WEIGHTS])
+        num_boxes = tf.unstack(ground_truths[BoxField.NUM_BOXES])
+        ground_truths = []
+        for b, l, w, nb in zip(gt_boxes, gt_labels, gt_weights, num_boxes):
+            ground_truths.append({
+                BoxField.BOXES: b[:nb],
+                BoxField.LABELS: l[:nb],
+                BoxField.WEIGHTS: w[:nb],
+            })
 
         unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], self.dtype)
         y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths,

@@ -33,14 +33,16 @@ def test_fast_rcnn_full_inference_and_training(fast_rcnn_class):
 
     image_information = [[800., 700.], [700., 800.]]
 
-    ground_truths = [{
-        BoxField.BOXES: tf.constant([[0, 0, 1, 1], [0, 0, 2, 2]], tf.float32),
-        BoxField.LABELS: tf.constant([[0, 0, 1], [0, 1, 0]], tf.float32),
-        BoxField.WEIGHTS: tf.constant([1, 0], tf.float32)
-    }, {
-        BoxField.BOXES: tf.constant([[0, 0, 3, 3]], tf.float32),
-        BoxField.LABELS: tf.constant([[0, 0, 1]], tf.float32)
-    }]
+    ground_truths = {
+        BoxField.BOXES:
+            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+        BoxField.LABELS:
+            tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+        BoxField.WEIGHTS:
+            tf.constant([[1, 0], [1, 1]], tf.float32),
+        BoxField.NUM_BOXES:
+            tf.constant([2, 1], tf.int32)
+    }
 
     num_classes = 3
     fast_rcnn = fast_rcnn_class(num_classes)
@@ -58,14 +60,16 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
     boxes = tf.constant([boxes, boxes], tf.float32)
 
     num_classes = 3
-    ground_truths = [{
-        BoxField.BOXES: tf.constant([[0, 0, 1, 1], [0, 0, 2, 2]], tf.float32),
-        BoxField.LABELS: tf.constant([[0, 0, 1], [0, 1, 0]], tf.float32),
-        BoxField.WEIGHTS: tf.constant([1, 0], tf.float32)
-    }, {
-        BoxField.BOXES: tf.constant([[0, 0, 3, 3]], tf.float32),
-        BoxField.LABELS: tf.constant([[0, 0, 1]], tf.float32)
-    }]
+    ground_truths = {
+        BoxField.BOXES:
+            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+        BoxField.LABELS:
+            tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+        BoxField.WEIGHTS:
+            tf.constant([[1, 0], [1, 1]], tf.float32),
+        BoxField.NUM_BOXES:
+            tf.constant([2, 1], tf.int32)
+    }
 
     fast_rcnn = FastRCNN(num_classes)
     sampling_size = 10
@@ -100,29 +104,6 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
     np.testing.assert_array_equal(expected_weights_classification,
                                   weights[LossField.CLASSIFICATION])
     np.testing.assert_array_equal(expected_weights_localization, weights[LossField.LOCALIZATION])
-
-
-def test_fast_rcnn_sample_boxes_value_error():
-    # The mocking allows to make the test deterministic
-    boxes = [[0, 0, i, i] for i in range(1, 21)]
-    boxes = tf.constant([boxes], tf.float32)
-
-    num_classes = 3
-    ground_truths = [{
-        BoxField.BOXES: tf.constant([[0, 0, 1, 1], [0, 0, 2, 2]], tf.float32),
-        BoxField.LABELS: tf.constant([[0, 0, 1], [0, 1, 0]], tf.float32),
-        BoxField.WEIGHTS: tf.constant([1, 0], tf.float32)
-    }, {
-        BoxField.BOXES: tf.constant([[0, 0, 3, 3]], tf.float32),
-        BoxField.LABELS: tf.constant([[0, 0, 1]], tf.float32)
-    }]
-
-    fast_rcnn = FastRCNN(num_classes)
-    # TODO allow tf.dunction to support it
-    # with pytest.raises(ValueError):
-    #     fast_rcnn.sample_boxes(boxes, ground_truths, sampling_size=10)
-    with pytest.raises(ValueError):
-        fast_rcnn.sample_boxes(boxes, ground_truths, sampling_size=100)
 
 
 def test_fast_rcnn_compute_loss():

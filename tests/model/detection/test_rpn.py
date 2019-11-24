@@ -28,15 +28,14 @@ def test_rpn(rpn_class):
     rpn = rpn_class()
     image_information = tf.constant([[200, 200], [200, 200]])
     features = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20]]
-    boxes = np.array([[-3.5, -3.5, 3.5, 3.5]])
-    labels = np.array([1])
-    ground_truths = [{
-        BoxField.BOXES: boxes,
-        BoxField.LABELS: labels
-    }, {
-        BoxField.BOXES: boxes,
-        BoxField.LABELS: labels
-    }]
+    ground_truths = {
+        BoxField.BOXES:
+            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+        BoxField.LABELS:
+            tf.constant([[[0, 1, 0], [0, 1, 0]], [[0, 1, 0], [0, 1, 0]]], tf.float32),
+        BoxField.NUM_BOXES:
+            tf.constant([2, 1], tf.int32),
+    }
     boxes, scores = rpn([features, image_information, ground_truths], training=True)
     assert (2, 2000, 4) == boxes.shape
     assert (2, 2000) == scores.shape
@@ -59,12 +58,12 @@ def test_compute_loss_rpn(mock_shuffle):
 
     anchors = tf.constant([[0, 0, 1, 1], [0, 0, 2, 2], [0, 0, 3, 3]], tf.float32)
 
-    ground_truths = [{
-        BoxField.BOXES: tf.constant([[0, 0, 1, 1], [0, 0, 2, 2]], tf.float32),
-    }, {
-        BoxField.BOXES: tf.constant([[0, 0, 3, 3]], tf.float32),
-    }]
-
+    ground_truths = {
+        BoxField.BOXES:
+            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+        BoxField.NUM_BOXES:
+            tf.constant([2, 1], tf.int32),
+    }
     rpn = RegionProposalNetwork(classification_loss_weight=1.0)
     classification_loss, localization_loss = rpn.compute_loss(localization_pred,
                                                               classification_pred, anchors,

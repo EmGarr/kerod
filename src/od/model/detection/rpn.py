@@ -80,12 +80,28 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         Arguments:
 
-        - *inputs*: A list with the following schema:
-          - *input_tensors*: A List of tensors the output of the pyramid
-          - *image_informations*A Tensor of shape [batch_size, (height, width)]
-            The height and the width are without the padding.
-          - *ground_truths*: If the training is true, The ground_truths which is a list of dict with
-          BoxField as key and a tensor as value.
+        *inputs*: A list with the following schema:
+
+        1. *pyramid*: A List of tensors the output of the pyramid
+        3. *image_informations*: A Tensor of shape [batch_size, (height, width)]
+        The height and the width are without the padding.
+        4. *ground_truths*: If the training is true, a dict with
+
+        ```python
+        ground_truths = {
+            BoxField.BOXES:
+                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+            BoxField.LABELS:
+                tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+            BoxField.WEIGHTS:
+                tf.constant([[1, 0], [1, 1]], tf.float32),
+            BoxField.NUM_BOXES:
+                tf.constant([2, 1], tf.int32)
+        }
+        ```
+
+        where `NUM_BOXES` allows to remove the padding created by tf.Data.
+
         - *training*: Boolean
 
         Returns:
@@ -97,13 +113,13 @@ class RegionProposalNetwork(AbstractDetectionHead):
         """
 
         if training:
-            input_tensors, image_information, ground_truths = inputs
+            pyramid, image_information, ground_truths = inputs
         else:
-            input_tensors, image_information = inputs
+            pyramid, image_information = inputs
 
-        rpn_predictions = [self.build_rpn_head(tensor) for tensor in input_tensors]
+        rpn_predictions = [self.build_rpn_head(tensor) for tensor in pyramid]
         rpn_anchors = []
-        for tensor, anchor_stride in zip(input_tensors, self._anchor_strides):
+        for tensor, anchor_stride in zip(pyramid, self._anchor_strides):
             anchors = generate_anchors(anchor_stride, tf.constant([8], self.dtype),
                                        tf.constant(self._anchor_ratios, self.dtype),
                                        tf.shape(tensor))
@@ -138,7 +154,22 @@ class RegionProposalNetwork(AbstractDetectionHead):
         - *localization_pred*: A tensor of shape [batch_size, num_anchors, 4]
         - *classification_pred*: A tensor of shape [batch_size, num_anchors, 2]
         - *anchors*: A tensor of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
-        - *ground_truths*: a list of dict with BoxField as key and a tensor as value.
+        - *ground_truths*: A dict with BoxField as key and a tensor as value.
+
+        ```python
+        ground_truths = {
+            BoxField.BOXES:
+                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+            BoxField.LABELS:
+                tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+            BoxField.WEIGHTS:
+                tf.constant([[1, 0], [1, 1]], tf.float32),
+            BoxField.NUM_BOXES:
+                tf.constant([2, 1], tf.int32)
+        }
+        ```
+
+        where `NUM_BOXES` allows to remove the padding created by tf.Data.
 
         Returns:
 
@@ -147,9 +178,13 @@ class RegionProposalNetwork(AbstractDetectionHead):
         """
         # Will be auto batch by the target assigner
         anchors = {BoxField.BOXES: anchors}
+
         # We only want the Localization field here the target assigner will understand that
         # it is the RPN mode.
-        ground_truths = [{BoxField.BOXES: gt[BoxField.BOXES]} for gt in ground_truths]
+        gt_boxes = tf.unstack(ground_truths[BoxField.BOXES])
+        num_boxes = tf.unstack(ground_truths[BoxField.NUM_BOXES])
+        ground_truths = [{BoxField.BOXES: b[:nb]} for b, nb in zip(gt_boxes, num_boxes)]
+
         y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths)
 
         # y_true[LossField.CLASSIFICATION] is a [batch_size, num_anchors, 1]
