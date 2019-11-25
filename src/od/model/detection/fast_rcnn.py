@@ -41,10 +41,12 @@ class FastRCNN(AbstractDetectionHead):
                                               matcher,
                                               encode_boxes_faster_rcnn,
                                               dtype=self.dtype)
+    def build(self, input_shape):
         self.denses = [
             KL.Dense(1024, kernel_initializer=initializers.VarianceScaling(), activation='relu')
             for _ in range(2)
         ]
+        super().build(input_shape)
 
     def call(self, inputs, training=None):
         """Build the computational graph of the fast RCNN HEAD.

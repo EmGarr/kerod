@@ -8,17 +8,22 @@ class Pyramid(KL.Layer):
 
     def __init__(self, dim=256, **kwargs):
         super().__init__(**kwargs)
-        # DIRTY but hardcoded value for the number of layers on which the pyramid will be build
-        # It is necessary to create the convolution
-        num_outputs = 4
+        self._dim = dim
+
+    def build(self, input_shape):
+        num_level_pyramid = len(input_shape[0])
         self.lateral_connection_2345 = [
-            KL.Conv2D(dim, (1, 1), padding='same', kernel_initializer=VarianceScaling(scale=1.))
-            for _ in range(num_outputs)
+            KL.Conv2D(self._dim, (1, 1),
+                      padding='same',
+                      kernel_initializer=VarianceScaling(scale=1.))
+            for _ in range(num_level_pyramid)
         ]
 
         self.anti_aliasing_conv = [
-            KL.Conv2D(dim, (3, 3), padding='same', kernel_initializer=VarianceScaling(scale=1.))
-            for _ in range(num_outputs)
+            KL.Conv2D(self._dim, (3, 3),
+                      padding='same',
+                      kernel_initializer=VarianceScaling(scale=1.))
+            for _ in range(num_level_pyramid)
         ]
 
     def call(self, inputs):

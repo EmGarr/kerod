@@ -51,10 +51,13 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         self._anchor_strides = (4, 8, 16, 32, 64)
         self._anchor_ratios = anchor_ratios
+
+    def build(self, input_shape):
         self.rpn_conv2d = KL.Conv2D(512, (3, 3),
                                     padding='same',
                                     kernel_initializer=self._kernel_initializer_classification_head,
                                     kernel_regularizer=self._kernel_regularizer)
+        super().build(input_shape)
 
     def build_rpn_head(self, inputs):
         """Predictions for the classification and the regression

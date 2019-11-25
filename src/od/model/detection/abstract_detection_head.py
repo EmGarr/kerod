@@ -54,6 +54,7 @@ class AbstractDetectionHead(KL.Layer):
         self._localization_loss = localization_loss
         self._classification_loss_weight = classification_loss_weight
         self._localization_loss_weight = localization_loss_weight
+        self._multiples = multiples
         self._kernel_initializer_classification_head = kernel_initializer_classification_head
         self._kernel_initializer_box_prediction_head = kernel_initializer_box_prediction_head
 
@@ -62,20 +63,22 @@ class AbstractDetectionHead(KL.Layer):
         else:
             self._kernel_regularizer = regularizers.get()
 
+    def build(self, input_shape):
         self._conv_classification_head = KL.Conv2D(
-            multiples * self._num_classes, (1, 1),
+            self._multiples * self._num_classes, (1, 1),
             padding='valid',
             activation=None,
             kernel_initializer=self._kernel_initializer_classification_head,
             kernel_regularizer=self._kernel_regularizer,
             name=f'{self.name}classification_head')
         self._conv_box_prediction_head = KL.Conv2D(
-            (self._num_classes - 1) * multiples * 4, (1, 1),
+            (self._num_classes - 1) * self._multiples * 4, (1, 1),
             padding='valid',
             activation=None,
             kernel_initializer=self._kernel_initializer_box_prediction_head,
             kernel_regularizer=self._kernel_regularizer,
             name=f'{self.name}box_prediction_head')
+        super().build(input_shape)
 
     def build_segmentation_head(self, inputs, num_convs, dim=256):
         """Build the detection head
