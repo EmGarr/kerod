@@ -43,11 +43,11 @@ def test_rpn(rpn_class):
     assert (2, 1000, 4) == boxes.shape
     assert (2, 1000) == scores.shape
 
-
-@mock.patch('tensorflow.random.shuffle')
-def test_compute_loss_rpn(mock_shuffle):
-    # The mocking allows to make the test deterministic
-    mock_shuffle.side_effect = mocked_random_shuffle
+# We are forced to Mock the add_metric because Keras want it to be used inside the call
+# You can see it works automatically in test_rpn 
+@mock.patch('od.model.detection.rpn.RegionProposalNetwork.add_metric', spec=True, return_value=None)
+@mock.patch('tensorflow.random.shuffle', side_effect=mocked_random_shuffle)
+def test_compute_loss_rpn(mock_add_metric, mock_shuffle):
     localization_pred = tf.constant(
         [[[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]],
         tf.float32)

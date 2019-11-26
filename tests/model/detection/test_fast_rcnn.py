@@ -106,7 +106,10 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
     np.testing.assert_array_equal(expected_weights_localization, weights[LossField.LOCALIZATION])
 
 
-def test_fast_rcnn_compute_loss():
+# We are forced to Mock the add_metric because want it to be used inside the call
+# You can see it works automatically in test_fast_rcnn
+@mock.patch('od.model.detection.fast_rcnn.FastRCNN.add_metric', spec=True, return_value=None)
+def test_fast_rcnn_compute_loss(mock_add_metric):
     localization_pred = tf.constant([
         [
             [0, 0, 0, 0, 1, 1, 1, 1],
