@@ -168,4 +168,6 @@ class AbstractDetectionHead(KL.Layer):
                         name=f'{self.name}_localization_loss',
                         aggregation='mean')
 
+        self.add_loss([classification_loss, localization_loss])
+
         return classification_loss, localization_loss

@@ -135,7 +135,6 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         if training:
             loss = self.compute_loss(localization_pred, classification_pred, anchors, ground_truths)
-            self.add_loss(loss)
             return post_process_rpn(classification_prob,
                                     localization_pred,
                                     anchors,

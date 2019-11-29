@@ -114,7 +114,6 @@ class FastRCNN(AbstractDetectionHead):
 
         if training:
             losses = self.compute_loss(y_true, weights, classification_pred, localization_pred)
-            self.add_loss(losses)
 
         classification_pred = tf.nn.softmax(classification_pred)
 
