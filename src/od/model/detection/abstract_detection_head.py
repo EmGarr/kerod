@@ -33,6 +33,7 @@ class AbstractDetectionHead(KL.Layer):
         - *kernel_regularizer*: Regularizer function applied to
             the `kernel` weights matrix of every layers
             (see [regularizer](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
+        - *use_mask*: Boolean define if the segmentation_head will be used.
         """
 
     def __init__(self,
@@ -45,6 +46,7 @@ class AbstractDetectionHead(KL.Layer):
                  kernel_initializer_classification_head=None,
                  kernel_initializer_box_prediction_head=None,
                  kernel_regularizer=None,
+                 use_mask=False,
                  **kwargs):
 
         super().__init__(**kwargs)
@@ -57,6 +59,7 @@ class AbstractDetectionHead(KL.Layer):
         self._multiples = multiples
         self._kernel_initializer_classification_head = kernel_initializer_classification_head
         self._kernel_initializer_box_prediction_head = kernel_initializer_box_prediction_head
+        self._use_mask = use_mask
 
         if kernel_regularizer is None:
             self._kernel_regularizer = regularizers.l2(0.0005)
@@ -78,44 +81,47 @@ class AbstractDetectionHead(KL.Layer):
             kernel_initializer=self._kernel_initializer_box_prediction_head,
             kernel_regularizer=self._kernel_regularizer,
             name=f'{self.name}box_prediction_head')
+
+        if self._use_mask:
+            self._segmentation_layers = [
+                KL.Conv2D(256, (3, 3),
+                          padding='valid',
+                          activation='relu',
+                          kernel_initializer=initializers.VarianceScaling(scale=2., mode='fan_out'),
+                          kernel_regularizer=self._kernel_regularizer),
+                KL.Conv2DTranspose(256, (2, 2),
+                                   strides=(2, 2),
+                                   padding='valid',
+                                   activation='relu',
+                                   kernel_initializer=initializers.VarianceScaling(scale=2.,
+                                                                                   mode='fan_out'),
+                                   kernel_regularizer=self._kernel_regularizer),
+                KL.Conv2D(self._num_classes, (3, 3),
+                          padding='valid',
+                          activation='relu',
+                          kernel_initializer=initializers.VarianceScaling(scale=2., mode='fan_out'),
+                          kernel_regularizer=self._kernel_regularizer)
+            ]
+
         super().build(input_shape)
 
-    def build_segmentation_head(self, inputs, num_convs, dim=256):
+    def build_segmentation_head(self, inputs):
         """Build the detection head
 
         Arguments:
 
         - *inputs*: A tensor of  shape [N, H, W, C]
                 num_convs:
-        - *dim*: Default to 256. Is the channel size
 
         Returns:
 
         A tensor and shape [N, H*2, W*2, num_classes - 1]
         """
 
-        layer = inputs
-        for _ in range(num_convs):
-            layer = KL.Conv2D(dim, (3, 3),
-                              padding='valid',
-                              activation='relu',
-                              kernel_initializer=initializers.VarianceScaling(scale=2.,
-                                                                              mode='fan_out'),
-                              kernel_regularizer=self._kernel_regularizer)(layer)
-
-        layer = KL.Conv2DTranspose(dim, (2, 2),
-                                   strides=(2, 2),
-                                   padding='valid',
-                                   activation='relu',
-                                   kernel_initializer=initializers.VarianceScaling(scale=2.,
-                                                                                   mode='fan_out'),
-                                   kernel_regularizer=self._kernel_regularizer)(layer)
-
-        return KL.Conv2D(self._num_classes, (3, 3),
-                         padding='valid',
-                         activation='relu',
-                         kernel_initializer=initializers.VarianceScaling(scale=2., mode='fan_out'),
-                         kernel_regularizer=self._kernel_regularizer)(layer)
+        x = inputs
+        for layer in self._segmentation_layers:
+            x = layer(x)
+        return x
 
     def build_detection_head(self, inputs):
         """ Build a detection head composed 
@@ -170,4 +176,22 @@ class AbstractDetectionHead(KL.Layer):
 
         self.add_loss([classification_loss, localization_loss])
 
-        return classification_loss, localization_loss
+        if self._use_mask:
+            segmentation_loss = _compute_loss(self._segmentation_loss,
+                                              self._segmentation_loss_weight,
+                                              LossField.INSTANCE_SEGMENTATION)
+
+            self.add_metric(segmentation_loss,
+                            name=f'{self.name}_segmentation_loss',
+                            aggregation='mean')
+            self.add_loss(segmentation_loss)
+            return {
+                LossField.CLASSIFICATION: classification_loss,
+                LossField.LOCALIZATION: localization_loss,
+                LossField.INSTANCE_SEGMENTATION: segmentation_loss
+            }
+
+        return {
+            LossField.CLASSIFICATION: classification_loss,
+            LossField.LOCALIZATION: localization_loss
+        }

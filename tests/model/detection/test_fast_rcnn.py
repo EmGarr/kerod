@@ -140,8 +140,9 @@ def test_fast_rcnn_compute_loss(mock_add_loss, mock_add_metric):
     num_classes = 3
     fast_rcnn = FastRCNN(num_classes)
 
-    loss_cls, loss_loc = fast_rcnn.compute_loss(y_true, weights, classification_pred,
+    losses = fast_rcnn.compute_loss(y_true, weights, classification_pred,
                                                 localization_pred)
 
-    assert loss_cls == 400 / 3 / 2
-    assert loss_loc == 0.5
+    assert losses[LossField.CLASSIFICATION] == 400 / 3 / 2
+    assert losses[LossField.LOCALIZATION] == 0.5
+    assert len(losses) == 2

@@ -1,11 +1,10 @@
 from unittest import mock
 
-import numpy as np
 import pytest
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-from od.core.standard_fields import BoxField
+from od.core.standard_fields import BoxField, LossField
 from od.model.detection.rpn import RegionProposalNetwork
 
 
@@ -66,9 +65,10 @@ def test_compute_loss_rpn(mock_add_metric, mock_add_loss, mock_shuffle):
             tf.constant([2, 1], tf.int32),
     }
     rpn = RegionProposalNetwork(classification_loss_weight=1.0)
-    classification_loss, localization_loss = rpn.compute_loss(localization_pred,
+    losses = rpn.compute_loss(localization_pred,
                                                               classification_pred, anchors,
                                                               ground_truths)
 
-    assert localization_loss == 0
-    assert classification_loss == 100
+    assert losses[LossField.CLASSIFICATION] == 100 
+    assert losses[LossField.LOCALIZATION] == 0
+    assert len(losses) == 2
