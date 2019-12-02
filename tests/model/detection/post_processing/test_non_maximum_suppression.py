@@ -37,8 +37,9 @@ def test_post_process_fast_rcnn_boxes():
     # 95, 9,
     classification_pred = tf.constant([classification_pred, classification_pred])
 
-    image_information = tf.constant([[200, 1001], [200, 1001]])
-    exp_boxes = [[0, 10, 1, 11], [0, 0, 1, 1], [0, 1000, 1, 1001], [0, 999, 2, 1001]]
+    image_information = tf.constant([[200, 1001], [200, 1001]], dtype=tf.float32)
+    exp_boxes = [[0, 10 / 1001, 1 / 200, 11 / 1001], [0, 0, 1 / 200, 1 / 1001],
+                 [0, 1000 / 1001, 1 / 200, 1], [0, 999 / 1001, 1 / 100, 1]]
     exp_scores = [.95, .9, .85, .5]
     exp_labels = [0, 0, 1, 1]
 
@@ -47,7 +48,7 @@ def test_post_process_fast_rcnn_boxes():
 
     assert valid_detections[0] == 4
 
-    np.testing.assert_array_equal(nmsed_boxes[0, :4], exp_boxes)
+    np.testing.assert_almost_equal(nmsed_boxes[0, :4], exp_boxes)
     np.testing.assert_array_almost_equal(nmsed_scores[0, :4], exp_scores)
     np.testing.assert_array_equal(nmsed_labels[0, :4], exp_labels)
 

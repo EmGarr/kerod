@@ -136,7 +136,8 @@ def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
     Returns:
 
     - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]
-      containing the non-max suppressed boxes.
+      containing the non-max suppressed boxes. The coordinates returned are
+    between 0 and 1.
     - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
       the scores for the boxes.
     - *nmsed_classes*: A Tensor of shape [batch_size, max_detections] 
@@ -165,7 +166,9 @@ def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
         score_threshold=score_threshold,
         clip_boxes=False)
 
-    nmsed_boxes = tf.identity(nmsed_boxes, name=BoxField.BOXES)
+
+    normalizer_boxes = tf.tile(tf.expand_dims(image_information, axis=1), [1, 1, 2])
+    nmsed_boxes = tf.math.divide(nmsed_boxes, normalizer_boxes, name=BoxField.BOXES)
     nmsed_scores = tf.identity(nmsed_scores, name=BoxField.SCORES)
     nmsed_labels = tf.identity(nmsed_labels, name=BoxField.LABELS)
     valid_detections = tf.identity(valid_detections, name=BoxField.NUM_BOXES)

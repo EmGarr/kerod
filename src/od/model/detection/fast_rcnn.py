@@ -81,7 +81,8 @@ class FastRCNN(AbstractDetectionHead):
         Returns:
 
         - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]
-        containing the non-max suppressed boxes.
+        containing the non-max suppressed boxes. The coordinates returned are
+        between 0 and 1.
         - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
         the scores for the boxes.
         - *nmsed_classes*: A Tensor of shape [batch_size, max_detections] 
