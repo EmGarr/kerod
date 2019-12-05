@@ -7,8 +7,8 @@ Adapted from code contributed by BigMoyan.
 import os
 
 import tensorflow as tf
-from tensorflow.keras import layers as KL
 from tensorflow.keras import backend as K
+from tensorflow.keras import layers as KL
 from tensorflow.keras import utils
 from tensorflow.keras.applications.resnet import preprocess_input
 
@@ -173,7 +173,20 @@ def ResNet50(weights='imagenet', input_tensor=None, input_shape=None):
         bn_axis = 1
 
     x = preprocess_input(img_input)
-    x = KL.ZeroPadding2D(padding=(3, 3), name='conv1_pad')(x)
+
+    # This padding is here to make the pixels of the output perfectly aligned
+
+    chan = x.shape[3]
+    b4_stride = 32.0
+    shape2d = tf.shape(x)[1:3]
+    new_shape2d = tf.cast(
+        tf.math.ceil(tf.cast(shape2d, tf.float32) / b4_stride) * b4_stride, tf.int32)
+    pad_shape2d = new_shape2d - shape2d
+    x = tf.pad(x,
+               tf.stack([[0, 0], [3, 2 + pad_shape2d[0]], [3, 2 + pad_shape2d[1]], [0, 0]]),
+               name='conv1_pad')
+    x.set_shape([None, None, None, chan])
+
     x = KL.Conv2D(64, (7, 7),
                   strides=(2, 2),
                   padding='valid',

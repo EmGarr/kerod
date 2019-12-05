@@ -3,7 +3,6 @@ from typing import List
 import gin
 import tensorflow as tf
 import tensorflow.keras.layers as KL
-
 from tensorflow.keras import initializers
 from tensorflow.keras.losses import CategoricalCrossentropy, MeanAbsoluteError
 
@@ -41,6 +40,7 @@ class FastRCNN(AbstractDetectionHead):
                                               matcher,
                                               encode_boxes_faster_rcnn,
                                               dtype=self.dtype)
+
     def build(self, input_shape):
         self.denses = [
             KL.Dense(1024, kernel_initializer=initializers.VarianceScaling(), activation='relu')
@@ -58,7 +58,7 @@ class FastRCNN(AbstractDetectionHead):
         1. *pyramid*: A List of tensors the output of the pyramid
         2. *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
         3. *image_informations*: A Tensor of shape [batch_size, (height, width)]
-        The height and the width are without the padding.
+        The height and the width of the original preprocess input images without the padding.
         4. *ground_truths*: If the training is true, a dict with
 
         ```python
@@ -93,14 +93,17 @@ class FastRCNN(AbstractDetectionHead):
         entries are zero paddings.
         """
         if training:
-            pyramid, anchors, image_shape, image_information, ground_truths = inputs
+            pyramid, anchors, image_information, ground_truths = inputs
             y_true, weights = self.sample_boxes(anchors, ground_truths)
             anchors = y_true[LossField.LOCALIZATION]
         else:
-            pyramid, anchors, image_shape, image_information = inputs
+            pyramid, anchors, image_information = inputs
 
         # Remove P6
         pyramid = pyramid[:-1]
+        # We can compute the original image shape regarding
+        # TODO compute it more automatically without knowing that the last layer is stride 32
+        image_shape = tf.cast(tf.shape(pyramid[-1])[1:3] * 32, dtype=self.dtype)
         boxe_tensors = multilevel_roi_align(pyramid, anchors, image_shape, crop_size=7)
         l = KL.Flatten()(boxe_tensors)
         for dense in self.denses:
