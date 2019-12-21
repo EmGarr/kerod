@@ -1,6 +1,8 @@
 import numpy as np
 
-from od.dataset.preprocessing import resize_to_min_dim
+from od.core.standard_fields import BoxField, DatasetField
+from od.dataset.preprocessing import (expand_dims_for_single_batch, preprocess,
+                                      resize_to_min_dim)
 
 
 def test_resize_to_min_dim():
@@ -18,3 +20,40 @@ def test_resize_to_min_dim():
     image_exp = np.zeros((800, 800, 3))
 
     np.testing.assert_array_equal(image_exp, image_out)
+
+
+def test_preprocess():
+    inputs = {
+        'image': np.zeros((100, 50, 3)),
+        'objects': {
+            BoxField.BOXES: np.array([[0, 0, 1, 1]], dtype=np.float32),
+            BoxField.LABELS: np.array([1])
+        }
+    }
+    outputs = preprocess(inputs)
+
+    np.testing.assert_array_equal(np.zeros((1300, 650, 3)), outputs[DatasetField.IMAGES])
+    np.testing.assert_array_equal(np.array([1300, 650]), outputs[DatasetField.IMAGES_INFO])
+    np.testing.assert_array_equal(np.array([[0, 0, 1300, 650]]), outputs[BoxField.BOXES])
+    np.testing.assert_array_equal(np.array([1]), outputs[BoxField.LABELS])
+    np.testing.assert_array_equal(np.array([1.]), outputs[BoxField.WEIGHTS])
+    assert outputs[BoxField.NUM_BOXES].shape == (1,)
+
+
+def test_expand_dims_for_single_batch():
+    inputs = {
+        'image': np.zeros((100, 50, 3)),
+        'objects': {
+            BoxField.BOXES: np.array([[0, 0, 1, 1]], dtype=np.float32),
+            BoxField.LABELS: np.array([1])
+        }
+    }
+
+    outputs = expand_dims_for_single_batch(preprocess(inputs))
+
+    np.testing.assert_array_equal(np.zeros((1, 1300, 650, 3)), outputs[DatasetField.IMAGES])
+    np.testing.assert_array_equal(np.array([[1300, 650]]), outputs[DatasetField.IMAGES_INFO])
+    np.testing.assert_array_equal(np.array([[[0, 0, 1300, 650]]]), outputs[BoxField.BOXES])
+    np.testing.assert_array_equal(np.array([[1]]), outputs[BoxField.LABELS])
+    np.testing.assert_array_equal(np.array([[1.]]), outputs[BoxField.WEIGHTS])
+    assert outputs[BoxField.NUM_BOXES].shape == (1, 1)

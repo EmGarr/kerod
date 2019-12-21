@@ -36,11 +36,11 @@ def test_fast_rcnn_full_inference_and_training(fast_rcnn_class):
         BoxField.BOXES:
             tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
         BoxField.LABELS:
-            tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+            tf.constant([[1, 0], [1, 0]], tf.int32),
         BoxField.WEIGHTS:
             tf.constant([[1, 0], [1, 1]], tf.float32),
         BoxField.NUM_BOXES:
-            tf.constant([2, 1], tf.int32)
+            tf.constant([[2], [1]], tf.int32)
     }
 
     num_classes = 3
@@ -63,11 +63,11 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
         BoxField.BOXES:
             tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
         BoxField.LABELS:
-            tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+            tf.constant([[1, 0], [1, 0]], tf.int32),
         BoxField.WEIGHTS:
             tf.constant([[1, 0], [1, 1]], tf.float32),
         BoxField.NUM_BOXES:
-            tf.constant([2, 1], tf.int32)
+            tf.constant([[2], [1]], tf.int32)
     }
 
     fast_rcnn = FastRCNN(num_classes)

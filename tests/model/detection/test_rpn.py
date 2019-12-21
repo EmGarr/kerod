@@ -31,9 +31,9 @@ def test_rpn(rpn_class):
         BoxField.BOXES:
             tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
         BoxField.LABELS:
-            tf.constant([[[0, 1, 0], [0, 1, 0]], [[0, 1, 0], [0, 1, 0]]], tf.float32),
+            tf.constant([[[0, 0], [0, 0]]], tf.float32),
         BoxField.NUM_BOXES:
-            tf.constant([2, 1], tf.int32),
+            tf.constant([[2], [1]], tf.int32),
     }
     boxes, scores = rpn([features, image_information, ground_truths], training=True)
     assert (2, 2000, 4) == boxes.shape
@@ -62,7 +62,7 @@ def test_compute_loss_rpn(mock_add_metric, mock_add_loss, mock_shuffle):
         BoxField.BOXES:
             tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
         BoxField.NUM_BOXES:
-            tf.constant([2, 1], tf.int32),
+            tf.constant([[2], [1]], tf.int32),
     }
     rpn = RegionProposalNetwork(classification_loss_weight=1.0)
     losses = rpn.compute_loss(localization_pred,

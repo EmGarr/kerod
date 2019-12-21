@@ -1,4 +1,4 @@
-class BoxField():
+class BoxField:
     BOXES = 'bbox'
     KEYPOINTS = 'keypoints'
     LABELS = 'label'
@@ -7,7 +7,13 @@ class BoxField():
     SCORES = 'scores'
     WEIGHTS = 'weights'
 
-class LossField():
+
+class LossField:
     CLASSIFICATION = 'classification'
     INSTANCE_SEGMENTATION = 'instance_segmentation'
     LOCALIZATION = 'localization'
+
+
+class DatasetField:
+    IMAGES = 'images'
+    IMAGES_INFO = 'images_information'

@@ -163,11 +163,11 @@ class RegionProposalNetwork(AbstractDetectionHead):
             BoxField.BOXES:
                 tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
             BoxField.LABELS:
-                tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+                tf.constant([[1, 0], [1, 0]], tf.float32),
             BoxField.WEIGHTS:
                 tf.constant([[1, 0], [1, 1]], tf.float32),
             BoxField.NUM_BOXES:
-                tf.constant([2, 1], tf.int32)
+                tf.constant([[2], [1]], tf.int32)
         }
         ```
 
@@ -185,7 +185,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         # it is the RPN mode.
         gt_boxes = tf.unstack(ground_truths[BoxField.BOXES])
         num_boxes = tf.unstack(ground_truths[BoxField.NUM_BOXES])
-        ground_truths = [{BoxField.BOXES: b[:nb]} for b, nb in zip(gt_boxes, num_boxes)]
+        ground_truths = [{BoxField.BOXES: b[:nb[0]]} for b, nb in zip(gt_boxes, num_boxes)]
 
         y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths)
 

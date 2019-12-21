@@ -137,7 +137,7 @@ class AbstractDetectionHead(KL.Layer):
         return classification_head, box_prediction_head
 
     def compute_losses(self, y_true: Dict[str, tf.Tensor], y_pred: Dict[str, tf.Tensor],
-                       weights: Dict[str, tf.Tensor]):
+                       weights: Dict[str, tf.Tensor]) -> dict:
         """Compute the losses of the object detection head.
         Each dictionary is composed of the same key (classification, localization, segmentation)
 
@@ -150,7 +150,7 @@ class AbstractDetectionHead(KL.Layer):
 
         Returns:
 
-        A scalar
+        A dict of different losses
         """
 
         def _compute_loss(loss, loss_weight, target):

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 import gin
 import tensorflow as tf
@@ -23,7 +23,8 @@ class FastRCNN(AbstractDetectionHead):
 
     Arguments:
 
-    - *num_classes*: The number of classes that predict the classification head (N+1).
+    - *num_classes*: The number of classes that predict the classification head (N+1) where N
+    is the number of classes of your dataset and 1 is the background.
     """
 
     def __init__(self, num_classes, **kwargs):
@@ -127,7 +128,7 @@ class FastRCNN(AbstractDetectionHead):
     @gin.configurable()
     def sample_boxes(self,
                      anchors: tf.Tensor,
-                     ground_truths: List[dict],
+                     ground_truths: Dict[str, tf.Tensor],
                      sampling_size: int = 512,
                      sampling_positive_ratio: float = 0.25):
         """Perform the sampling of the target anchors. During the training a set of RoIs is
@@ -144,11 +145,11 @@ class FastRCNN(AbstractDetectionHead):
             BoxField.BOXES:
                 tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
             BoxField.LABELS:
-                tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+                tf.constant([[8, 0], [1, 0]], tf.float32),
             BoxField.WEIGHTS:
                 tf.constant([[1, 0], [1, 1]], tf.float32),
             BoxField.NUM_BOXES:
-                tf.constant([2, 1], tf.int32)
+                tf.constant([[2], [1]], tf.int32)
         }
         ```
         where `NUM_BOXES` allows to remove the padding created by tf.Data.
@@ -187,20 +188,22 @@ class FastRCNN(AbstractDetectionHead):
         # Remove the padding and convert the ground_truths to the format
         # expected by the target_assigner
         gt_boxes = tf.unstack(ground_truths[BoxField.BOXES])
-        gt_labels = tf.unstack(ground_truths[BoxField.LABELS])
+        # We add one because the background is not counted in ground_truths[BoxField.LABELS]
+        gt_labels = tf.one_hot(ground_truths[BoxField.LABELS] + 1, self._num_classes)
+        gt_labels = tf.unstack(gt_labels)
         gt_weights = tf.unstack(ground_truths[BoxField.WEIGHTS])
         num_boxes = tf.unstack(ground_truths[BoxField.NUM_BOXES])
-        ground_truths = []
+        unstack_ground_truths = []
         for b, l, w, nb in zip(gt_boxes, gt_labels, gt_weights, num_boxes):
-            ground_truths.append({
-                BoxField.BOXES: b[:nb],
-                BoxField.LABELS: l[:nb],
-                BoxField.WEIGHTS: w[:nb],
+            unstack_ground_truths.append({
+                BoxField.BOXES: b[:nb[0]],
+                BoxField.LABELS: l[:nb[0]],
+                BoxField.WEIGHTS: w[:nb[0]],
             })
 
         unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], self.dtype)
-        y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths,
-                                                  unmatched_class_label)
+        y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors,
+                                                  unstack_ground_truths, unmatched_class_label)
 
         # Here we have a tensor of shape [batch_size, num_anchors, num_classes]. We want
         # to know all the foreground anchors for sampling.
