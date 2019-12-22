@@ -122,6 +122,11 @@ class FastRCNN(AbstractDetectionHead):
 
         classification_pred = tf.nn.softmax(classification_pred)
 
+        if training:
+            # Post process_fast_rcnn_perform NMS computation which is CPU intensive we do not want this
+            # in training. This output can still be usefull when coupled with callback to perform
+            # visualization on an image.
+            return classification_pred, localization_pred, anchors
         return post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
                                             image_information, self._num_classes)
 
