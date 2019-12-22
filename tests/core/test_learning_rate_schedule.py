@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from od.learning_rate_schedule import ManualStepping, WarmupLearningRateScheduler
+from od.core.learning_rate_schedule import ManualStepping, WarmupLearningRateScheduler
 from tensorflow.python.keras import testing_utils
 from tensorflow.python.keras import keras_parameterized
 
