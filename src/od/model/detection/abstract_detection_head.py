@@ -195,3 +195,12 @@ class AbstractDetectionHead(KL.Layer):
             LossField.CLASSIFICATION: classification_loss,
             LossField.LOCALIZATION: localization_loss
         }
+
+    def get_config(self):
+        base_config = super().get_config()
+        base_config['num_classes'] = self._num_classes
+        base_config['classification_loss_weight'] = self._classification_loss_weight
+        base_config['localization_loss_weight'] = self._localization_loss_weight
+        base_config['multiples'] = self._multiples
+        base_config['use_mask'] = self._use_mask
+        return base_config

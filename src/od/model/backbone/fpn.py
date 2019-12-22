@@ -58,3 +58,8 @@ class Pyramid(KL.Layer):
 
         p6 = KL.MaxPool2D()(lateral_connection_2345[-1])
         return lateral_connection_2345 + [p6]
+
+    def get_config(self):
+        base_config = super().get_config()
+        base_config['dim'] = self._dim
+        return base_config

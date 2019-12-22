@@ -213,3 +213,8 @@ class RegionProposalNetwork(AbstractDetectionHead):
         }
 
         return self.compute_losses(y_true, y_pred, weights)
+
+    def get_config(self):
+        base_config = super().get_config()
+        base_config['anchor_ratios'] = self._anchor_ratios
+        return base_config
