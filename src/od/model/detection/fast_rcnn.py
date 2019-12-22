@@ -179,10 +179,11 @@ class FastRCNN(AbstractDetectionHead):
         - *ValueError*: If the batch_size between your ground_truths and the anchors does not match.
         """
         # In graph mode unstack need to be aware of the batch_shape
-        batch_size = anchors.get_shape().as_list()[0]
+        batch_size = ground_truths[BoxField.BOXES].get_shape().as_list()[0]
         if batch_size is None:
             raise ValueError("In training the batch size cannot be None. You should specify it"
                              " in tf.Keras.layers.Input using the argument batch_size.")
+        anchors.set_shape((batch_size, None, 4))
         anchors = [{BoxField.BOXES: anchor} for anchor in tf.unstack(anchors)]
 
         # Remove the padding and convert the ground_truths to the format
