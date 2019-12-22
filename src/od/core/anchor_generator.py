@@ -29,8 +29,8 @@ def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, tensor_s
     heights = ratios * widths
     base_anchors = tf.stack([-widths, -heights, widths, heights], axis=1) * 0.5
 
-    y_centers = tf.cast(range(tensor_shape[1]), dtype=scales.dtype) * stride
-    x_centers = tf.cast(range(tensor_shape[2]), dtype=scales.dtype) * stride
+    y_centers = tf.cast(tf.range(tensor_shape[1]), dtype=scales.dtype) * stride
+    x_centers = tf.cast(tf.range(tensor_shape[2]), dtype=scales.dtype) * stride
     x_centers, y_centers = tf.meshgrid(x_centers, y_centers)
     x_centers = tf.reshape(x_centers, [-1])
     y_centers = tf.reshape(y_centers, [-1])
