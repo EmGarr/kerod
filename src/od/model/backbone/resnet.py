@@ -224,7 +224,7 @@ def ResNet50(weights='imagenet', input_tensor=None, input_shape=None):
     else:
         inputs = img_input
     # Create model.
-    model = tf.keras.Model(inputs, [b2, b2, b3, b4], name='resnet50')
+    model = tf.keras.Model(inputs, [b1, b2, b3, b4], name='resnet50')
 
     # Load weights.
     if weights == 'imagenet':
