@@ -53,17 +53,18 @@ def get_all_anchors(stride, sizes, ratios, max_size):
 
 
 def test_generate_anchors():
-    """Ensure the anchor generation is the same than tensorpack"""
-    stride = 16
+    """Ensure the anchor generation is the same than tensorpack for the feature pyramidal network."""
     ratios = [0.5, 1, 2]
-    scales = [8, 16, 32]
-    feature_map_shape = 8
-    anchors_tensorpack = get_all_anchors(stride, scales, ratios,
-                                         stride * feature_map_shape).reshape((-1, 4))
+    strides = (4, 8, 16, 32, 64)
+    scales = (32, 64, 128, 256, 512)
+    feature_map_shapes = [200, 100, 50, 25, 12]
+    for stride, scale, feature_map_shape in zip(strides, scales, feature_map_shapes):
+        anchors_tensorpack = get_all_anchors(stride, scales, ratios,
+                                            stride * feature_map_shape).reshape((-1, 4))
 
-    anchors_od = generate_anchors(stride, tf.constant(scales, tf.float32),
-                                  tf.constant(ratios, tf.float32),
-                                  (1, feature_map_shape, feature_map_shape, None))
+        anchors_od = generate_anchors(stride, tf.constant(scales, tf.float32),
+                                    tf.constant(ratios, tf.float32),
+                                    (1, feature_map_shape, feature_map_shape, None))
 
-    anchors_od = tf.gather(anchors_od, [1, 0, 3, 2], axis=-1)
-    np.testing.assert_array_almost_equal(anchors_tensorpack, anchors_od, decimal=5)
+        anchors_od = tf.gather(anchors_od, [1, 0, 3, 2], axis=-1)
+        np.testing.assert_array_almost_equal(anchors_tensorpack, anchors_od, decimal=5)

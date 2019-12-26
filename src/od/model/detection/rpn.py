@@ -50,6 +50,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
                                               dtype=self.dtype)
 
         self._anchor_strides = (4, 8, 16, 32, 64)
+        self._anchor_zises = (32, 64, 128, 256, 512)
         self._anchor_ratios = anchor_ratios
 
     def build(self, input_shape):
@@ -122,8 +123,9 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         rpn_predictions = [self.build_rpn_head(tensor) for tensor in pyramid]
         rpn_anchors = []
-        for tensor, anchor_stride in zip(pyramid, self._anchor_strides):
-            anchors = generate_anchors(anchor_stride, tf.constant([8], self.dtype),
+        for tensor, anchor_stride, anchor_size in zip(pyramid, self._anchor_strides,
+                                                      self._anchor_zises):
+            anchors = generate_anchors(anchor_stride, tf.constant([anchor_size], self.dtype),
                                        tf.constant(self._anchor_ratios, self.dtype),
                                        tf.shape(tensor))
             # TODO clipping to investigate
