@@ -115,11 +115,8 @@ class RegionProposalNetwork(AbstractDetectionHead):
         - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
         the scores for the boxes.
         """
-
-        if training:
-            pyramid, image_information, ground_truths = inputs
-        else:
-            pyramid, image_information = inputs
+        pyramid = inputs[0]
+        image_information = inputs[1]
 
         rpn_predictions = [self.build_rpn_head(tensor) for tensor in pyramid]
         rpn_anchors = []
@@ -136,6 +133,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         classification_prob = tf.nn.softmax(classification_pred)
 
         if training:
+            ground_truths = inputs[2]
             loss = self.compute_loss(localization_pred, classification_pred, anchors, ground_truths)
             return post_process_rpn(classification_prob,
                                     localization_pred,

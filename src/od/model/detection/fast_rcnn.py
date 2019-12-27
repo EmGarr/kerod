@@ -93,15 +93,15 @@ class FastRCNN(AbstractDetectionHead):
         in nms_boxes[i], nms_scores[i] and nms_class[i] are valid. The rest of the
         entries are zero paddings.
         """
+        # Remove P6
+        pyramid = inputs[0][:-1]
+        anchors = inputs[1]
+        image_information = inputs[2]
         if training:
-            pyramid, anchors, image_information, ground_truths = inputs
+            ground_truths = inputs[3]
             y_true, weights = self.sample_boxes(anchors, ground_truths)
             anchors = y_true[LossField.LOCALIZATION]
-        else:
-            pyramid, anchors, image_information = inputs
 
-        # Remove P6
-        pyramid = pyramid[:-1]
         # We can compute the original image shape regarding
         # TODO compute it more automatically without knowing that the last layer is stride 32
         image_shape = tf.cast(tf.shape(pyramid[-1])[1:3] * 32, dtype=self.dtype)
