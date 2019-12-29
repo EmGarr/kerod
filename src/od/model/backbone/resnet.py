@@ -17,7 +17,7 @@ WEIGHTS_PATH_NO_TOP = ('https://github.com/fchollet/deep-learning-models/'
                        'resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5')
 
 
-def identity_block(input_tensor, kernel_size, filters, stage, block):
+def identity_block(input_tensor, kernel_size, filters, stage, block, trainable=True):
     """The identity block is the block that has no conv layer at shortcut.
 
     Arguments:
@@ -27,7 +27,9 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
             middle conv layer at main path
     - *filters*: list of integers, the filters of 3 conv layer at main path
     - *stage*: integer, current stage label, used for generating layer names
-        block: 'a','b'..., current block label, used for generating layer names
+    - *block*: 'a','b'..., current block label, used for generating layer names
+    - *trainable*: All the layers are trainable.
+
     Return:
 
     Output tensor for the block.
@@ -40,8 +42,10 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     conv_name_base = 'res' + str(stage) + block + '_branch'
     bn_name_base = 'bn' + str(stage) + block + '_branch'
 
-    x = KL.Conv2D(filters1, (1, 1), kernel_initializer='he_normal',
-                  name=conv_name_base + '2a')(input_tensor)
+    x = KL.Conv2D(filters1, (1, 1),
+                  kernel_initializer='he_normal',
+                  name=conv_name_base + '2a',
+                  trainable=trainable)(input_tensor)
     x = KL.BatchNormalization(axis=bn_axis, name=bn_name_base + '2a', trainable=False)(x)
     x = KL.Activation('relu')(x)
 
@@ -49,11 +53,15 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
                   kernel_size,
                   padding='same',
                   kernel_initializer='he_normal',
-                  name=conv_name_base + '2b')(x)
+                  name=conv_name_base + '2b',
+                  trainable=trainable)(x)
     x = KL.BatchNormalization(axis=bn_axis, name=bn_name_base + '2b', trainable=False)(x)
     x = KL.Activation('relu')(x)
 
-    x = KL.Conv2D(filters3, (1, 1), kernel_initializer='he_normal', name=conv_name_base + '2c')(x)
+    x = KL.Conv2D(filters3, (1, 1),
+                  kernel_initializer='he_normal',
+                  name=conv_name_base + '2c',
+                  trainable=trainable)(x)
     x = KL.BatchNormalization(axis=bn_axis, name=bn_name_base + '2c', trainable=False)(x)
 
     x = KL.add([x, input_tensor])
@@ -61,7 +69,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     return x
 
 
-def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2)):
+def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2), trainable=True):
     """A block that has a conv layer at shortcut.
 
     Arguments:
@@ -73,6 +81,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2))
     - *stage*: integer, current stage label, used for generating layer names
     - *block*: 'a','b'..., current block label, used for generating layer names
     - *strides*: Strides for the first conv layer in the block.
+    - *trainable*: All the layers are trainable.
 
     Returns:
 
@@ -93,7 +102,8 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2))
     x = KL.Conv2D(filters1, (1, 1),
                   strides=strides,
                   kernel_initializer='he_normal',
-                  name=conv_name_base + '2a')(input_tensor)
+                  name=conv_name_base + '2a',
+                  trainable=trainable)(input_tensor)
     x = KL.BatchNormalization(axis=bn_axis, name=bn_name_base + '2a', trainable=False)(x)
     x = KL.Activation('relu')(x)
 
@@ -101,17 +111,22 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2))
                   kernel_size,
                   padding='same',
                   kernel_initializer='he_normal',
-                  name=conv_name_base + '2b')(x)
+                  name=conv_name_base + '2b',
+                  trainable=trainable)(x)
     x = KL.BatchNormalization(axis=bn_axis, name=bn_name_base + '2b', trainable=False)(x)
     x = KL.Activation('relu')(x)
 
-    x = KL.Conv2D(filters3, (1, 1), kernel_initializer='he_normal', name=conv_name_base + '2c')(x)
+    x = KL.Conv2D(filters3, (1, 1),
+                  kernel_initializer='he_normal',
+                  name=conv_name_base + '2c',
+                  trainable=trainable)(x)
     x = KL.BatchNormalization(axis=bn_axis, name=bn_name_base + '2c', trainable=False)(x)
 
     shortcut = KL.Conv2D(filters3, (1, 1),
                          strides=strides,
                          kernel_initializer='he_normal',
-                         name=conv_name_base + '1')(input_tensor)
+                         name=conv_name_base + '1',
+                         trainable=trainable)(input_tensor)
     shortcut = KL.BatchNormalization(axis=bn_axis, name=bn_name_base + '1',
                                      trainable=False)(shortcut)
 
@@ -191,15 +206,16 @@ def ResNet50(weights='imagenet', input_tensor=None, input_shape=None):
                   strides=(2, 2),
                   padding='valid',
                   kernel_initializer='he_normal',
-                  name='conv1')(x)
+                  name='conv1',
+                  trainable=False)(x)
     x = KL.BatchNormalization(axis=bn_axis, name='bn_conv1', trainable=False)(x)
     x = KL.Activation('relu')(x)
     x = KL.ZeroPadding2D(padding=(1, 1), name='pool1_pad')(x)
     x = KL.MaxPooling2D((3, 3), strides=(2, 2))(x)
 
-    x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1))
-    x = identity_block(x, 3, [64, 64, 256], stage=2, block='b')
-    b1 = identity_block(x, 3, [64, 64, 256], stage=2, block='c')
+    x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1), trainable=False)
+    x = identity_block(x, 3, [64, 64, 256], stage=2, block='b', trainable=False)
+    b1 = identity_block(x, 3, [64, 64, 256], stage=2, block='c', trainable=False)
 
     x = conv_block(b1, 3, [128, 128, 512], stage=3, block='a')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='b')
