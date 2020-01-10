@@ -67,7 +67,7 @@ class FastRCNN(AbstractDetectionHead):
             BoxField.BOXES:
                 tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
             BoxField.LABELS:
-                tf.constant([[[0, 0, 1], [0, 1, 0]], [[0, 0, 1], [0, 0, 0]]], tf.float32),
+                tf.constant([[2,1], [2, 0]], tf.int32),
             BoxField.WEIGHTS:
                 tf.constant([[1, 0], [1, 1]], tf.float32),
             BoxField.NUM_BOXES:
