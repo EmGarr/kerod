@@ -99,6 +99,8 @@ class FastRCNN(AbstractDetectionHead):
         image_information = inputs[2]
         if training:
             ground_truths = inputs[3]
+            # Include the ground_truths as RoIs for the training and put their scores to 1
+            anchors = tf.concat([anchors, ground_truths[BoxField.BOXES]], axis=1)
             y_true, weights = self.sample_boxes(anchors, ground_truths)
             anchors = y_true[LossField.LOCALIZATION]
 
