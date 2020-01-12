@@ -43,11 +43,11 @@ class RegionProposalNetwork(AbstractDetectionHead):
             **kwargs)
 
         #Force each ground_truths to match to at least one anchor
-        matcher = ArgMaxMatcher(0.7, 0.3, force_match_for_each_row=True, dtype=self.dtype)
+        matcher = ArgMaxMatcher(0.7, 0.3, force_match_for_each_row=True, dtype=self._compute_dtype)
         self.target_assigner = TargetAssigner(compute_iou,
                                               matcher,
                                               encode_boxes_faster_rcnn,
-                                              dtype=self.dtype)
+                                              dtype=self._compute_dtype)
 
         self._anchor_strides = (4, 8, 16, 32, 64)
         self._anchor_zises = (32, 64, 128, 256, 512)
@@ -123,8 +123,9 @@ class RegionProposalNetwork(AbstractDetectionHead):
         # TODO compute constant anchors once and extract only the usefull part
         for tensor, anchor_stride, anchor_size in zip(pyramid, self._anchor_strides,
                                                       self._anchor_zises):
-            anchors = generate_anchors(anchor_stride, tf.constant([anchor_size], self.dtype),
-                                       tf.constant(self._anchor_ratios, self.dtype),
+            anchors = generate_anchors(anchor_stride, tf.constant([anchor_size],
+                                                                  self._compute_dtype),
+                                       tf.constant(self._anchor_ratios, self._compute_dtype),
                                        tf.shape(tensor))
             # TODO clipping to investigate
             rpn_anchors.append(anchors)
@@ -140,13 +141,13 @@ class RegionProposalNetwork(AbstractDetectionHead):
                                     localization_pred,
                                     anchors,
                                     image_information,
-                                    pre_nms_topk=12000,
+                                    pre_nms_topk=2000 * len(pyramid),
                                     post_nms_topk=2000)
         return post_process_rpn(classification_prob,
                                 localization_pred,
                                 anchors,
                                 image_information,
-                                pre_nms_topk=6000,
+                                pre_nms_topk=1000 * len(pyramid),
                                 post_nms_topk=1000)
 
     def compute_loss(self, localization_pred, classification_pred, anchors, ground_truths):
@@ -191,9 +192,8 @@ class RegionProposalNetwork(AbstractDetectionHead):
         y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths)
 
         ## Compute metrics
-        recall = compute_rpn_metrics(
-            tf.squeeze(y_true[LossField.CLASSIFICATION], axis=-1), classification_pred,
-            weights[LossField.CLASSIFICATION])
+        recall = compute_rpn_metrics(tf.squeeze(y_true[LossField.CLASSIFICATION], axis=-1),
+                                     classification_pred, weights[LossField.CLASSIFICATION])
         self.add_metric(recall, name='rpn_recall', aggregation='mean')
 
         ## Samling
@@ -204,7 +204,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
             SAMPLING_SIZE,
             labels,
             positive_fraction=SAMPLING_POSITIVE_RATIO,
-            dtype=self.dtype)
+            dtype=self._compute_dtype)
         # Create one_hot encoding [batch_size, num_anchors, 1] -> [batch_size, num_anchors, 2]
         y_true[LossField.CLASSIFICATION] = tf.one_hot(tf.cast(
             y_true[LossField.CLASSIFICATION][:, :, 0], tf.int32),
@@ -241,6 +241,9 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
 
     - *recall*: Among all the boxes that we had to find how much did we found.
     """
+    # Force the cast to avoid type issue when the mixed precision is activated  
+    y_true, y_pred, weights = tf.cast(y_true, tf.float32), tf.cast(y_pred, tf.float32), tf.cast(
+        weights, tf.float32)
 
     # Sometimes the weights have decimal value we do not want that
     weights = tf.clip_by_value(tf.math.ceil(weights), 0, 1)

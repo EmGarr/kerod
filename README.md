@@ -22,9 +22,11 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 
 - As powerful and concise as Keras
 - Low barrier to entry for educators and practitioners
-- Documentation
+- [Documentation](https://emgarr.github.io/od/)
 - Simple (again)
 - Handle batch in training and inference
+- Multi-GPU training
+- The mixed_precision is supported (WIP some metrics are buggy). You can try it with this [notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
 
 ### Algorithms
 
@@ -108,6 +110,7 @@ model_faster_rcnn = tf.keras.Model(inputs=[images, images_information, ground_tr
 You can find examples in the [notebooks folder](./notebooks). There are no runners shipped with the library.
 
 - Pascal VOC training example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/pascal_voc_training_fpn50.ipynb)
+- Mixed precision Pascal VOC training example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
 - Coco example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb). Training an algorithm on COCO has never been so easy just run the cells.
 
 ### Serving
@@ -191,7 +194,6 @@ pytest tests/
 ### Implementation
 
 - [ ] evaluation (MAP)
-- [ ] Mixed Precision
 - [ ] Improved fit loop using gradient tape
 
 ### Futur Improvements

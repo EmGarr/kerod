@@ -159,7 +159,7 @@ class TargetAssigner(object):
 
         Returns:
 
-        *reg_targets*: a float32 tensor with shape [N, box_code_dimension]
+        *reg_targets*: A tensor with shape [N, box_code_dimension]
         """
         matched_gt_boxes = match.gather_based_on_match(groundtruth_boxes[BoxField.BOXES],
                                                        unmatched_value=tf.zeros(4,

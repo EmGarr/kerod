@@ -51,14 +51,12 @@ class ArgMaxMatcher(matcher.Matcher):
   For ignored matches this class sets the values in the Match object to -2.
   """
 
-    def __init__(
-            self,
-            matched_threshold: float,
-            unmatched_threshold: float = None,
-            negatives_lower_than_unmatched=True,
-            force_match_for_each_row=False,
-            dtype=None
-    ):
+    def __init__(self,
+                 matched_threshold: float,
+                 unmatched_threshold: float = None,
+                 negatives_lower_than_unmatched=True,
+                 force_match_for_each_row=False,
+                 dtype=None):
         """Construct ArgMaxMatcher.
 
         Arguments:
@@ -104,10 +102,16 @@ class ArgMaxMatcher(matcher.Matcher):
                                      self._matched_threshold, self._unmatched_threshold))
         self._force_match_for_each_row = force_match_for_each_row
         self._negatives_lower_than_unmatched = negatives_lower_than_unmatched
+
         if dtype is None:
             dtype = K.floatx()
         self.dtype = dtype
 
+        # Convert the value to the proper dtype
+        if self._matched_threshold is not None:
+            self._matched_threshold = tf.constant(self._matched_threshold, self.dtype)
+        if self._unmatched_threshold is not None:
+            self._unmatched_threshold = tf.constant(self._unmatched_threshold, self.dtype)
 
     def _match(self, similarity_matrix, valid_rows):
         """Tries to match each column of the similarity matrix to a row.

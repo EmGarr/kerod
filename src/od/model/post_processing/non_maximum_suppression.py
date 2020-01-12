@@ -63,7 +63,6 @@ def post_process_rpn(classification_pred: tf.Tensor,
     - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
       the scores for the boxes.
     """
-
     batch_size = tf.shape(classification_pred)[0]
     localization_pred = tf.reshape(localization_pred, (batch_size, -1, 4))
     boxes = decode_boxes_faster_rcnn(localization_pred, anchors)
@@ -75,7 +74,8 @@ def post_process_rpn(classification_pred: tf.Tensor,
     topk = tf.minimum(pre_nms_topk, tf.size(scores[0]))
     topk_scores, topk_indices = tf.nn.top_k(scores, k=topk, sorted=False)
     topk_indices = get_full_indices(topk_indices, pre_nms_topk, batch_size)
-    topk_boxes = tf.gather_nd(boxes, topk_indices)
+    topk_boxes = tf.cast(tf.gather_nd(boxes, topk_indices), tf.float32)
+    topk_scores = tf.cast(topk_scores, tf.float32)
 
     nmsed_boxes, nmsed_scores, _, _ = tf.image.combined_non_max_suppression(
         tf.expand_dims(topk_boxes, 2),
@@ -155,8 +155,8 @@ def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
     boxes = tf.reshape(boxes, (batch_size, -1, num_classes - 1, 4))
 
     nmsed_boxes, nmsed_scores, nmsed_labels, valid_detections = tf.image.combined_non_max_suppression(
-        boxes,
-        classification_pred,
+        tf.cast(boxes, tf.float32),
+        tf.cast(classification_pred, tf.float32),
         max_output_size_per_class,
         max_total_size,
         iou_threshold=iou_threshold,

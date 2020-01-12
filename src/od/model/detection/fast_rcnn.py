@@ -34,11 +34,11 @@ class FastRCNN(AbstractDetectionHead):
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.001),
             **kwargs)
 
-        matcher = ArgMaxMatcher(0.5, dtype=self.dtype)
+        matcher = ArgMaxMatcher(0.5, dtype=self._compute_dtype)
         self.target_assigner = TargetAssigner(compute_iou,
                                               matcher,
                                               encode_boxes_faster_rcnn,
-                                              dtype=self.dtype)
+                                              dtype=self._compute_dtype)
 
     def build(self, input_shape):
         self.denses = [
@@ -105,7 +105,7 @@ class FastRCNN(AbstractDetectionHead):
 
         # We can compute the original image shape regarding
         # TODO compute it more automatically without knowing that the last layer is stride 32
-        image_shape = tf.cast(tf.shape(pyramid[-1])[1:3] * 32, dtype=self.dtype)
+        image_shape = tf.cast(tf.shape(pyramid[-1])[1:3] * 32, dtype=self._compute_dtype)
         boxe_tensors = multilevel_roi_align(pyramid, anchors, image_shape, crop_size=7)
         l = KL.Flatten()(boxe_tensors)
         for dense in self.denses:
@@ -188,7 +188,9 @@ class FastRCNN(AbstractDetectionHead):
         # expected by the target_assigner
         gt_boxes = tf.unstack(ground_truths[BoxField.BOXES])
         # We add one because the background is not counted in ground_truths[BoxField.LABELS]
-        gt_labels = tf.one_hot(ground_truths[BoxField.LABELS] + 1, self._num_classes)
+        gt_labels = tf.one_hot(ground_truths[BoxField.LABELS] + 1,
+                               self._num_classes,
+                               dtype=self._compute_dtype)
         gt_labels = tf.unstack(gt_labels)
         gt_weights = tf.unstack(ground_truths[BoxField.WEIGHTS])
         num_boxes = tf.unstack(ground_truths[BoxField.NUM_BOXES])
@@ -200,7 +202,8 @@ class FastRCNN(AbstractDetectionHead):
                 BoxField.WEIGHTS: w[:nb[0]],
             })
 
-        unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], self.dtype)
+        unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0],
+                                            self._compute_dtype)
         y_true, weights, _ = batch_assign_targets(self.target_assigner, unstack_anchors,
                                                   unstack_ground_truths, unmatched_class_label)
 
@@ -214,7 +217,7 @@ class FastRCNN(AbstractDetectionHead):
             sampling_size,
             labels,
             positive_fraction=sampling_positive_ratio,
-            dtype=self.dtype)
+            dtype=self._compute_dtype)
 
         weights[LossField.CLASSIFICATION] = tf.multiply(sample_idx,
                                                         weights[LossField.CLASSIFICATION])

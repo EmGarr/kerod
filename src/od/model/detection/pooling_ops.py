@@ -81,10 +81,11 @@ def roi_align(inputs, boxes, box_indices, image_shape, crop_size: int):
 
     """
     normalized_boxes = normalize_box_coordinates(boxes, image_shape[0], image_shape[1])
-    # Normalized the boxes to the input tensor_shape 
+    # Normalized the boxes to the input tensor_shape
     # TODO rewrite this normalization unnomarlization isn't pretty at all
     tensor_shape = tf.shape(inputs)[1:3]
-    normalized_boxes *= tf.cast(tf.tile(tf.expand_dims(tensor_shape, axis=0), [1, 2]), tf.float32)
+    normalized_boxes *= tf.cast(tf.tile(tf.expand_dims(tensor_shape, axis=0), [1, 2]),
+                                normalized_boxes.dtype)
     ret = _crop_and_resize(inputs, normalized_boxes, box_indices, crop_size * 2)
     return KL.AveragePooling2D(padding='same')(ret)
 
@@ -137,6 +138,7 @@ def match_boxes_to_their_pyramid_level(boxes, num_level):
     - *original_pos_per_level* A list of 1-D tensor with int32 values in [0, num_boxes * batch_size)
     It will be useful to reorder our boxes after the roi_align operation.
     """
+
     def _select_level(tensors, levels):
         return [tf.squeeze(tf.gather(tensors, selected_level), 1) for selected_level in levels]
 

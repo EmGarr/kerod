@@ -102,10 +102,12 @@ def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
         y_min2, x_min2, y_max2, x_max2 = tf.split(value=boxes2, num_or_size_splits=4, axis=-1)
         all_pairs_min_ymax = tf.minimum(y_max1, tf.transpose(y_max2))
         all_pairs_max_ymin = tf.maximum(y_min1, tf.transpose(y_min2))
-        intersect_heights = tf.maximum(0.0, all_pairs_min_ymax - all_pairs_max_ymin)
+        intersect_heights = tf.maximum(tf.constant(0, boxes1.dtype),
+                                       all_pairs_min_ymax - all_pairs_max_ymin)
         all_pairs_min_xmax = tf.minimum(x_max1, tf.transpose(x_max2))
         all_pairs_max_xmin = tf.maximum(x_min1, tf.transpose(x_min2))
-        intersect_widths = tf.maximum(0.0, all_pairs_min_xmax - all_pairs_max_xmin)
+        intersect_widths = tf.maximum(tf.constant(0, boxes1.dtype),
+                                      all_pairs_min_xmax - all_pairs_max_xmin)
         return intersect_heights * intersect_widths
 
 
@@ -157,7 +159,7 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
         areas1 = compute_area(boxes1)
         areas2 = compute_area(boxes2)
         unions = (tf.expand_dims(areas1, -1) + tf.expand_dims(areas2, 0) - intersections)
-        return tf.where(tf.equal(intersections, 0.0), tf.zeros_like(intersections),
+        return tf.where(tf.equal(intersections, 0), tf.zeros_like(intersections),
                         tf.truediv(intersections, unions))
 
 
@@ -194,7 +196,7 @@ def clip_boxes(boxes: tf.Tensor, window: tf.Tensor) -> tf.Tensor:
 
     A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
     """
-    boxes = tf.maximum(boxes, 0.0)
+    boxes = tf.maximum(boxes, tf.cast(0, boxes.dtype))
     m = tf.tile(tf.expand_dims(window, axis=1), [1, 1, 2])
     boxes = tf.minimum(boxes, tf.cast(m, boxes.dtype))
     return boxes

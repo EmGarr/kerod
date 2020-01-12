@@ -182,10 +182,13 @@ class AbstractDetectionHead(KL.Layer):
         """
 
         def _compute_loss(loss, loss_weight, target):
-            losses = loss(y_true[target], y_pred[target], sample_weight=weights[target])
+            losses = loss(tf.cast(y_true[target], tf.float32),
+                          tf.cast(y_pred[target], tf.float32),
+                          sample_weight=tf.cast(weights[target], tf.float32))
             return loss_weight * tf.reduce_mean(tf.reduce_sum(losses, axis=1) / normalizer)
 
         normalizer = tf.maximum(tf.reduce_sum(weights[LossField.CLASSIFICATION], axis=1), 1.0)
+        normalizer = tf.cast(normalizer, tf.float32)
 
         classification_loss = _compute_loss(self._classification_loss,
                                             self._classification_loss_weight,
