@@ -135,6 +135,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         if training:
             ground_truths = inputs[2]
             loss = self.compute_loss(localization_pred, classification_pred, anchors, ground_truths)
+            # replace post_process_rpn by tf.image.generate_bounding_box_proposals
             return post_process_rpn(classification_prob,
                                     localization_pred,
                                     anchors,
