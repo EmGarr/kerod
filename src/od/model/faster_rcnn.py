@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from od.core.standard_fields import BoxField, DatasetField
+from od.model import factory
 from od.model.backbone.fpn import Pyramid
 from od.model.backbone.resnet import ResNet50
 from od.model.detection.fast_rcnn import FastRCNN
@@ -38,32 +38,9 @@ def build_fpn_resnet50_faster_rcnn(num_classes: int, batch_size: int) -> tf.kera
     [DatasetField.IMAGES, DatasetField.IMAGES_INFO, BoxField.BOXES, BoxField.LABELS,
     BoxField.WEIGHTS, BoxField.NUM_BOXES]
     """
-    images = tf.keras.layers.Input(shape=(None, None, 3),
-                                   batch_size=batch_size,
-                                   name=DatasetField.IMAGES)
-    images_information = tf.keras.layers.Input(shape=(2),
-                                               batch_size=batch_size,
-                                               name=DatasetField.IMAGES_INFO)
+    images, images_information, ground_truths = factory.build_input_layers(training=True,
+                                                                     batch_size=batch_size)
 
-    ground_truths = {
-        BoxField.BOXES:
-            tf.keras.layers.Input(shape=(None, 4), batch_size=batch_size, name=BoxField.BOXES),
-        BoxField.LABELS:
-            tf.keras.layers.Input(shape=(None,),
-                                  batch_size=batch_size,
-                                  dtype=tf.int32,
-                                  name=BoxField.LABELS),
-        BoxField.WEIGHTS:
-            tf.keras.layers.Input(shape=(None,),
-                                  batch_size=batch_size,
-                                  dtype=tf.float32,
-                                  name=BoxField.WEIGHTS),
-        BoxField.NUM_BOXES:
-            tf.keras.layers.Input(shape=(batch_size),
-                                  batch_size=batch_size,
-                                  dtype=tf.int32,
-                                  name=BoxField.NUM_BOXES)
-    }
     resnet = ResNet50(input_tensor=images, weights='imagenet')
     pyramid = Pyramid()(resnet.outputs)
     rois, _ = RegionProposalNetwork()([pyramid, images_information, ground_truths], training=True)

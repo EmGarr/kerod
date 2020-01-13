@@ -25,42 +25,18 @@ pip install git+https://github.com/EmGarr/od.git
 
 It provides simple blocks to create the state of the art object detection algorithms.
 
-
 ```python
 from od.model.backbone.fpn import Pyramid
 from od.model.backbone.resnet import ResNet50
 from od.model.detection.fast_rcnn import FastRCNN
 from od.model.detection.rpn import RegionProposalNetwork
+from od.model import factory
 
 
 # Inputs of our model
 batch_size = 2
-images = tf.keras.layers.Input(shape=(None, None, 3),
-                                batch_size=batch_size,
-                                name='images')
-images_information = tf.keras.layers.Input(shape=(2),
-                                            batch_size=batch_size,
-                                            name='images_info')
+images, images_information, ground_truths = factory.build_input_layers(training=True, batch_size=batch_size)
 
-ground_truths = {
-    BoxField.BOXES:
-        tf.keras.layers.Input(shape=(None, 4), batch_size=batch_size, name='bbox'),
-    BoxField.LABELS:
-        tf.keras.layers.Input(shape=(None,),
-                              batch_size=batch_size,
-                              dtype=tf.int32,
-                              name='label'),
-    BoxField.WEIGHTS:
-        tf.keras.layers.Input(shape=(None,),
-                              batch_size=batch_size,
-                              dtype=tf.float32,
-                              name='weights'),
-    BoxField.NUM_BOXES:
-        tf.keras.layers.Input(shape=(batch_size),
-                              batch_size=batch_size,
-                              dtype=tf.int32,
-                              name='num_boxes')
-}
 # Keras layers
 num_classes = 20
 resnet = ResNet50(input_tensor=images, weights='imagenet')
