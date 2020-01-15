@@ -6,7 +6,7 @@ import tensorflow as tf
 import tensorflow.keras.backend as K
 
 from od.core.standard_fields import BoxField, LossField
-from od.model.detection.fast_rcnn import FastRCNN
+from od.model.detection.fast_rcnn import FastRCNN, compute_fast_rcnn_metrics
 
 
 def mocked_random_shuffle(indices):
@@ -139,9 +139,22 @@ def test_fast_rcnn_compute_loss(mock_add_loss, mock_add_metric):
     num_classes = 3
     fast_rcnn = FastRCNN(num_classes)
 
-    losses = fast_rcnn.compute_loss(y_true, weights, classification_pred,
-                                                localization_pred)
+    losses = fast_rcnn.compute_loss(y_true, weights, classification_pred, localization_pred)
 
     assert losses[LossField.CLASSIFICATION] == 400 / 3 / 2
     assert losses[LossField.LOCALIZATION] == 0.5
     assert len(losses) == 2
+
+
+def test_compute_fast_rcnn_metrics():
+    y_pred = tf.constant([[[-100, 100, -100], [100, -100, -100], [100, -100, -100]],
+                          # TP foreground   - TP background    -  TP background
+                          [[100, -100, -100], [-100, -100, 100], [-100, -100, 100]]], tf.float32)
+             # FP background & FN predicted - TP foreground   - FP
+
+    y_true = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0]], [[0, 0, 1], [0, 0, 1], [0, 1, 0]]])
+
+    accuracy, fg_accuracy, false_negative = compute_fast_rcnn_metrics(y_true, y_pred)
+    assert accuracy == 4/6
+    assert fg_accuracy == 0.5
+    assert false_negative == 1/4

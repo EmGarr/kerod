@@ -271,6 +271,11 @@ class FastRCNN(AbstractDetectionHead):
         - *classification_loss*: A scalar
         - *localization_loss*: A scalar
         """
+        accuracy, fg_accuracy, false_negative = compute_fast_rcnn_metrics(
+            y_true[LossField.CLASSIFICATION], classification_pred)
+        self.add_metric(accuracy, name='accuracy', aggregation='mean')
+        self.add_metric(fg_accuracy, name='fg_accuracy', aggregation='mean')
+        self.add_metric(false_negative, name='false_negative', aggregation='mean')
 
         # y_true[LossField.CLASSIFICATION] is just 1 and 0 we are using it as mask to extract
         # the corresponding target anchors
@@ -287,4 +292,51 @@ class FastRCNN(AbstractDetectionHead):
             LossField.CLASSIFICATION: classification_pred,
             LossField.LOCALIZATION: extracted_localization_pred
         }
+
         return self.compute_losses(y_true, y_pred, weights)
+
+
+def compute_fast_rcnn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
+    """Useful metrics that allows to track how behave the training of the fast rcnn head.
+
+    TODO Handle the sample_weights
+
+    Arguments:
+
+    - *y_true*: A one-hot encoded vector with shape [batch_size, num_sample_anchors, num_classes]
+    - *y_pred*: A tensor with shape [batch_size, num_sample_anchors, num_classes],
+    representing the classification logits.
+
+    Returns:
+
+    - *accuracy*: A scalar tensor representing the accuracy with the background classes included
+    - *fg_accuracy*: A scalar tensor representing the accuracy without the background classes included
+    - *false_negative*: A scalar tensor representing the ratio of boxes predicted as background instead of
+    their respective class among the foreground example to predict.
+
+    Warning:
+
+    This function should be used if the ground_truths have been added to the RoIs.
+    It won't work if the there are no foreground ground_truths in the sample_boxes which isn't
+    possible if they have been added.
+    """
+    # compute usefull metrics
+    #Even if the softmax has not been applyed the argmax can be usefull
+    prediction = tf.argmax(y_pred, axis=-1, name='label_prediction')
+    correct_labels = tf.argmax(y_true, axis=-1, name='label_prediction')
+    correct = tf.cast(tf.equal(prediction, correct_labels), tf.float32)
+    # The accuracy allows to determine if the models perform well (background included)
+    accuracy = tf.reduce_mean(correct, name='accuracy')
+
+    # Compute accuracy and false negative on all the foreground boxes
+    fg_inds = tf.where(y_true[:, :, 0] < 1)
+    num_fg = tf.shape(fg_inds)[0]
+    fg_label_pred = tf.argmax(tf.gather_nd(y_pred, fg_inds), axis=-1)
+    num_zero = tf.reduce_sum(tf.cast(tf.equal(fg_label_pred, 0), tf.int32), name='num_zero')
+
+    # Number of example predicted as background instead of one of our classes
+    false_negative = tf.cast(tf.truediv(num_zero, num_fg), tf.float32, name='false_negative')
+
+    fg_accuracy = tf.reduce_mean(tf.gather_nd(correct, fg_inds), name='fg_accuracy')
+
+    return accuracy, fg_accuracy, false_negative
