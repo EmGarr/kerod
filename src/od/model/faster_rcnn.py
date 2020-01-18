@@ -5,9 +5,12 @@ from od.model.backbone.fpn import Pyramid
 from od.model.backbone.resnet import ResNet50
 from od.model.detection.fast_rcnn import FastRCNN
 from od.model.detection.rpn import RegionProposalNetwork
+from od.model.post_processing import post_process_fast_rcnn_boxes
 
 
-def build_fpn_resnet50_faster_rcnn(num_classes: int, batch_size: int) -> tf.keras.Model:
+def build_fpn_resnet50_faster_rcnn(num_classes: int,
+                                   batch_size: int,
+                                   training=True) -> tf.keras.Model:
     """Build a FPN Resnet 50 Faster RCNN network ready to use for training. 
 
     You can use it as follow:
@@ -26,7 +29,8 @@ def build_fpn_resnet50_faster_rcnn(num_classes: int, batch_size: int) -> tf.kera
 
     - *num_classes*: The number of classes of your dataset
     (**do not include the background class** it is handle for you)
-    - *batch_size*: The batch_size needs to specify for the training mode.
+    - *batch_size*: The batch_size needs to specify for the training mode. In inference it should be
+    set to None.
 
     Return:
 
@@ -36,18 +40,30 @@ def build_fpn_resnet50_faster_rcnn(num_classes: int, batch_size: int) -> tf.kera
 
     The inputs of the model are flatten. It is a list defined by the following keys:
     [DatasetField.IMAGES, DatasetField.IMAGES_INFO, BoxField.BOXES, BoxField.LABELS,
-    BoxField.WEIGHTS, BoxField.NUM_BOXES]
+    BoxField.WEIGHTS, BoxField.NUM_BOXES] in training and [DatasetField.IMAGES, DatasetField.IMAGES_INFO]
+    in inference.
     """
-    images, images_information, ground_truths = factory.build_input_layers(training=True,
-                                                                     batch_size=batch_size)
+    if training:
+        images, images_information, ground_truths = factory.build_input_layers(
+            training=True, batch_size=batch_size)
+    else:
+        images, images_information = factory.build_input_layers(training=False)
 
     resnet = ResNet50(input_tensor=images, weights='imagenet')
     pyramid = Pyramid()(resnet.outputs)
-    rois, _ = RegionProposalNetwork()([pyramid, images_information, ground_truths], training=True)
 
-    outputs = FastRCNN(num_classes + 1)([pyramid, rois, images_information, ground_truths],
-                                        training=True)
+    if training:
+        rois, _ = RegionProposalNetwork()([pyramid, images_information, ground_truths],
+                                          training=True)
+        outputs = FastRCNN(num_classes + 1)([pyramid, rois, ground_truths], training=True)
+        inputs = [images, images_information, ground_truths]
+    else:
+        rois, _ = RegionProposalNetwork()([pyramid, images_information], training=False)
+        classification_pred, localization_pred, anchors = FastRCNN(num_classes + 1)([pyramid, rois],
+                                                                                    training=False)
+        outputs = post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
+                                               images_information, num_classes + 1)
 
-    model_faster_rcnn = tf.keras.Model(inputs=[images, images_information, ground_truths],
-                                       outputs=outputs)
-    return model_faster_rcnn
+        inputs = [images, images_information]
+
+    return tf.keras.Model(inputs=inputs, outputs=outputs)

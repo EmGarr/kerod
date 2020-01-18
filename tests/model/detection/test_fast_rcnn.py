@@ -30,7 +30,6 @@ def test_fast_rcnn_full_inference_and_training(fast_rcnn_class):
     boxes = [[0, 0, i, i] for i in range(1, 1000)]
     boxes = tf.constant([boxes, boxes], tf.float32)
 
-    image_information = [[800., 700.], [700., 800.]]
 
     ground_truths = {
         BoxField.BOXES:
@@ -46,8 +45,8 @@ def test_fast_rcnn_full_inference_and_training(fast_rcnn_class):
     num_classes = 3
     fast_rcnn = fast_rcnn_class(num_classes)
 
-    fast_rcnn([pyramid, boxes, image_information, ground_truths], training=True)
-    fast_rcnn([pyramid, boxes, image_information])
+    fast_rcnn([pyramid, boxes, ground_truths], training=True)
+    fast_rcnn([pyramid, boxes])
 
 
 @mock.patch('tensorflow.random.shuffle')

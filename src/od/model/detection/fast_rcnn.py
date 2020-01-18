@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict
 
 import tensorflow as tf
 import tensorflow.keras.layers as KL
@@ -13,7 +13,6 @@ from od.core.standard_fields import BoxField, LossField
 from od.core.target_assigner import TargetAssigner, batch_assign_targets
 from od.model.detection.abstract_detection_head import AbstractDetectionHead
 from od.model.detection.pooling_ops import multilevel_roi_align
-from od.model.post_processing import post_process_fast_rcnn_boxes
 
 
 class FastRCNN(AbstractDetectionHead):
@@ -57,9 +56,7 @@ class FastRCNN(AbstractDetectionHead):
 
         1. *pyramid*: A List of tensors the output of the pyramid
         2. *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
-        3. *image_informations*: A Tensor of shape [batch_size, (height, width)]
-        The height and the width of the original preprocess input images without the padding.
-        4. *ground_truths*: If the training is true, a dict with
+        3. *ground_truths*: If the training is true, a dict with
 
         ```python
         ground_truths = {
@@ -80,24 +77,28 @@ class FastRCNN(AbstractDetectionHead):
 
         Returns:
 
-        - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]
-        containing the non-max suppressed boxes. The coordinates returned are
-        between 0 and 1.
-        - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
-        the scores for the boxes.
-        - *nmsed_classes*: A Tensor of shape [batch_size, max_detections] 
-        containing the class for boxes.
-        - *valid_detections*: A [batch_size] int32 tensor indicating the number of
-        valid detections per batch item. Only the top valid_detections[i] entries
-        in nms_boxes[i], nms_scores[i] and nms_class[i] are valid. The rest of the
-        entries are zero paddings.
+
+        - *classification_pred*: A Tensor of shape [batch_size, num_boxes, num_classes]
+        - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
+        - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
+
+        Raw predictions from the FastRCNN head you can post_process them using:
+
+        ```python
+        from od.model.post_processing import post_process_fast_rcnn_boxes
+
+        outputs = post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
+                                    images_information, num_classes)
+        ```
+
+        where `images_information` is provided as input of your model and `num_classes` includes
+        the background.
         """
         # Remove P6
         pyramid = inputs[0][:-1]
         anchors = inputs[1]
-        image_information = inputs[2]
         if training:
-            ground_truths = inputs[3]
+            ground_truths = inputs[2]
             # Include the ground_truths as RoIs for the training and put their scores to 1
             anchors = tf.concat([anchors, ground_truths[BoxField.BOXES]], axis=1)
             y_true, weights = self.sample_boxes(anchors, ground_truths)
@@ -122,14 +123,7 @@ class FastRCNN(AbstractDetectionHead):
             losses = self.compute_loss(y_true, weights, classification_pred, localization_pred)
 
         classification_pred = tf.nn.softmax(classification_pred)
-
-        if training:
-            # Post process_fast_rcnn_perform NMS computation which is CPU intensive we do not want this
-            # in training. This output can still be usefull when coupled with callback to perform
-            # visualization on an image.
-            return classification_pred, localization_pred, anchors
-        return post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
-                                            image_information, self._num_classes)
+        return classification_pred, localization_pred, anchors
 
     def sample_boxes(self,
                      anchors: tf.Tensor,

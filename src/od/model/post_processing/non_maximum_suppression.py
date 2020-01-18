@@ -166,7 +166,6 @@ def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
         score_threshold=score_threshold,
         clip_boxes=False)
 
-
     normalizer_boxes = tf.tile(tf.expand_dims(image_information, axis=1), [1, 1, 2])
     nmsed_boxes = tf.math.divide(nmsed_boxes, normalizer_boxes, name=BoxField.BOXES)
     nmsed_scores = tf.identity(nmsed_scores, name=BoxField.SCORES)
