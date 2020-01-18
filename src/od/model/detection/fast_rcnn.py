@@ -1,6 +1,5 @@
 from typing import List, Dict
 
-import gin
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
@@ -132,7 +131,6 @@ class FastRCNN(AbstractDetectionHead):
         return post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
                                             image_information, self._num_classes)
 
-    @gin.configurable()
     def sample_boxes(self,
                      anchors: tf.Tensor,
                      ground_truths: Dict[str, tf.Tensor],
