@@ -321,6 +321,7 @@ def compute_fast_rcnn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
     accuracy = tf.reduce_mean(correct, name='accuracy')
 
     # Compute accuracy and false negative on all the foreground boxes
+    # At position 0 the background boxes are equal to 1 which means the ones equal to 0 are foreground
     fg_inds = tf.where(y_true[:, :, 0] < 1)
     num_fg = tf.shape(fg_inds)[0]
     fg_label_pred = tf.argmax(tf.gather_nd(y_pred, fg_inds), axis=-1)

@@ -190,9 +190,16 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths)
 
+        ## Compute metrics
+        fg_precision, recall = compute_rpn_metrics(
+            tf.squeeze(y_true[LossField.CLASSIFICATION], axis=-1), classification_pred,
+            weights[LossField.CLASSIFICATION])
+        self.add_metric(fg_precision, name='rpn_fg_precision', aggregation='mean')
+        self.add_metric(recall, name='rpn_recall', aggregation='mean')
+
+        ## Samling
         # y_true[LossField.CLASSIFICATION] is a [batch_size, num_anchors, 1]
         labels = tf.cast(y_true[LossField.CLASSIFICATION][:, :, 0], dtype=bool)
-
         sample_idx = batch_sample_balanced_positive_negative(
             weights[LossField.CLASSIFICATION],
             SAMPLING_SIZE,
@@ -219,3 +226,40 @@ class RegionProposalNetwork(AbstractDetectionHead):
         base_config = super().get_config()
         base_config['anchor_ratios'] = self._anchor_ratios
         return base_config
+
+
+def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor):
+    """Useful metrics that allows to track how behave the training of the rpn head.
+
+    Arguments:
+
+    - *y_true*: A one-hot encoded vector with shape [batch_size, num_anchors]
+    - *y_pred*: A tensor of shape [batch_size, num_anchors, 2],
+    representing the classification logits.
+    - *weights*: A tensor of shape [batch_size, num_anchors] where weights should
+
+    Returns:
+
+    - *fg_precision*: Compute the precision for all the boxes that have been predicted as foreground
+    and do not take into account the background boxes. TODO to challenge.
+    - *recall*: Among all the boxes that we had to find how much did we found.
+    """
+
+    # Sometimes the weights have decimal value we do not want that
+    weights = tf.clip_by_value(tf.math.ceil(weights), 0, 1)
+    masked_y_true = y_true * weights
+    prediction = tf.cast(tf.argmax(y_pred, axis=-1, name='label_prediction'),
+                         tf.float32) * weights  # 0 or 1
+    correct = tf.cast(tf.equal(prediction, masked_y_true), tf.float32)
+
+    fg_inds = tf.where(masked_y_true == 1)
+
+    # Compute the precision only for the boxes which have been predicted as foreground
+    # We do not want to compute the precision with all the background_boxes
+    fg_pred_inds = tf.where(prediction == 1)
+    fg_precision = tf.reduce_mean(tf.gather_nd(correct, fg_pred_inds), name='fg_precision')
+
+    num_valid_anchor = tf.math.count_nonzero(masked_y_true)
+    num_pos_foreground_prediction = tf.math.count_nonzero(tf.gather_nd(correct, fg_inds))
+    recall = tf.truediv(num_pos_foreground_prediction, num_valid_anchor, name='recall')
+    return fg_precision, recall

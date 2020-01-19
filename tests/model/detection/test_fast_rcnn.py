@@ -146,14 +146,18 @@ def test_fast_rcnn_compute_loss(mock_add_loss, mock_add_metric):
 
 
 def test_compute_fast_rcnn_metrics():
-    y_pred = tf.constant([[[-100, 100, -100], [100, -100, -100], [100, -100, -100]],
-                          # TP foreground   - TP background    -  TP background
-                          [[100, -100, -100], [-100, -100, 100], [-100, -100, 100]]], tf.float32)
-             # FP background & FN predicted - TP foreground   - FP
+    y_pred = tf.constant(
+        [
+            [[-100, 100, -100], [100, -100, -100], [100, -100, -100]],
+            # TP foreground   - TP background    -  TP background
+            [[100, -100, -100], [-100, -100, 100], [-100, -100, 100]]
+        ],
+        tf.float32)
+    # FP background & FN predicted - TP foreground   - FP
 
     y_true = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0]], [[0, 0, 1], [0, 0, 1], [0, 1, 0]]])
 
     accuracy, fg_accuracy, false_negative = compute_fast_rcnn_metrics(y_true, y_pred)
-    assert accuracy == 4/6
+    assert accuracy == 4 / 6
     assert fg_accuracy == 0.5
-    assert false_negative == 1/4
+    assert false_negative == 1 / 4

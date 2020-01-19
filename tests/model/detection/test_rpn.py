@@ -5,7 +5,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 
 from od.core.standard_fields import BoxField, LossField
-from od.model.detection.rpn import RegionProposalNetwork
+from od.model.detection.rpn import RegionProposalNetwork, compute_rpn_metrics
 
 
 def mocked_random_shuffle(indices):
@@ -65,10 +65,28 @@ def test_compute_loss_rpn(mock_add_metric, mock_add_loss, mock_shuffle):
             tf.constant([[2], [1]], tf.int32),
     }
     rpn = RegionProposalNetwork(classification_loss_weight=1.0)
-    losses = rpn.compute_loss(localization_pred,
-                                                              classification_pred, anchors,
-                                                              ground_truths)
+    losses = rpn.compute_loss(localization_pred, classification_pred, anchors, ground_truths)
 
-    assert losses[LossField.CLASSIFICATION] == 100 
+    assert losses[LossField.CLASSIFICATION] == 100
     assert losses[LossField.LOCALIZATION] == 0
     assert len(losses) == 2
+
+
+def test_compute_rpn_metrics():
+    y_true = tf.constant([[0, 0, 0, 1, 1, 0, 1, 0, 0]], tf.float32)
+    weights = tf.constant([[0, 1, 1, 2, 1, 1, 0.5, 1, 1]])
+
+    y_pred = tf.constant([[
+        [-100, 100],
+        [100, -100],
+        [100, -100],
+        [-100, 100],
+        [-100, 100],
+        [-100, 100],
+        [100, -100],
+        [-100, 100],
+        [-100, 100],
+    ]], tf.float32)
+    fg_precision, recall = compute_rpn_metrics(y_true, y_pred, weights)
+    assert fg_precision == 2/5
+    assert recall == 2/3

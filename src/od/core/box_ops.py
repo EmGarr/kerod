@@ -111,6 +111,37 @@ def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
 def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
     """Computes pairwise intersection-over-union between box collections.
 
+    Example:
+
+   The axis x correspond to boxes2 and y the boxes1:
+
+    ```python
+    from od.core.box_ops import compute_iou
+    import numpy as np
+
+    boxes1 = np.array([[548.26666, 364.57202, 706.1333 , 524.472  ],
+           [473.6    , 547.924  , 565.3333 , 635.336  ],
+           [477.86664, 688.63605, 580.26666, 786.70795],
+           [497.06668, 750.464  , 576.     , 857.064  ]])
+
+    boxes2 = np.array([[474.74518, 553.37256, 565.2548 , 598.62744],
+                     [448., 736., 576., 864.],
+                      [464., 672., 592., 800.],
+                      [560., 368., 688., 496.]
+                     ])
+    compute_iou(boxes1, boxes2)
+    ```
+
+    output
+
+    ```
+    <tf.Tensor: shape=(4, 4), dtype=float64, numpy=
+    array([[0.        , 0.        , 0.        , 0.6490545 ],
+           [0.51081317, 0.        , 0.        , 0.        ],
+           [0.        , 0.23198337, 0.61294949, 0.        ],
+           [0.        , 0.51356762, 0.18718853, 0.        ]])>
+    ```
+
     Arguments:
 
     - *boxes1*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
