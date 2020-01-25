@@ -44,7 +44,7 @@ def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: t
     nw = spacing_w * tf.cast(crop_shape[1] - 1, boxes.dtype) / tensor_shape[1]
     nh = spacing_h * tf.cast(crop_shape[0] - 1, boxes.dtype) / tensor_shape[0]
 
-    return tf.concat([ny0, nx0, ny0 + nh, nx0 + nw], axis=1)
+    return tf.concat([ny0, nx0, ny0 + nh, nx0 + nw], axis=-1)
 
 
 def convert_to_center_coordinates(boxes: tf.Tensor) -> tf.Tensor:

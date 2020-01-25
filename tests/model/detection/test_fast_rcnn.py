@@ -30,7 +30,6 @@ def test_fast_rcnn_full_inference_and_training(fast_rcnn_class):
     boxes = [[0, 0, i, i] for i in range(1, 1000)]
     boxes = tf.constant([boxes, boxes], tf.float32)
 
-
     ground_truths = {
         BoxField.BOXES:
             tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
@@ -71,10 +70,10 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
 
     fast_rcnn = FastRCNN(num_classes)
     sampling_size = 10
-    y_true, weights = fast_rcnn.sample_boxes(boxes,
-                                             ground_truths,
-                                             sampling_size=sampling_size,
-                                             sampling_positive_ratio=0.2)
+    y_true, weights, sample_anchors = fast_rcnn.sample_boxes(boxes,
+                                                             ground_truths,
+                                                             sampling_size=sampling_size,
+                                                             sampling_positive_ratio=0.2)
 
     expected_y_true_classification = np.zeros((2, sampling_size, 3))
     expected_y_true_classification[:, :, 0] = 1
@@ -102,6 +101,20 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
     np.testing.assert_array_equal(expected_weights_classification,
                                   weights[LossField.CLASSIFICATION])
     np.testing.assert_array_equal(expected_weights_localization, weights[LossField.LOCALIZATION])
+
+    # In this batch [0, 0, 2, 2] isn't sampled because of the ground_truths weights
+    # On the ground_truths [0, 0, 2, 2] the weights has been set to 0
+    expected_sample_anchors_batch_1 = [[0., 0., 1., 1.], [0., 0., 3., 3.], [0., 0., 4., 4.],
+                                       [0., 0., 5., 5.], [0., 0., 6., 6.], [0., 0., 7., 7.],
+                                       [0., 0., 8., 8.], [0., 0., 9., 9.], [0., 0., 10., 10.],
+                                       [0., 0., 11., 11.]]
+    expected_sample_anchors_batch_2 = [[0., 0., 1., 1.], [0., 0., 2., 2.], [0., 0., 3., 3.],
+                                       [0., 0., 4., 4.], [0., 0., 5., 5.], [0., 0., 6., 6.],
+                                       [0., 0., 7., 7.], [0., 0., 8., 8.], [0., 0., 9., 9.],
+                                       [0., 0., 10., 10.]]
+    expected_sample_anchors = np.array(
+        [expected_sample_anchors_batch_1, expected_sample_anchors_batch_2])
+    np.testing.assert_array_equal(expected_sample_anchors, sample_anchors)
 
 
 # We are forced to Mock the add_metric, add_loss because want it to be used inside the call

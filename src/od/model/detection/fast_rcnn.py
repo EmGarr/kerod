@@ -101,8 +101,7 @@ class FastRCNN(AbstractDetectionHead):
             ground_truths = inputs[2]
             # Include the ground_truths as RoIs for the training and put their scores to 1
             anchors = tf.concat([anchors, ground_truths[BoxField.BOXES]], axis=1)
-            y_true, weights = self.sample_boxes(anchors, ground_truths)
-            anchors = y_true[LossField.LOCALIZATION]
+            y_true, weights, anchors = self.sample_boxes(anchors, ground_truths)
 
         # We can compute the original image shape regarding
         # TODO compute it more automatically without knowing that the last layer is stride 32
@@ -183,7 +182,7 @@ class FastRCNN(AbstractDetectionHead):
             raise ValueError("In training the batch size cannot be None. You should specify it"
                              " in tf.Keras.layers.Input using the argument batch_size.")
         anchors.set_shape((batch_size, None, 4))
-        anchors = [{BoxField.BOXES: anchor} for anchor in tf.unstack(anchors)]
+        unstack_anchors = [{BoxField.BOXES: anchor} for anchor in tf.unstack(anchors)]
 
         # Remove the padding and convert the ground_truths to the format
         # expected by the target_assigner
@@ -202,7 +201,7 @@ class FastRCNN(AbstractDetectionHead):
             })
 
         unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0], self.dtype)
-        y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors,
+        y_true, weights, _ = batch_assign_targets(self.target_assigner, unstack_anchors,
                                                   unstack_ground_truths, unmatched_class_label)
 
         # Here we have a tensor of shape [batch_size, num_anchors, num_classes]. We want
@@ -227,6 +226,9 @@ class FastRCNN(AbstractDetectionHead):
 
         # Extract the selected anchors corresponding anchors
         # tf.gather_nd collaps the batch_together so we reshape with the proper batch_size
+        anchors = tf.reshape(
+            tf.gather_nd(anchors, selected_boxes_idx), (batch_size, -1, 4))
+
         y_true[LossField.LOCALIZATION] = tf.reshape(
             tf.gather_nd(y_true[LossField.LOCALIZATION], selected_boxes_idx), (batch_size, -1, 4))
 
@@ -239,7 +241,7 @@ class FastRCNN(AbstractDetectionHead):
                                       (batch_size, -1))
             weights[key] = tf.stop_gradient(weights[key])
             y_true[key] = tf.stop_gradient(y_true[key])
-        return y_true, weights
+        return y_true, weights, anchors
 
     def compute_loss(self, y_true: dict, weights: dict, classification_pred: tf.Tensor,
                      localization_pred: tf.Tensor):
