@@ -63,6 +63,10 @@ Pascal VOC training example [![Open In Colab](https://colab.research.google.com/
 - [ ] visualisation of the predictions
 - [ ] Mixed Precision
 
+### Improvements
+
+Compute anchors once and slice the non usefull anchors
+
 ### Algorithms
 
 - [x] [Feature Pyramidal Network](https://arxiv.org/abs/1612.03144) 

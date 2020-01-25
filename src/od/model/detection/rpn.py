@@ -42,7 +42,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.01),
             **kwargs)
 
-        # TODO check force_match_for_each_row
+        #Force each ground_truths to match to at least one anchor
         matcher = ArgMaxMatcher(0.7, 0.3, force_match_for_each_row=True, dtype=self.dtype)
         self.target_assigner = TargetAssigner(compute_iou,
                                               matcher,
@@ -120,6 +120,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         rpn_predictions = [self.build_rpn_head(tensor) for tensor in pyramid]
         rpn_anchors = []
+        # TODO compute constant anchors once and extract only the usefull part
         for tensor, anchor_stride, anchor_size in zip(pyramid, self._anchor_strides,
                                                       self._anchor_zises):
             anchors = generate_anchors(anchor_stride, tf.constant([anchor_size], self.dtype),
@@ -131,7 +132,6 @@ class RegionProposalNetwork(AbstractDetectionHead):
         classification_pred = tf.concat([prediction[0] for prediction in rpn_predictions], 1)
         anchors = tf.concat([anchors for anchors in rpn_anchors], 0)
         classification_prob = tf.nn.softmax(classification_pred)
-
         if training:
             ground_truths = inputs[2]
             loss = self.compute_loss(localization_pred, classification_pred, anchors, ground_truths)

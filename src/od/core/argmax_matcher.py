@@ -77,14 +77,14 @@ class ArgMaxMatcher(matcher.Matcher):
         - *force_match_for_each_row*: If True, ensures that each row is matched to
                 at least one column (which is not guaranteed otherwise if the
                 matched_threshold is high). Defaults to False. See
-                argmax_matcher_test.testMatcherForceMatch() for an example.
+                test_return_correct_matches_unmatched_row_while_using_force_match for an example.
 
         Raises:
 
         ValueError: if unmatched_threshold is set but matched_threshold is not set
             or if unmatched_threshold > matched_threshold.
         """
-        super(ArgMaxMatcher, self).__init__()
+        super().__init__()
         if (matched_threshold is None) and (unmatched_threshold is not None):
             raise ValueError('Need to also define matched_threshold when'
                              'unmatched_threshold is defined')
