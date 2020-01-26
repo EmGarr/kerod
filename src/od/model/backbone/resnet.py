@@ -17,7 +17,9 @@ WEIGHTS_PATH_NO_TOP = ('https://github.com/fchollet/deep-learning-models/'
 
 
 def padd_for_aligning_pixels(inputs):
-    """This padding operation is here to make the pixels of the output perfectly aligned"""
+    """This padding operation is here to make the pixels of the output perfectly aligned,
+    It padd with 0 the bottom and the right of the images
+    """
 
     chan = inputs.shape[3]
     b4_stride = 32.0
@@ -26,8 +28,10 @@ def padd_for_aligning_pixels(inputs):
         tf.math.ceil(tf.cast(shape2d, tf.float32) / b4_stride) * b4_stride, tf.int32)
     pad_shape2d = new_shape2d - shape2d
     inputs = tf.pad(inputs,
-                    tf.stack([[0, 0], [3, 2 + pad_shape2d[0]],
-                              [3, 2 + pad_shape2d[1]], [0, 0]]),
+                    tf.stack([[0, 0],
+                              [0, pad_shape2d[0]],
+                              [0, pad_shape2d[1]],
+                              [0, 0]]),
                     name='conv1_pad') # yapf: disable
     inputs.set_shape([None, None, None, chan])
     return inputs
