@@ -191,10 +191,9 @@ class RegionProposalNetwork(AbstractDetectionHead):
         y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths)
 
         ## Compute metrics
-        fg_precision, recall = compute_rpn_metrics(
+        recall = compute_rpn_metrics(
             tf.squeeze(y_true[LossField.CLASSIFICATION], axis=-1), classification_pred,
             weights[LossField.CLASSIFICATION])
-        self.add_metric(fg_precision, name='rpn_fg_precision', aggregation='mean')
         self.add_metric(recall, name='rpn_recall', aggregation='mean')
 
         ## Samling
@@ -240,8 +239,6 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
 
     Returns:
 
-    - *fg_precision*: Compute the precision for all the boxes that have been predicted as foreground
-    and do not take into account the background boxes. TODO to challenge.
     - *recall*: Among all the boxes that we had to find how much did we found.
     """
 
@@ -253,13 +250,7 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
     correct = tf.cast(tf.equal(prediction, masked_y_true), tf.float32)
 
     fg_inds = tf.where(masked_y_true == 1)
-
-    # Compute the precision only for the boxes which have been predicted as foreground
-    # We do not want to compute the precision with all the background_boxes
-    fg_pred_inds = tf.where(prediction == 1)
-    fg_precision = tf.reduce_mean(tf.gather_nd(correct, fg_pred_inds), name='fg_precision')
-
     num_valid_anchor = tf.math.count_nonzero(masked_y_true)
     num_pos_foreground_prediction = tf.math.count_nonzero(tf.gather_nd(correct, fg_inds))
     recall = tf.truediv(num_pos_foreground_prediction, num_valid_anchor, name='recall')
-    return fg_precision, recall
+    return recall

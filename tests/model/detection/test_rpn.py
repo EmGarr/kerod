@@ -87,6 +87,5 @@ def test_compute_rpn_metrics():
         [-100, 100],
         [-100, 100],
     ]], tf.float32)
-    fg_precision, recall = compute_rpn_metrics(y_true, y_pred, weights)
-    assert fg_precision == 2/5
+    recall = compute_rpn_metrics(y_true, y_pred, weights)
     assert recall == 2/3
