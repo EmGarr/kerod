@@ -39,15 +39,16 @@ def _crop_and_resize(tensor, boxes, box_indices, crop_size: int, pad_border=True
     assert isinstance(crop_size, int), crop_size
     boxes = tf.stop_gradient(boxes)
 
-    # TF's crop_and_resize produces zeros on border
+    # TF's crop_and_resize produces zeros on border use symetric padding instead
     if pad_border:
         # this can be quite slow
         image = tf.pad(tensor, [[0, 0], [1, 1], [1, 1], [0, 0]], mode='SYMMETRIC')
         boxes = boxes + 1
 
-    tensor_shape = tf.shape(tensor)[1:]
+    # Height, width extraction
+    tensor_shape = tf.shape(tensor)[1:3]
+    # The boxes should be at the size of the input tensor
     boxes = transform_fpcoor_for_tf(boxes, tensor_shape, [crop_size, crop_size])
-
     ret = tf.image.crop_and_resize(image,
                                    tf.cast(boxes, tf.float32), # crop and resize needs float32
                                    tf.cast(box_indices, tf.int32),
@@ -85,6 +86,10 @@ def roi_align(inputs, boxes, box_indices, image_shape, crop_size: int):
 
     """
     normalized_boxes = normalize_box_coordinates(boxes, image_shape[0], image_shape[1])
+    # Normalized the boxes to the input tensor_shape 
+    # TODO rewrite this normalization unnomarlization isn't pretty at all
+    tensor_shape = tf.shape(inputs)[1:3]
+    normalized_boxes *= tf.cast(tf.tile(tf.expand_dims(tensor_shape, axis=0), [1, 2]), tf.float32)
     ret = _crop_and_resize(inputs, normalized_boxes, box_indices, crop_size * 2)
     return KL.AveragePooling2D(padding='same')(ret)
 

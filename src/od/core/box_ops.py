@@ -161,7 +161,7 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
 
 
 def normalize_box_coordinates(boxes, height: int, width: int):
-    """ Normalize the boxes coordinates with image shape and transpose the coordinates
+    """ Normalize the boxes coordinates with image shape
 
     Arguments:
 
