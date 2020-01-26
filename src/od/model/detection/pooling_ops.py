@@ -131,11 +131,14 @@ def match_boxes_to_their_pyramid_level(boxes, num_level):
 
     Returns:
 
-    - *boxes_per_level*
-    - *box_indices_per_level*
-    - *original_pos_per_level*
-
+    - *boxes_per_level*: A list of 2-D tensor and shape [N, 4]
+    - *box_indices_per_level*: A list of 1-D tensor with int32 values in [0, batch).
+    The value of a box_indices_per_level[lvl][i] specifies the image that the i-th box refers to.
+    - *original_pos_per_level* A list of 1-D tensor with int32 values in [0, num_boxes * batch_size)
+    It will be useful to reorder our boxes after the roi_align operation.
     """
+    def _select_level(tensors, levels):
+        return [tf.squeeze(tf.gather(tensors, selected_level), 1) for selected_level in levels]
 
     batch_size = tf.shape(boxes)[0]
     num_boxes = tf.shape(boxes)[1]
@@ -146,12 +149,10 @@ def match_boxes_to_their_pyramid_level(boxes, num_level):
     box_indices = tf.reshape(box_indices, (-1,))
     box_original_pos = tf.range(batch_size * num_boxes)
 
-    levels = [tf.squeeze(tf.where(tf.equal(box_levels, i))) for i in range(num_level)]
-    boxes_per_level = [tf.gather(boxes, selected_level) for selected_level in levels]
-    box_indices_per_level = [tf.gather(box_indices, selected_level) for selected_level in levels]
-    original_pos_per_level = [
-        tf.gather(box_original_pos, selected_level) for selected_level in levels
-    ]
+    levels = [tf.where(tf.equal(box_levels, i)) for i in range(num_level)]
+    boxes_per_level = _select_level(boxes, levels)
+    box_indices_per_level = _select_level(box_indices, levels)
+    original_pos_per_level = _select_level(box_original_pos, levels)
     return boxes_per_level, box_indices_per_level, original_pos_per_level
 
 

@@ -43,6 +43,41 @@ def test_match_boxes_to_their_pyramid_level():
         assert np.array_equal(np.array(exp, dtype=np.float32), out.numpy())
 
 
+def test_match_boxes_to_their_pyramid_level_single_batch():
+    """test empty output and single batch"""
+    boxes = tf.constant([[[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10],
+                          [0, 0, 250, 250],  [0, 0, 112, 112]]],
+                        dtype=tf.float32)
+    exp_boxes_per_level = [
+        [[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10]],
+        [[0, 0, 112, 112]],
+        [[0, 0, 250, 250]],
+        [],
+    ]
+    exp_indices_per_level = [[0, 0, 0], [0], [0]]
+    exp_original_pos_per_level = [[0, 1, 2], [4], [3]]
+
+    boxes_plvl, box_indices_plvl, original_pos_plvl = match_boxes_to_their_pyramid_level(boxes, 4)
+
+    for exp, out in zip(exp_boxes_per_level, boxes_plvl):
+        if exp:
+            assert np.array_equal(np.array(exp, dtype=np.float32), out.numpy())
+        else:
+            assert out.shape == (0, 4)
+
+    for exp, out in zip(exp_indices_per_level, box_indices_plvl):
+        if exp:
+            assert np.array_equal(np.array(exp, dtype=np.float32), out.numpy())
+        else:
+            assert out.shape == (0,)
+
+    for exp, out in zip(exp_original_pos_per_level, original_pos_plvl):
+        if exp:
+            assert np.array_equal(np.array(exp, dtype=np.float32), out.numpy())
+        else:
+            assert out.shape == (0,)
+
+
 def test_multilevel_roi_align():
     boxes = tf.constant([[[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10], [0, 0, 1000, 1000],
                           [0, 0, 250, 250], [0, 0, 500, 500], [0, 0, 112, 112]],
