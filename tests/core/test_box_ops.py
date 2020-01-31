@@ -87,3 +87,48 @@ def test_flip_left_right():
     expected_boxes = np.array([[0.4, 0.4, 0.6, 0.7], [0.5, 0.35, 0.9, 0.4]], np.float32)
     flipped_boxes = box_ops.flip_left_right(boxes)
     np.testing.assert_allclose(flipped_boxes, expected_boxes)
+
+
+def test_compute_dimensional_relative_geometry():
+    boxes = tf.constant([[[3.0, 4.0, 6.0, 8.0], [0.0, 0.0, 20.0, 20.0]],
+                         [[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0]]])
+
+    # The boxes will be computed as centered
+    # center_boxes = tf.constant([[[4.5, 6.0, 3.0, 4.0], [10.0, 10.0, 20.0, 20.0]],
+    #                             [[4.5, 6.0, 3.0, 4.0], [14.5, 14.5, 1, 1]]])
+
+    expected_boxes = [
+        [
+            [
+                [np.log(1e-3), np.log(1e-3), np.log(1),
+                 np.log(1)],
+                [np.log((10 - 4.5) / 3),
+                 np.log((10 - 6) / 4),
+                 np.log(20 / 3),
+                 np.log(20 / 4)],
+            ],
+            [
+                [np.log(5.5 / 20), np.log(4 / 20),
+                 np.log(3 / 20), np.log(4 / 20)],
+                [np.log(1e-3), np.log(1e-3), np.log(1),
+                 np.log(1)],
+            ],
+        ],
+        [
+            [
+                [np.log(1e-3), np.log(1e-3), np.log(1),
+                 np.log(1)],
+                [np.log((10) / 3),
+                 np.log((8.5) / 4),
+                 np.log(1 / 3), np.log(1 / 4)],
+            ],
+            [
+                [np.log(10), np.log(8.5), np.log(3), np.log(4)],
+                [np.log(1e-3), np.log(1e-3), np.log(1),
+                 np.log(1)],
+            ],
+        ],
+    ]
+
+    relative_geometry = box_ops.compute_dimensional_relative_geometry(boxes)
+    np.testing.assert_almost_equal(expected_boxes, relative_geometry, decimal=5)

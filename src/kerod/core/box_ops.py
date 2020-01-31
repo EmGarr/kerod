@@ -218,3 +218,62 @@ def flip_left_right(boxes: tf.Tensor) -> tf.Tensor:
     flipped_xmax = tf.subtract(1.0, xmin)
     flipped_boxes = tf.concat([ymin, flipped_xmin, ymax, flipped_xmax], 1)
     return flipped_boxes
+
+
+def compute_dimensional_relative_geometry(boxes: tf.Tensor):
+    """Compute a relative geometry invariant to translation and scale
+    transformations like in [Relation Network for Object Detection](https://arxiv.org/pdf/1711.11575.pdf).
+    It compute a proximity matrix between all the boxes.
+
+    It is a modified version of the widely used bounding box regression target in Fast-RCNN.
+    The first two elements are transformed using log(·) to count more on close-by objects.
+    The intuition behind this modification is that we need to model distant objects
+    while original bounding box regression onlyconsiders close-by objects.
+
+    The formule is the following:
+
+    ```
+    w_mn = [log(|y_cm - y_cn| / h_m), log(|x_cm - x_cn| / w_m), log(h_n / h_m), log(w_n / w_m)]
+    ```
+
+    Argument:
+
+    - *boxes*: A tensor of float32 and shape [batch, nb_boxes, (y_min, x_min, y_max, x_max)]
+
+    Return:
+
+    A tensor of float32 and shape [batch, nb_boxes, nb_boxes, 4]
+    """
+
+    def _compute_single_batch_dimentional_relative_geometry(boxes):
+        """
+        Argument:
+
+        - *boxes*: A tensor of float32 and shape [nb_boxes, (y_center, x_center, h, w)]
+
+        Return:
+
+        A tensor of float32 and shape [batch, nb_boxes, nb_boxes, 4]
+        """
+
+        y, x, h, w = tf.split(value=boxes, num_or_size_splits=4, axis=-1)
+        h_n, h_m = tf.meshgrid(h, h)
+        w_n, w_m = tf.meshgrid(w, w)
+        y_n, y_m = tf.meshgrid(y, y)
+        x_n, x_m = tf.meshgrid(x, x)
+
+        log_y = tf.math.log(tf.maximum(tf.math.abs(y_m - y_n) / h_m, 1e-3))
+        log_x = tf.math.log(tf.maximum(tf.math.abs(x_m - x_n) / w_m, 1e-3))
+        log_h = tf.math.log(h_n / h_m)
+        log_w = tf.math.log(w_n / w_m)
+        wg = tf.concat([
+            tf.expand_dims(log_y, axis=-1),
+            tf.expand_dims(log_x, axis=-1),
+            tf.expand_dims(log_h, axis=-1),
+            tf.expand_dims(log_w, axis=-1)
+        ],
+                       axis=2)
+        return wg
+
+    boxes = convert_to_center_coordinates(boxes)
+    return tf.vectorized_map(_compute_single_batch_dimentional_relative_geometry, boxes)

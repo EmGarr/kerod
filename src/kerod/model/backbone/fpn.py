@@ -6,23 +6,23 @@ from tensorflow.keras.initializers import VarianceScaling
 class Pyramid(layers.Layer):
     """Over your backbone feature build a FPN (inspired from tensorpack)"""
 
-    def __init__(self, dim=256, **kwargs):
+    def __init__(self, units=256, **kwargs):
         super().__init__(**kwargs)
-        self._dim = dim
+        self._units = units
 
     def build(self, input_shape):
         num_level_pyramid = len(input_shape[0])
         self.lateral_connection_2345 = [
-            layers.Conv2D(self._dim, (1, 1),
-                          padding='same',
-                          kernel_initializer=VarianceScaling(scale=1.))
+            layers.Conv2D(self._units, (1, 1),
+                      padding='same',
+                      kernel_initializer=VarianceScaling(scale=1.))
             for _ in range(num_level_pyramid)
         ]
 
         self.anti_aliasing_conv = [
-            layers.Conv2D(self._dim, (3, 3),
-                          padding='same',
-                          kernel_initializer=VarianceScaling(scale=1.))
+            layers.Conv2D(self._units, (3, 3),
+                      padding='same',
+                      kernel_initializer=VarianceScaling(scale=1.))
             for _ in range(num_level_pyramid)
         ]
 
@@ -63,5 +63,5 @@ class Pyramid(layers.Layer):
 
     def get_config(self):
         base_config = super().get_config()
-        base_config['dim'] = self._dim
+        base_config['units'] = self._units
         return base_config
