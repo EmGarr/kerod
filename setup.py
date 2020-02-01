@@ -25,4 +25,5 @@ setup(
     packages=find_packages('src/'),
     package_dir={'': 'src/'},
     install_requires=install_requires,
+    version='0.0.1'
 )

@@ -1,6 +1,5 @@
 """Methods using non maximum_suppression to handle overlaps between boxes.
 """
-import gin
 import tensorflow as tf
 
 from od.core.box_coder import decode_boxes_faster_rcnn
@@ -33,7 +32,6 @@ def get_full_indices(indices, k, batch_size):
     return full_indices
 
 
-@gin.configurable()
 def post_process_rpn(classification_pred: tf.Tensor,
                      localization_pred: tf.Tensor,
                      anchors: tf.Tensor,
@@ -91,7 +89,6 @@ def post_process_rpn(classification_pred: tf.Tensor,
     return tf.stop_gradient(nmsed_boxes), tf.stop_gradient(nmsed_scores)
 
 
-@gin.configurable()
 def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
                                  localization_pred: tf.Tensor,
                                  anchors: tf.Tensor,
