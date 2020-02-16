@@ -132,7 +132,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         classification_pred = tf.concat([prediction[0] for prediction in rpn_predictions], 1)
         anchors = tf.concat([anchors for anchors in rpn_anchors], 0)
         classification_prob = tf.nn.softmax(classification_pred)
-        if training:
+        if training and not self.serving:
             ground_truths = inputs[2]
             loss = self.compute_loss(localization_pred, classification_pred, anchors, ground_truths)
             # replace post_process_rpn by tf.image.generate_bounding_box_proposals

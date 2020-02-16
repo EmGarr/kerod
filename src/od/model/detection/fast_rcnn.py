@@ -97,7 +97,7 @@ class FastRCNN(AbstractDetectionHead):
         # Remove P6
         pyramid = inputs[0][:-1]
         anchors = inputs[1]
-        if training:
+        if training and not self.serving:
             ground_truths = inputs[2]
             # Include the ground_truths as RoIs for the training and put their scores to 1
             anchors = tf.concat([anchors, ground_truths[BoxField.BOXES]], axis=1)
@@ -118,7 +118,7 @@ class FastRCNN(AbstractDetectionHead):
         localization_pred = tf.reshape(localization_pred,
                                        (batch_size, -1, (self._num_classes - 1) * 4))
 
-        if training:
+        if training and not self.serving:
             losses = self.compute_loss(y_true, weights, classification_pred, localization_pred)
 
         classification_pred = tf.nn.softmax(classification_pred)

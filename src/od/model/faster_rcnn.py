@@ -58,9 +58,10 @@ def build_fpn_resnet50_faster_rcnn(num_classes: int,
         outputs = FastRCNN(num_classes + 1)([pyramid, rois, ground_truths], training=True)
         inputs = [images, images_information, ground_truths]
     else:
-        rois, _ = RegionProposalNetwork()([pyramid, images_information], training=False)
-        classification_pred, localization_pred, anchors = FastRCNN(num_classes + 1)([pyramid, rois],
-                                                                                    training=False)
+        rois, _ = RegionProposalNetwork(serving=True)([pyramid, images_information], training=False)
+        classification_pred, localization_pred, anchors = FastRCNN(num_classes + 1,
+                                                                   serving=True)([pyramid, rois],
+                                                                                 training=False)
         outputs = post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
                                                images_information, num_classes + 1)
 
