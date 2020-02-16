@@ -108,7 +108,63 @@ model_faster_rcnn = tf.keras.Model(inputs=[images, images_information, ground_tr
 You can find examples in the [notebooks folder](./notebooks). There are no runners shipped with the library.
 
 - Pascal VOC training example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/pascal_voc_training_fpn50.ipynb)
-- Coco example will arrive soon
+- Coco example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb). Training an algorithm has never been so easy just run the cells.
+
+### Serving
+
+#### Export
+
+To export a model for tensorflow serving:
+
+```python
+import tensorflow as tf
+
+from od.model.faster_rcnn import build_fpn_resnet50_faster_rcnn
+
+model_faster_rcnn_inference = build_fpn_resnet50_faster_rcnn(num_classes, None, training=False)
+model_faster_rcnn_inference.load_weights('my_amazing_weights.h5')
+model_faster_rcnn_inference.save('serving_model')
+```
+
+#### Serving
+You can then use it in production with [tensorflow model server](https://www.tensorflow.org/tfx/serving/docker).
+
+```python
+import requests
+
+from od.core.standard_fields import DatasetField
+
+API_ENDPOINT = 'https://my_server:XXX/'
+
+image = resize_to_min_dim(inputs['image'], 800.0, 1300.0)
+image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
+
+# Will perform a query for a single batch but you can perform query on batch
+inputs = {
+  DatasetField.IMAGES: tf.expand_dims(images, axis=0).numpy().tolist(),
+  DatasetField.IMAGES_INFO: tf.expand_dims(image_information, axis=0).numpy().tolist(),
+}
+
+url_serving = os.path.join(API_ENDPOINT, "v1/models/serving:predict")
+headers = {"content-type": "application/json"}
+response = requests.post(url_serving, data=json.dumps(signature), headers=headers)
+outputs = json.loads(response.text)['outputs']
+```
+
+The outputs will have the following format:
+
+- *bbox*: A Tensor of shape [batch_size, max_detections, 4]
+containing the non-max suppressed boxes. The coordinates returned are
+between 0 and 1.
+- *scores*: A Tensor of shape [batch_size, max_detections] containing
+the scores for the boxes.
+- *label*: A Tensor of shape [batch_size, max_detections] 
+containing the class for boxes.
+- *num_boxes*: A [batch_size] int32 tensor indicating the number of
+valid detections per batch item. Only the top valid_detections[i] entries
+in nms_boxes[i], nms_scores[i] and nms_class[i] are valid. The rest of the
+entries are zero paddings.
+
 
 ## Tests
 

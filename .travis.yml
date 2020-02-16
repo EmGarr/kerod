@@ -14,7 +14,7 @@ install:
 
 script:
   - make tests 
-  - "portray as_html -m src/od -o docs --overwrite && mv docs/* ./ && rm -rf docs" 
+  - "portray as_html -m src/od  && rm -rf docs/ && mv site/* ./ && rm -rf site/"
 
 deploy:
   provider: pages
