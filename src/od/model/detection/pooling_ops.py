@@ -5,7 +5,7 @@ from tensorflow.keras import backend as K
 from od.core.box_ops import (compute_area, normalize_box_coordinates, transform_fpcoor_for_tf)
 
 
-def _crop_and_resize(tensor, boxes, box_indices, crop_size: int, pad_border=True):
+def _crop_and_resize(tensor, boxes, box_indices, crop_size: int):
     """Taken from tensorpack (https://github.com/tensorpack/tensorpack/blob/master/examples/FasterRCNN/modeling/model_box.py)
     Aligned version of tf.image.crop_and_resize, following our definition of floating point boxes.
 
@@ -13,7 +13,6 @@ def _crop_and_resize(tensor, boxes, box_indices, crop_size: int, pad_border=True
 
     - *tensor*: A 4-D tensor of shape [batch, image_height, image_width, depth].
             Both image_height and image_width need to be positive.
-    - *image_shape*: A
 
     - *boxes*: A 2-D tensor of shape [num_boxes, 4].
             The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is
@@ -30,26 +29,22 @@ def _crop_and_resize(tensor, boxes, box_indices, crop_size: int, pad_border=True
 
     - *crop_size*: An int representing the ouput size of the crop.
 
-    - *pad_border*: Pad the border of the images
-
     Returns:
 
     A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].
     """
-    assert isinstance(crop_size, int), crop_size
     boxes = tf.stop_gradient(boxes)
 
-    # TF's crop_and_resize produces zeros on border use symetric padding instead
-    if pad_border:
-        # this can be quite slow
-        image = tf.pad(tensor, [[0, 0], [1, 1], [1, 1], [0, 0]], mode='SYMMETRIC')
-        boxes = boxes + 1
+    # TF's crop_and_resize produces zeros on border. The symetric padding 
+    # allows to have a better interpolation for the boxes on the border of the image.
+    tensor = tf.pad(tensor, [[0, 0], [1, 1], [1, 1], [0, 0]], mode='SYMMETRIC')
+    boxes = boxes + 1
 
     # Height, width extraction
     tensor_shape = tf.shape(tensor)[1:3]
     # The boxes should be at the size of the input tensor
     boxes = transform_fpcoor_for_tf(boxes, tensor_shape, [crop_size, crop_size])
-    ret = tf.image.crop_and_resize(image,
+    ret = tf.image.crop_and_resize(tensor,
                                    tf.cast(boxes, tf.float32), # crop and resize needs float32
                                    tf.cast(box_indices, tf.int32),
                                    crop_size=[crop_size, crop_size])

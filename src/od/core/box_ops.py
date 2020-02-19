@@ -22,7 +22,7 @@ def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: t
     - *normalized_boxes*:  A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]. These
     boxes have already been normalized in the feature space. The coordinates are not in
     the input image space.
-    - *tensor_shape*:
+    - *tensor_shape*: Height and width respectively
     - *crop_shape*:
 
     Returns:
@@ -31,18 +31,19 @@ def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: t
     """
     y_min, x_min, y_max, x_max = tf.split(boxes, 4, axis=-1)
 
-    spacing_w = (x_max - x_min) / tf.cast(crop_shape[1], boxes.dtype)
     spacing_h = (y_max - y_min) / tf.cast(crop_shape[0], boxes.dtype)
+    spacing_w = (x_max - x_min) / tf.cast(crop_shape[1], boxes.dtype)
 
-    tensor_shape = [
+    tensor_shape = (
         tf.cast(tensor_shape[0] - 1, boxes.dtype),
         tf.cast(tensor_shape[1] - 1, boxes.dtype)
-    ]
+    )
+        
     ny0 = (y_min + spacing_h / 2 - 0.5) / tensor_shape[0]
     nx0 = (x_min + spacing_w / 2 - 0.5) / tensor_shape[1]
 
-    nw = spacing_w * tf.cast(crop_shape[1] - 1, boxes.dtype) / tensor_shape[1]
     nh = spacing_h * tf.cast(crop_shape[0] - 1, boxes.dtype) / tensor_shape[0]
+    nw = spacing_w * tf.cast(crop_shape[1] - 1, boxes.dtype) / tensor_shape[1]
 
     return tf.concat([ny0, nx0, ny0 + nh, nx0 + nw], axis=-1)
 

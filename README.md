@@ -108,7 +108,7 @@ model_faster_rcnn = tf.keras.Model(inputs=[images, images_information, ground_tr
 You can find examples in the [notebooks folder](./notebooks). There are no runners shipped with the library.
 
 - Pascal VOC training example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/pascal_voc_training_fpn50.ipynb)
-- Coco example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb). Training an algorithm has never been so easy just run the cells.
+- Coco example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb). Training an algorithm on COCO has never been so easy just run the cells.
 
 ### Serving
 

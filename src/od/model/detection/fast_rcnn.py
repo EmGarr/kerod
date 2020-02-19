@@ -99,7 +99,7 @@ class FastRCNN(AbstractDetectionHead):
         anchors = inputs[1]
         if training and not self.serving:
             ground_truths = inputs[2]
-            # Include the ground_truths as RoIs for the training and put their scores to 1
+            # Include the ground_truths as RoIs for the training
             anchors = tf.concat([anchors, ground_truths[BoxField.BOXES]], axis=1)
             y_true, weights, anchors = self.sample_boxes(anchors, ground_truths)
 
