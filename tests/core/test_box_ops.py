@@ -64,6 +64,14 @@ def test_compute_iou_works_on_empty_inputs():
     np.testing.assert_array_equal(iou_empty_3.shape, (0, 0))
 
 
+def test_normalize_boxes_coordinates():
+    boxes = tf.constant([[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]])
+    expected_boxes = np.array([[1, 3 / 10, 7 / 4, 5 / 10], [5 / 4, 6 / 10, 10 / 4, 7 / 10]],
+                              np.float32)
+    out_boxes = box_ops.normalize_box_coordinates(boxes, 4, 10)
+    np.testing.assert_array_equal(out_boxes, expected_boxes)
+
+
 def test_clip_boxes():
     boxes = tf.constant([[[-1, -1, 2, 1], [-1, 0, 2, 1]], [[-1, -1, 2, 1], [-1, 0, 2, 1]]],
                         tf.float32)

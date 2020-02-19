@@ -177,7 +177,7 @@ def normalize_box_coordinates(boxes, height: int, width: int):
     x_max = x_max / width
 
     # Won't be backpropagated to rois anyway, but to save time
-    boxes = tf.stop_gradient(tf.concat([y_min, x_min, x_max, y_max], axis=-1))
+    boxes = tf.stop_gradient(tf.concat([y_min, x_min, y_max, x_max], axis=-1))
     return boxes
 
 
