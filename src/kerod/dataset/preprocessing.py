@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+from kerod.core import constants
 from kerod.core.box_ops import compute_area
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.dataset.augmentation import random_horizontal_flip
@@ -20,7 +21,14 @@ def resize_to_min_dim(image, short_edge_length, max_dimension):
 
     Returns:
     - *resized_image*: The input image resized with the aspect_ratio preserved in float32
+
+    Raises:
+
+    ValueError: If the max_dimension is above `kerod.core.constants.MAX_IMAGE_SIZE`
     """
+    if max_dimension > constants.MAX_IMAGE_DIMENSION:
+        raise ValueError(
+            f"The max_dimension can only be inferior or equal to {constants.MAX_IMAGE_DIMENSION}")
     shape = tf.shape(image)
     height = tf.cast(shape[0], tf.float32)
     width = tf.cast(shape[1], tf.float32)

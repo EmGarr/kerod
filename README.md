@@ -191,10 +191,3 @@ or
 ```bash
 pytest tests/
 ```
-
-## Roadmap
-
-### Futur Improvements
-
-- Compute anchors once and slice the non usefull anchors. The anchors are computed at each inference which is useless. I should generate them on the maximum grid and slice them as done in tensorpack.
-- The sampling is done in the graph. It may be worth it to remove it and place it in the tf.Dataset (like tensorpack) ?

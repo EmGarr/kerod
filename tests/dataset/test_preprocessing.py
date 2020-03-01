@@ -1,10 +1,12 @@
 from unittest import mock
 
 import numpy as np
+import pytest
 
+from kerod.core.constants import MAX_IMAGE_DIMENSION
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.dataset.preprocessing import (expand_dims_for_single_batch, preprocess,
-                                      preprocess_coco_example, resize_to_min_dim)
+                                         preprocess_coco_example, resize_to_min_dim)
 
 
 def test_resize_to_min_dim():
@@ -22,6 +24,9 @@ def test_resize_to_min_dim():
     image_exp = np.zeros((800, 800, 3))
 
     np.testing.assert_array_equal(image_exp, image_out)
+
+    with pytest.raises(ValueError):
+        image_out = resize_to_min_dim(image, target_size, MAX_IMAGE_DIMENSION + 1)
 
 
 def test_preprocess():

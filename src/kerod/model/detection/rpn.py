@@ -5,7 +5,7 @@ import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 from tensorflow.keras.losses import CategoricalCrossentropy
 
-from kerod.core.anchor_generator import generate_anchors
+from kerod.core.anchor_generator import Anchors
 from kerod.core.argmax_matcher import ArgMaxMatcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.box_ops import compute_iou
@@ -50,9 +50,16 @@ class RegionProposalNetwork(AbstractDetectionHead):
                                               encode_boxes_faster_rcnn,
                                               dtype=self._compute_dtype)
 
-        self._anchor_strides = (4, 8, 16, 32, 64)
-        self._anchor_zises = (32, 64, 128, 256, 512)
+        anchor_strides = (4, 8, 16, 32, 64)
+        anchor_zises = (32, 64, 128, 256, 512)
         self._anchor_ratios = anchor_ratios
+
+        # Precompute a deterministic grid of anchors for each layer of the pyramid.
+        # We will extract a subpart of the anchors according to
+        self._anchors = [
+            Anchors(stride, size, self._anchor_ratios)
+            for stride, size in zip(anchor_strides, anchor_zises)
+        ]
 
     def build(self, input_shape):
         self.rpn_conv2d = KL.Conv2D(512, (3, 3),
@@ -93,19 +100,11 @@ class RegionProposalNetwork(AbstractDetectionHead):
         - *classification_pred*: A logit 3-D tensor of shape [batch_size, num_anchors, 2]
         - *anchors*: A tensor of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
         """
+        anchors = tf.concat([anchors(tensor) for tensor, anchors in zip(inputs, self._anchors)], 0)
+
         rpn_predictions = [self.build_rpn_head(tensor) for tensor in inputs]
-        rpn_anchors = []
-        # TODO compute constant anchors once and extract only the usefull part
-        for tensor, anchor_stride, anchor_size in zip(inputs, self._anchor_strides,
-                                                      self._anchor_zises):
-            anchors = generate_anchors(anchor_stride, tf.constant([anchor_size],
-                                                                  self._compute_dtype),
-                                       tf.constant(self._anchor_ratios, self._compute_dtype),
-                                       tf.shape(tensor))
-            rpn_anchors.append(anchors)
         localization_pred = tf.concat([prediction[1] for prediction in rpn_predictions], 1)
         classification_pred = tf.concat([prediction[0] for prediction in rpn_predictions], 1)
-        anchors = tf.concat([anchors for anchors in rpn_anchors], 0)
 
         return localization_pred, classification_pred, anchors
 

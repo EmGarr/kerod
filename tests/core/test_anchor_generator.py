@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
-from kerod.core.anchor_generator import generate_anchors
+from kerod.core.anchor_generator import generate_anchors, Anchors
+from kerod.core import constants
 
 
 def get_all_anchors(stride, sizes, ratios, max_size):
@@ -29,7 +30,7 @@ def get_all_anchors(stride, sizes, ratios, max_size):
             w = np.sqrt(sz * sz / ratio)
             h = ratio * w
             anchors.append([-w, -h, w, h])
-    cell_anchors = np.asarray(anchors) * 0.5
+            cell_anchors = np.asarray(anchors) * 0.5
 
     field_size = int(np.ceil(max_size / stride))
     shifts = (np.arange(0, field_size) * stride).astype("float32")
@@ -58,13 +59,31 @@ def test_generate_anchors():
     strides = (4, 8, 16, 32, 64)
     scales = (32, 64, 128, 256, 512)
     feature_map_shapes = [200, 100, 50, 25, 12]
-    for stride, scale, feature_map_shape in zip(strides, scales, feature_map_shapes):
-        anchors_tensorpack = get_all_anchors(stride, scales, ratios,
-                                            stride * feature_map_shape).reshape((-1, 4))
+    for stride, feature_map_shape in zip(strides, feature_map_shapes):
+        anchors_tensorpack = get_all_anchors(stride, scales, ratios, stride * feature_map_shape)
 
-        anchors_od = generate_anchors(stride, tf.constant(scales, tf.float32),
-                                    tf.constant(ratios, tf.float32),
-                                    (1, feature_map_shape, feature_map_shape, None))
+        anchors_od = generate_anchors(stride,
+                                      tf.constant(scales, tf.float32),
+                                      tf.constant(ratios, tf.float32),
+                                      max_size=stride * feature_map_shape)
 
         anchors_od = tf.gather(anchors_od, [1, 0, 3, 2], axis=-1)
+        np.testing.assert_array_almost_equal(anchors_tensorpack, anchors_od, decimal=5)
+
+
+def test_anchor_layers():
+    """Ensure the anchor generation is the same than tensorpack for the feature pyramidal network."""
+    ratios = [0.5, 1, 2]
+    strides = (4, 8, 16, 32, 64)
+    scales = (32, 64, 128, 256, 512)
+    feature_maps = [np.zeros((1, shape, shape, 1)) for shape in [200, 100, 50, 25, 12]]
+
+    for stride, feature_map in zip(strides, feature_maps):
+        anchors_layer = Anchors(stride, scales, ratios)
+        anchors_tensorpack = get_all_anchors(stride, scales, ratios, constants.MAX_IMAGE_DIMENSION)
+
+        anchors_od = anchors_layer(feature_map)
+        anchors_od = tf.gather(anchors_od, [1, 0, 3, 2], axis=-1)
+        anchors_tensorpack = anchors_tensorpack[:feature_map.shape[1], :feature_map.
+                                                shape[2]].reshape(-1, 4)
         np.testing.assert_array_almost_equal(anchors_tensorpack, anchors_od, decimal=5)
