@@ -1,29 +1,8 @@
-import io
-import os
-from setuptools import setup, find_packages
-try:  # for pip >= 10
-    from pip._internal.req import parse_requirements
-    from pip._internal.download import PipSession
-except ImportError:  # for pip <= 9.0.3
-    from pip.req import parse_requirements
-    from pip.download import PipSession
+#!/usr/bin/env python
+from setuptools import setup
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
 
-lines = list(parse_requirements("requirements.txt", session=PipSession()))
-install_requires = [str(l.req) for l in lines if l.original_link is None]
+setup(install_requires=required)
 
-setup(
-    name='od',
-    author="Emilien Garreau",
-    author_email="ppwwyyxxc@gmail.com",
-    url="https://github.com/EmGarr/od",
-    keywords="Tensorflow 2.0, deep learning, object detection",
-    license="Apache",
-    description='Algorithm for Object  Detection using tensorflow.',
-    long_description=io.open(os.path.join(os.path.dirname('__file__'), 'README.md'), encoding='utf-8').read(),
-    long_description_content_type='text/markdown',
-    packages=find_packages('src/'),
-    package_dir={'': 'src/'},
-    install_requires=install_requires,
-    version='0.0.1'
-)
