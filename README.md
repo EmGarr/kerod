@@ -1,5 +1,5 @@
 <h3 align="center">
-<p>OD - Faster R-CNN for TensorFlow 2.X 
+<p>OD - Faster R-CNN for TensorFlow 2
 </h3>
 
 [![Build Status](https://img.shields.io/travis/TheAlgorithms/Python.svg?label=Travis%20CI&logo=travis&style=flat-square)](https://travis-ci.com/EmGarr/od)
@@ -10,7 +10,7 @@ _________________
 _________________
 
 
-Od is pure tensorflow2.x implementation of object detection algorithms (Faster R-CNN) aiming production.
+Od is pure `tensorflow 2` implementation of object detection algorithms (Faster R-CNN) aiming production.
 
 It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.X.
 
@@ -76,7 +76,7 @@ You can install the package in dev mode as follow and everytime you refresh the 
 pip install -e .
 ```
 
-## Examples
+## Tutorials
 
 ### Basic blocks
 
@@ -107,11 +107,23 @@ model_faster_rcnn = tf.keras.Model(inputs=[images, images_information, ground_tr
 
 ### Notebooks
 
+#### Requirements
+
+If you don't run the examples on Colab please install `tensorflow_datasets`:
+
+```bash
+pip install tensorflow_datasets
+```
+
+#### Examples
+
+Training an algorithm on COCO or Pascal VOC has never been so easy. You just need to run the cells and everything will be done for you. 
+
 You can find examples in the [notebooks folder](./notebooks). There are no runners shipped with the library.
 
-- Pascal VOC training example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/pascal_voc_training_fpn50.ipynb)
-- Mixed precision Pascal VOC training example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
-- Coco example [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb). Training an algorithm on COCO has never been so easy just run the cells.
+- Pascal VOC training example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/pascal_voc_training_fpn50.ipynb).
+- Mixed precision Pascal VOC training (single GPU)[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb).
+- Coco example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb).
 
 ### Serving
 
@@ -150,7 +162,7 @@ inputs = {
 
 url_serving = os.path.join(API_ENDPOINT, "v1/models/serving:predict")
 headers = {"content-type": "application/json"}
-response = requests.post(url_serving, data=json.dumps(signature), headers=headers)
+response = requests.post(url_serving, data=json.dumps(inputs), headers=headers)
 outputs = json.loads(response.text)['outputs']
 ```
 
