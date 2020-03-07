@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+from od.core.box_ops import compute_area
 from od.core.standard_fields import BoxField, DatasetField
 
 
@@ -89,6 +90,102 @@ def preprocess(inputs):
         BoxField.LABELS: inputs['objects'][BoxField.LABELS],
         BoxField.NUM_BOXES: tf.shape(inputs['objects'][BoxField.LABELS]),
         BoxField.WEIGHTS: tf.fill(tf.shape(inputs['objects'][BoxField.LABELS]), 1.0)
+    }
+
+
+def filter_crowded_boxes(boxes: tf.Tensor, labels: tf.Tensor, crowd: tf.Tensor) -> tf.Tensor:
+    """Coco has boxes flagged as crowded which are not used during the training.
+    This function will discard them.
+
+    Arguments:
+
+    - *boxes*: A tensor of shape [num_boxes, (y1, x1, y2, x2)]
+    - *labels*: A tensor of shape [num_boxes, ]
+    - *crowd*: Boolean tensor which indicates if the boxes is crowded are not. Crowded means that the boxes
+    contains multiple entities which are to difficult to localize one by one. `True` is for crowded box. 
+
+    Returns:
+
+    - *boxes*: A tensor of shape [N <= num_boxes, (y1, x1, y2, x2)]
+    - *labels*: A tensor of shape [N <= num_boxes, ]
+    """
+    ind_uncrowded_boxes = tf.where(tf.equal(crowd, False))
+    return tf.gather_nd(boxes, ind_uncrowded_boxes), tf.gather_nd(labels, ind_uncrowded_boxes) 
+
+
+def filter_bad_area(boxes: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
+    """Remove all the boxes that have an area less or equal to 0.
+
+    Arguments:
+
+    - *boxes*: A tensor of shape [num_boxes, (y1, x1, y2, x2)]
+    - *labels*: A tensor of shape [num_boxes, ]
+
+    Returns:
+
+    - *boxes*: A tensor of shape [N <= num_boxes, (y1, x1, y2, x2)]
+    - *labels*: A tensor of shape [N <= num_boxes, ]
+
+    """
+    area = compute_area(boxes)
+    return tf.gather_nd(boxes, tf.where(area > 0)), tf.gather_nd(labels, tf.where(area > 0))
+
+
+def preprocess_coco_example(inputs):
+    """This operations performs a classical preprocessing operations for localization datasets:
+
+    - COCO
+    - Pascal Voc
+
+    You can download easily those dataset using [tensorflow dataset](https://www.tensorflow.org/datasets/catalog/overview).
+
+    Argument:
+
+    - *inputs*: It can be either a [FeaturesDict](https://www.tensorflow.org/datasets/api_docs/python/tfds/features/FeaturesDict) or a dict.
+    but it should have the following structures.
+
+    ```python
+    inputs = FeaturesDict({
+        'image': Image(shape=(None, None, 3), dtype=tf.uint8),
+        'objects': Sequence({
+            'area': Tensor(shape=(), dtype=tf.int64), # area
+            'bbox': BBoxFeature(shape=(4,), dtype=tf.float32), # The values are between 0 and 1
+            'label': ClassLabel(shape=(), dtype=tf.int64, num_classes=80),
+        }),
+    })
+    ```
+
+    Returns:
+
+    - *inputs*:
+        1. image: A 3D tensor of float32 and shape [None, None, 3]
+        2. image_information: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
+        of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.
+        The models needs those information in order to clip the boxes to the proper dimension.
+    - *inputs*: A dict with the following information
+
+    ```
+    inputs = {
+        BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
+        BoxField.LABELS: A tensor of shape [num_boxes, ]
+        BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
+    }
+    ```
+    """
+    image = resize_to_min_dim(inputs['image'], 800.0, 1300.0)
+    image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
+
+    boxes, labels = inputs['objects'][BoxField.BOXES], inputs['objects'][BoxField.LABELS]
+    boxes, labels = filter_crowded_boxes(boxes, labels, inputs['objects']['is_crowd'])
+    boxes, labels = filter_bad_area(boxes, labels)
+    boxes *= tf.tile(tf.expand_dims(image_information, axis=0), [1, 2])
+    return {
+        DatasetField.IMAGES: image,
+        DatasetField.IMAGES_INFO: image_information,
+        BoxField.BOXES: boxes,
+        BoxField.LABELS: labels,
+        BoxField.NUM_BOXES: tf.shape(labels),
+        BoxField.WEIGHTS: tf.fill(tf.shape(labels), 1.0)
     }
 
 
