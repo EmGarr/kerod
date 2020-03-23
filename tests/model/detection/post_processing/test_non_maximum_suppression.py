@@ -44,7 +44,7 @@ def test_post_process_fast_rcnn_boxes():
     exp_labels = [0, 0, 1, 1]
 
     nmsed_boxes, nmsed_scores, nmsed_labels, valid_detections = post_process_fast_rcnn_boxes(
-        classification_pred, localization_pred, anchors, image_information, num_classes)
+        classification_pred, localization_pred, anchors, image_information, num_classes, score_threshold=0.3)
 
     assert valid_detections[0] == 4
 

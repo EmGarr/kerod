@@ -97,7 +97,7 @@ def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
                                  max_output_size_per_class: int = 100,
                                  max_total_size: int = 100,
                                  iou_threshold: float = 0.5,
-                                 score_threshold: float = 0.3):
+                                 score_threshold: float = 0.05):
     """This is the classical post_processing for the Faster RCNN paper.
     This operation performs non_max_suppression on the inputs per batch, across
     all classes.
@@ -128,7 +128,7 @@ def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
     - *iou_threshold*: A float representing the threshold for deciding whether boxes
       overlap too much with respect to IOU.
     - *score_threshold*: A float representing the threshold for deciding when to
-      remove boxes based on score.
+      remove boxes based on score. `O.05` is used like in Detectron or Tensorpack.
 
     Returns:
 
