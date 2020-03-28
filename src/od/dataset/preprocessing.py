@@ -2,6 +2,7 @@ import tensorflow as tf
 
 from od.core.box_ops import compute_area
 from od.core.standard_fields import BoxField, DatasetField
+from od.dataset.augmentation import random_horizontal_flip
 
 
 def resize_to_min_dim(image, short_edge_length, max_dimension):
@@ -178,6 +179,7 @@ def preprocess_coco_example(inputs):
     boxes, labels = inputs['objects'][BoxField.BOXES], inputs['objects'][BoxField.LABELS]
     boxes, labels = filter_crowded_boxes(boxes, labels, inputs['objects']['is_crowd'])
     boxes, labels = filter_bad_area(boxes, labels)
+    image, boxes = random_horizontal_flip(image, boxes)
     boxes *= tf.tile(tf.expand_dims(image_information, axis=0), [1, 2])
     return {
         DatasetField.IMAGES: image,

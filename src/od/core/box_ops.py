@@ -34,11 +34,9 @@ def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: t
     spacing_h = (y_max - y_min) / tf.cast(crop_shape[0], boxes.dtype)
     spacing_w = (x_max - x_min) / tf.cast(crop_shape[1], boxes.dtype)
 
-    tensor_shape = (
-        tf.cast(tensor_shape[0] - 1, boxes.dtype),
-        tf.cast(tensor_shape[1] - 1, boxes.dtype)
-    )
-        
+    tensor_shape = (tf.cast(tensor_shape[0] - 1,
+                            boxes.dtype), tf.cast(tensor_shape[1] - 1, boxes.dtype))
+
     ny0 = (y_min + spacing_h / 2 - 0.5) / tensor_shape[0]
     nx0 = (x_min + spacing_w / 2 - 0.5) / tensor_shape[1]
 
@@ -200,3 +198,23 @@ def clip_boxes(boxes: tf.Tensor, window: tf.Tensor) -> tf.Tensor:
     m = tf.tile(tf.expand_dims(window, axis=1), [1, 1, 2])
     boxes = tf.minimum(boxes, tf.cast(m, boxes.dtype))
     return boxes
+
+
+def flip_left_right(boxes: tf.Tensor) -> tf.Tensor:
+    """[Taken from tensorflow models] Left-right flip the boxes.
+
+    Arguments:
+
+    - *boxes*: rank 2 float32 tensor containing the bounding boxes -> [N, 4].
+        Boxes are in normalized form meaning their coordinates vary
+        between [0, 1]. Each row is in the form of [ymin, xmin, ymax, xmax].
+
+    Return:
+
+    Flipped boxes.
+    """
+    ymin, xmin, ymax, xmax = tf.split(value=boxes, num_or_size_splits=4, axis=1)
+    flipped_xmin = tf.subtract(1.0, xmax)
+    flipped_xmax = tf.subtract(1.0, xmin)
+    flipped_boxes = tf.concat([ymin, flipped_xmin, ymax, flipped_xmax], 1)
+    return flipped_boxes

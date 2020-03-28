@@ -80,3 +80,10 @@ def test_clip_boxes():
 
     clipped_boxes = box_ops.clip_boxes(boxes, image_shape)
     np.testing.assert_array_equal(clipped_boxes, expected_boxes)
+
+
+def test_flip_left_right():
+    boxes = tf.constant([[0.4, 0.3, 0.6, 0.6], [0.5, 0.6, 0.9, 0.65]])
+    expected_boxes = np.array([[0.4, 0.4, 0.6, 0.7], [0.5, 0.35, 0.9, 0.4]], np.float32)
+    flipped_boxes = box_ops.flip_left_right(boxes)
+    np.testing.assert_allclose(flipped_boxes, expected_boxes)
