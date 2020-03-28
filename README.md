@@ -14,9 +14,9 @@ Od is pure `tensorflow 2` implementation of object detection algorithms (Faster 
 
 It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.X.
 
-Many ideas have been based on [google object detection](https://github.com/tensorflow/models/tree/master/research/object_detection) and [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN). If you need to have good performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for now but my aim is too match its benchmarks soon.
+Many ideas have been based on [google object detection](https://github.com/tensorflow/models/tree/master/research/object_detection) and [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN).
+ `Warning`: It is still a work in progress and some breaking changes could arrive soon. If you need to have good performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for now but my aim is too match its benchmarks soon. The current AP@[.5:.95] on the [coco notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb) is `27.4` which is quite low (but it was the first run so let's found those bugs). 
 
-`Warning`: It is still a work in progress and some breaking changes could arrive soon.
 
 ## Features
 
