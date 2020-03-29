@@ -37,4 +37,6 @@ class SmoothL1Localization(losses.Huber):
             loss: A tensor of shape [batch_size, num_anchors] tensor
             representing the value of the loss function.
         """
-        return tf.reduce_sum(super().call(y_true, y_pred), axis=2)
+        y_true = tf.expand_dims(y_true, axis=-1)
+        y_pred = tf.expand_dims(y_pred, axis=-1)
+        return tf.reduce_sum(super().call(y_true, y_pred), axis=-1)
