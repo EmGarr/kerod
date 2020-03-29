@@ -70,15 +70,9 @@ def preprocess(inputs):
         2. image_information: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
         of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.
         The models needs those information in order to clip the boxes to the proper dimension.
-    - *inputs*: A dict with the following information
-
-    ```
-    inputs = {
-        BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
-        BoxField.LABELS: A tensor of shape [num_boxes, ]
-        BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
-    }
-    ```
+        3. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
+        4. BoxField.LABELS: A tensor of shape [num_boxes, ]
+        5. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
     """
     image = resize_to_min_dim(inputs['image'], 800.0, 1300.0)
     image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
@@ -111,7 +105,7 @@ def filter_crowded_boxes(boxes: tf.Tensor, labels: tf.Tensor, crowd: tf.Tensor) 
     - *labels*: A tensor of shape [N <= num_boxes, ]
     """
     ind_uncrowded_boxes = tf.where(tf.equal(crowd, False))
-    return tf.gather_nd(boxes, ind_uncrowded_boxes), tf.gather_nd(labels, ind_uncrowded_boxes) 
+    return tf.gather_nd(boxes, ind_uncrowded_boxes), tf.gather_nd(labels, ind_uncrowded_boxes)
 
 
 def filter_bad_area(boxes: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
@@ -163,15 +157,9 @@ def preprocess_coco_example(inputs):
         2. image_information: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
         of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.
         The models needs those information in order to clip the boxes to the proper dimension.
-    - *inputs*: A dict with the following information
-
-    ```
-    inputs = {
-        BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
-        BoxField.LABELS: A tensor of shape [num_boxes, ]
-        BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
-    }
-    ```
+        3. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
+        4. BoxField.LABELS: A tensor of shape [num_boxes, ]
+        5. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
     """
     image = resize_to_min_dim(inputs['image'], 800.0, 1300.0)
     image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
@@ -227,21 +215,14 @@ def expand_dims_for_single_batch(inputs):
 
     Returns:
 
-    - *inputs*:
-        1. image: A 3D tensor of float32 and shape [None, None, 3]
-        2. image_information: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
+    - *inputs*: The features and the ground_truths are mixed together
+        1. DatasetField.IMAGES: A 3D tensor of float32 and shape [None, None, 3]
+        2. DatasetField.IMAGES_INFO: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
         of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.
         The models needs those information in order to clip the boxes to the proper dimension.
-
-    - *inputs*: A dict with the following information
-
-    ```
-    inputs = {
-        BoxField.BOXES: A tensor of shape [1, num_boxes, (y1, x1, y2, x2)] and resized to the image shape
-        BoxField.LABELS: A tensor of shape [1, num_boxes, ]
-        BoxField.NUM_BOXES: A tensor of shape [1, 1]. It is usefull to unpad the data in case of a batched training
-    }
-    ```
+        3. BoxField.BOXES: A tensor of shape [1, num_boxes, (y1, x1, y2, x2)] and resized to the image shape
+        4. BoxField.LABELS: A tensor of shape [1, num_boxes, ]
+        5. BoxField.NUM_BOXES: A tensor of shape [1, 1]. It is usefull to unpad the data in case of a batched training
     """
     return {
         DatasetField.IMAGES: tf.expand_dims(inputs[DatasetField.IMAGES], axis=0),
