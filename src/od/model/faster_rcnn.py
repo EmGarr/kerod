@@ -6,6 +6,7 @@ from od.model.backbone.resnet import ResNet50
 from od.model.detection.fast_rcnn import FastRCNN
 from od.model.detection.rpn import RegionProposalNetwork
 from od.model.post_processing import post_process_fast_rcnn_boxes
+from od.utils.training import freeze_batch_normalization, freeze_layers_before
 
 
 def build_fpn_resnet50_faster_rcnn(num_classes: int,
@@ -50,6 +51,10 @@ def build_fpn_resnet50_faster_rcnn(num_classes: int,
         images, images_information = factory.build_input_layers(training=False)
 
     resnet = ResNet50(input_tensor=images, weights='imagenet')
+
+    freeze_batch_normalization(resnet)
+    freeze_layers_before(resnet, "conv2_block3_out")
+
     pyramid = Pyramid()(resnet.outputs)
 
     if training:
