@@ -26,6 +26,8 @@ class Pyramid(KL.Layer):
             for _ in range(num_level_pyramid)
         ]
 
+        super().build(input_shape)
+
     def call(self, inputs):
         """Over your backbone feature build a FPN (inspired from tensorpack)
 
