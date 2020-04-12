@@ -15,7 +15,7 @@ Od is pure `tensorflow 2` implementation of object detection algorithms (Faster 
 It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.X.
 
 Many ideas have been based on [google object detection](https://github.com/tensorflow/models/tree/master/research/object_detection) and [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN).
- `Warning`: It is still a work in progress and some breaking changes could arrive soon. If you need to have good performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for now but my aim is too match its benchmarks soon. The current AP@[.5:.95] on the [coco notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb) is `27.4` which is quite low (but it was the first run so let's found those bugs). 
+ `Warning`: It is still a work in progress and some breaking changes could arrive soon. If you need to have good performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for now but my aim is too match its benchmarks soon. The current AP@[.5:.95] on the [coco notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb) is `27.4` (at commit e311bdf9a7c7f977bc7a82180d6877fb9f287372) which is quite low (but it was the first run so let's found those bugs). 
 
 
 ## Features
@@ -25,8 +25,10 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 - [Documentation](https://emgarr.github.io/od/)
 - Simple (again)
 - Handle batch in training and inference
-- Multi-GPU training
-- The mixed_precision is supported (WIP some metrics are buggy). You can try it with this [notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
+
+### WIP features
+
+- The mixed_precision is almost supported (should investigate). You can try it with this [notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
 
 ### Algorithms
 
@@ -78,31 +80,74 @@ pip install -e .
 
 ## Tutorials
 
+### Simple example
+
+To run a training you just need to write the following. 
+
+```python
+import numpy as np
+from od.dataset.preprocessing import expand_dims_for_single_batch, preprocess
+from od.model import factory
+
+num_classes = 20
+model = factory.build_model(num_classes, weights='imagenet')
+
+inputs = {
+    'image': np.zeros((2, 100, 50, 3)),
+    'objects': {
+        BoxField.BOXES: np.array([[[0, 0, 1, 1]], [[0, 0, 1, 1]]], dtype=np.float32),
+        BoxField.LABELS: np.array([[1], [1]])
+    }
+}
+
+data = tf.data.Dataset.from_tensor_slices(inputs)
+data = data.map(preprocess)
+data = data.map(expand_dims_for_single_batch)
+
+base_lr = 0.02
+optimizer = tf.keras.optimizers.SGD(learning_rate=base_lr)
+model.compile(optimizer=optimizer, loss=None)
+model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
+```
+
+All the notebooks use those basic blocks
+
 ### Basic blocks
 
-It provides simple blocks to create the state of the art object detection algorithms.
+`od` provides simple blocks to create the state of the art object detection algorithms.
 
 ```python
 from od.model.backbone.fpn import Pyramid
-from od.model.backbone.resnet import ResNet50
+from od.model.backbone.resnet_tensorpack import Resnet50
 from od.model.detection.fast_rcnn import FastRCNN
 from od.model.detection.rpn import RegionProposalNetwork
-from od.model import factory
 
+class MyOwnFasterRcnn(tf.keras.Model):
+    def __init__(self, num_classes, **kwargs):
+        super().__init__(**kwargs)
 
-# Inputs of our model
-batch_size = 2
-images, images_information, ground_truths = factory.build_input_layers(training=True, batch_size=batch_size)
+        self.num_classes = num_classes
+        self.resnet = Resnet50()
+        self.fpn = Pyramid()
+        self.rpn = RegionProposalNetwork()
+        self.fast_rcnn = FastRCNN(num_classes + 1)
 
-# Keras layers
-num_classes = 20
-resnet = ResNet50(input_tensor=images, weights='imagenet')
-pyramid = Pyramid()(resnet.outputs)
-rois, _ = RegionProposalNetwork()([pyramid, images_information, ground_truths], training=True)
-outputs = FastRCNN(num_classes + 1)([pyramid, rois, images_information, ground_truths],
-                                        training=True)
-model_faster_rcnn = tf.keras.Model(inputs=[images, images_information, ground_truths],
-                                       outputs=outputs)
+    def call(self, inputs, training=None):
+        # You can find the list of the standardized inputs here:
+        # https://emgarr.github.io/od/reference/od/dataset/preprocessing/#preprocess
+        images = inputs.pop(DatasetField.IMAGES)
+        images_information = inputs.pop(DatasetField.IMAGES_INFO)
+        x = self.resnet(images)
+        pyramid = self.fpn(x)
+        if training:
+            # We have poped the only two keys which are not ground_truths previously
+            ground_truths = inputs
+            rois, _ = self.rpn([pyramid, images_information, ground_truths], training=training)
+            outputs = self.fast_rcnn([pyramid, rois, ground_truths], training=training)
+        else:
+            rois, _ = self.rpn([pyramid, images_information], training=training)
+            outputs = self.fast_rcnn([pyramid, rois], training=training)
+        return outputs
 ```
 
 ### Notebooks
@@ -129,17 +174,17 @@ You can find examples in the [notebooks folder](./notebooks). There are no runne
 
 #### Export
 
-To export a model for tensorflow serving:
+1. Export a model for tensorflow serving:
 
 ```python
-import tensorflow as tf
-
-from od.model.faster_rcnn import build_fpn_resnet50_faster_rcnn
-
-model_faster_rcnn_inference = build_fpn_resnet50_faster_rcnn(num_classes, None, training=False)
-model_faster_rcnn_inference.load_weights('my_amazing_weights.h5')
-model_faster_rcnn_inference.save('serving_model')
+# Your model just trained
+model.export_for_serving('your_path')
 ```
+
+2. Why can't you just do a `model.save`
+
+Currently, the issue is that in training the ground_truths are passed to the call method but not in inference. For the serving only the `images` and `images_information` are defined. It means the inputs linked to the ground_truths won't be defined in serving. However, in tensorflow when the `training` arguments is defined in the method `call`, `tf.save_model.save` method performs a check on the graph for training=False and training=True. We don't want this check to be perform because our ground_truths inputs aren't defined. The method `export_for_serving` allows to bypass this behavior.
+
 
 #### Serving
 You can then use it in production with [tensorflow model server](https://www.tensorflow.org/tfx/serving/docker).
@@ -149,7 +194,7 @@ import requests
 
 from od.core.standard_fields import DatasetField
 
-API_ENDPOINT = 'https://my_server:XXX/'
+url = 'https://my_server:XXX/v1/models/serving:predict'
 
 image = resize_to_min_dim(inputs['image'], 800.0, 1300.0)
 image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
@@ -160,9 +205,8 @@ inputs = {
   DatasetField.IMAGES_INFO: tf.expand_dims(image_information, axis=0).numpy().tolist(),
 }
 
-url_serving = os.path.join(API_ENDPOINT, "v1/models/serving:predict")
 headers = {"content-type": "application/json"}
-response = requests.post(url_serving, data=json.dumps(inputs), headers=headers)
+response = requests.post(url, data=json.dumps(inputs), headers=headers)
 outputs = json.loads(response.text)['outputs']
 ```
 
@@ -202,11 +246,6 @@ pytest tests/
 ```
 
 ## Roadmap
-
-### Implementation
-
-- [ ] evaluation (MAP)
-- [ ] Improved fit loop using gradient tape
 
 ### Futur Improvements
 
