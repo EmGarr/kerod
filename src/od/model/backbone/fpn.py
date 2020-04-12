@@ -1,9 +1,9 @@
 import tensorflow as tf
-from tensorflow.keras import layers as KL
+from tensorflow.keras import layers
 from tensorflow.keras.initializers import VarianceScaling
 
 
-class Pyramid(KL.Layer):
+class Pyramid(layers.Layer):
     """Over your backbone feature build a FPN (inspired from tensorpack)"""
 
     def __init__(self, dim=256, **kwargs):
@@ -13,16 +13,16 @@ class Pyramid(KL.Layer):
     def build(self, input_shape):
         num_level_pyramid = len(input_shape[0])
         self.lateral_connection_2345 = [
-            KL.Conv2D(self._dim, (1, 1),
-                      padding='same',
-                      kernel_initializer=VarianceScaling(scale=1.))
+            layers.Conv2D(self._dim, (1, 1),
+                          padding='same',
+                          kernel_initializer=VarianceScaling(scale=1.))
             for _ in range(num_level_pyramid)
         ]
 
         self.anti_aliasing_conv = [
-            KL.Conv2D(self._dim, (3, 3),
-                      padding='same',
-                      kernel_initializer=VarianceScaling(scale=1.))
+            layers.Conv2D(self._dim, (3, 3),
+                          padding='same',
+                          kernel_initializer=VarianceScaling(scale=1.))
             for _ in range(num_level_pyramid)
         ]
 
@@ -58,7 +58,7 @@ class Pyramid(KL.Layer):
             conv(tensor) for conv, tensor in zip(self.anti_aliasing_conv, lat_sum_5432[::-1])
         ]
 
-        p6 = KL.MaxPool2D()(lateral_connection_2345[-1])
+        p6 = layers.MaxPool2D()(lateral_connection_2345[-1])
         return lateral_connection_2345 + [p6]
 
     def get_config(self):

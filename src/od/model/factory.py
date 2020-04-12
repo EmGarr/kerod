@@ -1,57 +1,35 @@
+import os
 import tensorflow as tf
-from od.core.standard_fields import BoxField, DatasetField
+
+from od.model.faster_rcnn import FasterRcnnFPNResnet50
+from od.core.standard_fields import DatasetField
+from od.utils.training import freeze_layers_before
+
+WEIGHTS_PATH = ('https://files.heuritech.com/raw_files/')
 
 
-def build_input_layers(training=False, batch_size=None):
-    """Factory that build input layers for training and inference mode
+def build_model(num_classes, weights: str = 'imagenet'):
+    model = FasterRcnnFPNResnet50(num_classes)
+    images_information = tf.constant([[1300, 650]], tf.float32)
+    features = tf.zeros((1, 1300, 650, 3), tf.float32)
 
-    Arguments:
+    # Blank shot to init weights
+    model({DatasetField.IMAGES: features, DatasetField.IMAGES_INFO: images_information})
 
-    - *training*: Boolean indicating if the network is either in training or inference mode.
-    - *batch_size*: In training this value should be specified. The current value used is 1 but the
-    the limit only depends on the limit of your GPU capacity.
+    # The weights need to be loaded here before freezing any layers
+    if weights == 'imagenet':
+        weights_path = tf.keras.utils.get_file('resnet50_tensorpack_converted.h5',
+                                               os.path.join(WEIGHTS_PATH,
+                                                            'resnet50_tensorpack_converted.h5'),
+                                               cache_subdir='models',
+                                               md5_hash='f67cc7a3179ec847f2e2073d9533789b')
+        model.resnet.load_weights(weights_path)
+    elif weights is not None:
+        model.load_weights(weights)
 
-    Returns:
+    model.resnet.freeze_normalization()
+    # Will freeze all the layers before group number one
+    # Should be done here because the layers won't be registered before the previous inference
+    freeze_layers_before(model.resnet, model.resnet.groups[1].name)
 
-    - *images*: A keras input for the images.
-    - *images_information*: A keras input for the images information (image shapes without the padding).
-    - *ground_truths*: If the training is set to true return the ground_truths needed by the model.
-
-    Raises:
-
-    - *ValueError*: is the batch_size has not been specified in training mode.
-    """
-    if training and batch_size is None:
-        raise ValueError('In training you should specify a batch_size: 1 is a current value '
-                         'in object detection of course it depends on your GPU capacity')
-
-    images = tf.keras.layers.Input(shape=(None, None, 3),
-                                   batch_size=batch_size,
-                                   name=DatasetField.IMAGES)
-    images_information = tf.keras.layers.Input(shape=(2),
-                                               batch_size=batch_size,
-                                               name=DatasetField.IMAGES_INFO)
-
-    if training:
-        ground_truths = {
-            BoxField.BOXES:
-                tf.keras.layers.Input(shape=(None, 4), batch_size=batch_size, name=BoxField.BOXES),
-            BoxField.LABELS:
-                tf.keras.layers.Input(shape=(None,),
-                                      batch_size=batch_size,
-                                      dtype=tf.int32,
-                                      name=BoxField.LABELS),
-            BoxField.WEIGHTS:
-                tf.keras.layers.Input(shape=(None,),
-                                      batch_size=batch_size,
-                                      dtype=tf.float32,
-                                      name=BoxField.WEIGHTS),
-            BoxField.NUM_BOXES:
-                tf.keras.layers.Input(shape=(batch_size),
-                                      batch_size=batch_size,
-                                      dtype=tf.int32,
-                                      name=BoxField.NUM_BOXES)
-        }
-        return images, images_information, ground_truths
-
-    return images, images_information
+    return model
