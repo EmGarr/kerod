@@ -1,5 +1,5 @@
 <h3 align="center">
-<p>OD - Faster R-CNN for TensorFlow 2
+<p>OD - Faster R-CNN for TensorFlow 2.2
 </h3>
 
 [![Build Status](https://img.shields.io/travis/TheAlgorithms/Python.svg?label=Travis%20CI&logo=travis&style=flat-square)](https://travis-ci.com/EmGarr/od)
@@ -12,7 +12,7 @@ _________________
 
 Od is pure `tensorflow 2` implementation of object detection algorithms (Faster R-CNN) aiming production.
 
-It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.X.
+It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.2.
 
 Many ideas have been based on [google object detection](https://github.com/tensorflow/models/tree/master/research/object_detection) and [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN).
  `Warning`: It is still a work in progress and some breaking changes could arrive soon. If you need to have good performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for now but my aim is too match its benchmarks soon. The current AP@[.5:.95] on the [coco notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb) is `27.4` (at commit e311bdf9a7c7f977bc7a82180d6877fb9f287372) which is quite low (but it was the first run so let's found those bugs). 
@@ -22,9 +22,9 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 
 - As powerful and concise as Keras
 - Low barrier to entry for educators and practitioners
+- Handle batch in training and inference
 - [Documentation](https://emgarr.github.io/od/)
 - Simple (again)
-- Handle batch in training and inference
 
 ### WIP features
 
@@ -36,7 +36,6 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 - [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (Much of the pieces are already here just need to put everything together. It will arrive soon.)
 - [ ] [Object Relation Network for object detection](https://arxiv.org/abs/1711.11575): aims to replace the fast-rcnn head multiclass nms. Will allow to make a better usage of the GPU (The NMS is used on CPU and block the serving efficiency).
 - [ ] [Cascade R-CNN](https://arxiv.org/abs/1906.09756)
-- [ ] [Efficient Det](https://arxiv.org/pdf/1911.09070.pdf) - will be converted in 2 stage mode instead of 1 stage 
 - [ ] [Max pool nms](http://openaccess.thecvf.com/content_CVPR_2019/papers/Cai_MaxpoolNMS_Getting_Rid_of_NMS_Bottlenecks_in_Two-Stage_Object_Detectors_CVPR_2019_paper.pdf) will make the network more efficient on GPU.
 
 ### No configuration file
@@ -47,7 +46,7 @@ Why: In deep learning each parameter is important. You must think thoroughly bef
 
 ## Installation
 
-This repo is tested on Python 3.6 and 3.7 and TensorFlow 2.1.
+This repo is tested on Python 3.6, 3.7, 3.8 and TensorFlow 2.2.
 
 You may want to install 'od' in a [virtual environment](https://docs.python.org/3/library/venv.html) or with [pyenv](https://github.com/pyenv/pyenv). Create a virtual environment with the version of Python you wanna use and activate it.
 
@@ -92,6 +91,7 @@ from od.model import factory
 num_classes = 20
 model = factory.build_model(num_classes, weights='imagenet')
 
+# Same format than COCO and Pascal VOC in tensorflow datasets
 inputs = {
     'image': np.zeros((2, 100, 50, 3)),
     'objects': {
@@ -110,17 +110,16 @@ model.compile(optimizer=optimizer, loss=None)
 model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
 ```
 
-All the notebooks use those basic blocks
-
 ### Basic blocks
 
 `od` provides simple blocks to create the state of the art object detection algorithms.
 
 ```python
 from od.model.backbone.fpn import Pyramid
-from od.model.backbone.resnet_tensorpack import Resnet50
+from od.model.backbone.resnet import Resnet50
 from od.model.detection.fast_rcnn import FastRCNN
 from od.model.detection.rpn import RegionProposalNetwork
+from od.core.standard_fields import DatasetField
 
 class MyOwnFasterRcnn(tf.keras.Model):
     def __init__(self, num_classes, **kwargs):
@@ -133,21 +132,25 @@ class MyOwnFasterRcnn(tf.keras.Model):
         self.fast_rcnn = FastRCNN(num_classes + 1)
 
     def call(self, inputs, training=None):
-        # You can find the list of the standardized inputs here:
-        # https://emgarr.github.io/od/reference/od/dataset/preprocessing/#preprocess
-        images = inputs.pop(DatasetField.IMAGES)
-        images_information = inputs.pop(DatasetField.IMAGES_INFO)
+        images = inputs[DatasetField.IMAGES]
+        images_information = inputs[DatasetField.IMAGES_INFO]
         x = self.resnet(images)
         pyramid = self.fpn(x)
         if training:
-            # We have poped the only two keys which are not ground_truths previously
-            ground_truths = inputs
+            # During the saving operation the check_mutation method raise
+            # an error if we modify the inputs dictionary
+            ground_truths = {
+                key: value
+                for key, value in inputs.items()
+                if key not in [DatasetField.IMAGES, DatasetField.IMAGES_INFO]
+            }
             rois, _ = self.rpn([pyramid, images_information, ground_truths], training=training)
             outputs = self.fast_rcnn([pyramid, rois, ground_truths], training=training)
         else:
             rois, _ = self.rpn([pyramid, images_information], training=training)
             outputs = self.fast_rcnn([pyramid, rois], training=training)
         return outputs
+
 ```
 
 ### Notebooks
