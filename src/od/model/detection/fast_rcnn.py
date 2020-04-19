@@ -78,7 +78,7 @@ class FastRCNN(AbstractDetectionHead):
         Returns:
 
 
-        - *classification_pred*: A Tensor of shape [batch_size, num_boxes, num_classes]
+        - *classification_pred*: A logit Tensor of shape [batch_size, num_boxes, num_classes]
         - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
         - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
 
@@ -97,11 +97,6 @@ class FastRCNN(AbstractDetectionHead):
         # Remove P6
         pyramid = inputs[0][:-1]
         anchors = inputs[1]
-        if training and not self.serving:
-            ground_truths = inputs[2]
-            # Include the ground_truths as RoIs for the training
-            anchors = tf.concat([anchors, ground_truths[BoxField.BOXES]], axis=1)
-            y_true, weights, anchors = self.sample_boxes(anchors, ground_truths)
 
         # We can compute the original image shape regarding
         # TODO compute it more automatically without knowing that the last layer is stride 32
@@ -117,12 +112,7 @@ class FastRCNN(AbstractDetectionHead):
         classification_pred = tf.reshape(classification_pred, (batch_size, -1, self._num_classes))
         localization_pred = tf.reshape(localization_pred,
                                        (batch_size, -1, (self._num_classes - 1) * 4))
-
-        if training and not self.serving:
-            losses = self.compute_loss(y_true, weights, classification_pred, localization_pred)
-
-        classification_pred = tf.nn.softmax(classification_pred)
-        return classification_pred, localization_pred, anchors
+        return classification_pred, localization_pred
 
     def sample_boxes(self,
                      anchors: tf.Tensor,

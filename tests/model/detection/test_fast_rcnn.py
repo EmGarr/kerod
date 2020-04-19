@@ -28,23 +28,10 @@ def test_fast_rcnn_full_inference_and_training(fast_rcnn_class):
     # args callable
     pyramid = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20, 20]]
     boxes = [[0, 0, i, i] for i in range(1, 1000)]
-    boxes = tf.constant([boxes, boxes], tf.float32)
-
-    ground_truths = {
-        BoxField.BOXES:
-            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
-        BoxField.LABELS:
-            tf.constant([[1, 0], [1, 0]], tf.int32),
-        BoxField.WEIGHTS:
-            tf.constant([[1, 0], [1, 1]], tf.float32),
-        BoxField.NUM_BOXES:
-            tf.constant([[2], [1]], tf.int32)
-    }
-
+    boxes = tf.constant([boxes, boxes], tf.float32) 
     num_classes = 3
     fast_rcnn = fast_rcnn_class(num_classes)
 
-    fast_rcnn([pyramid, boxes, ground_truths], training=True)
     fast_rcnn([pyramid, boxes])
 
 

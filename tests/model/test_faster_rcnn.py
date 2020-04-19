@@ -37,20 +37,14 @@ class BuildFasterRCNNTest(keras_parameterized.TestCase):
             }
         }
 
-        inputs_training = expand_dims_for_single_batch(preprocess(inputs))
-        model(inputs_training, training=True)
+        data = expand_dims_for_single_batch(*preprocess(inputs))
 
-        inputs_inf = {
-            DatasetField.IMAGES: inputs_training[DatasetField.IMAGES],
-            DatasetField.IMAGES_INFO: inputs_training[DatasetField.IMAGES_INFO]
-        }
-        model(inputs_inf)
+        model(data, training=True)
+        model([data[0]])
 
-        model.export_for_serving(path_save_model)
 
-        model_inference = tf.keras.models.load_model(path_save_model)
-
-        #model_inference.serve([inputs_training['images'], inputs_training['images_information']])
+        model.save(path_save_model)
+        model = tf.keras.models.load_model(path_save_model)
 
         if use_mixed_precision:
             # with pytest.raises(Exception):

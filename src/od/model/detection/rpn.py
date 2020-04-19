@@ -1,3 +1,5 @@
+from typing import List
+
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
@@ -12,7 +14,6 @@ from od.core.sampling_ops import batch_sample_balanced_positive_negative
 from od.core.standard_fields import BoxField, LossField
 from od.core.target_assigner import TargetAssigner, batch_assign_targets
 from od.model.detection.abstract_detection_head import AbstractDetectionHead
-from od.model.post_processing import post_process_rpn
 
 SAMPLING_SIZE = 256
 SAMPLING_POSITIVE_RATIO = 0.5
@@ -79,76 +80,34 @@ class RegionProposalNetwork(AbstractDetectionHead):
         localization_head = tf.reshape(localization_head, (batch_size, -1, 4))
         return classification_head, localization_head
 
-    def call(self, inputs, training=None):
+    def call(self, inputs: List[tf.Tensor], training=None):
         """Create the computation graph for the rpn inference
 
-        Arguments:
+        Argument:
 
-        *inputs*: A list with the following schema:
-
-        1. *pyramid*: A List of tensors the output of the pyramid
-        3. *image_informations*: A Tensor of shape [batch_size, (height, width)]
-        The height and the width are without the padding.
-        4. *ground_truths*: If the training is true, a dict with
-
-        ```python
-        ground_truths = {
-            BoxField.BOXES:
-                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
-            BoxField.LABELS:
-                tf.constant([[2,1], [2, 0]], tf.int32),
-            BoxField.WEIGHTS:
-                tf.constant([[1, 0], [1, 1]], tf.float32),
-            BoxField.NUM_BOXES:
-                tf.constant([2, 1], tf.int32)
-        }
-        ```
-
-        where `NUM_BOXES` allows to remove the padding created by tf.Data.
-
-        - *training*: Boolean
+        *inputs*: A List of tensors the output of the pyramid
 
         Returns:
-
-        - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]
-        containing the non-max suppressed boxes.
-        - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
-        the scores for the boxes.
+        
+        - *localization_pred*: A logit 3-D tensor of shape [batch_size, num_anchors, 4]
+        - *classification_pred*: A logit 3-D tensor of shape [batch_size, num_anchors, 2]
+        - *anchors*: A tensor of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
         """
-        pyramid = inputs[0]
-        image_information = inputs[1]
-
-        rpn_predictions = [self.build_rpn_head(tensor) for tensor in pyramid]
+        rpn_predictions = [self.build_rpn_head(tensor) for tensor in inputs]
         rpn_anchors = []
         # TODO compute constant anchors once and extract only the usefull part
-        for tensor, anchor_stride, anchor_size in zip(pyramid, self._anchor_strides,
+        for tensor, anchor_stride, anchor_size in zip(inputs, self._anchor_strides,
                                                       self._anchor_zises):
             anchors = generate_anchors(anchor_stride, tf.constant([anchor_size],
                                                                   self._compute_dtype),
                                        tf.constant(self._anchor_ratios, self._compute_dtype),
                                        tf.shape(tensor))
-            # TODO clipping to investigate
             rpn_anchors.append(anchors)
         localization_pred = tf.concat([prediction[1] for prediction in rpn_predictions], 1)
         classification_pred = tf.concat([prediction[0] for prediction in rpn_predictions], 1)
         anchors = tf.concat([anchors for anchors in rpn_anchors], 0)
-        classification_prob = tf.nn.softmax(classification_pred)
-        if training and not self.serving:
-            ground_truths = inputs[2]
-            loss = self.compute_loss(localization_pred, classification_pred, anchors, ground_truths)
-            # replace post_process_rpn by tf.image.generate_bounding_box_proposals
-            return post_process_rpn(classification_prob,
-                                    localization_pred,
-                                    anchors,
-                                    image_information,
-                                    pre_nms_topk=2000 * len(pyramid),
-                                    post_nms_topk=2000)
-        return post_process_rpn(classification_prob,
-                                localization_pred,
-                                anchors,
-                                image_information,
-                                pre_nms_topk=1000 * len(pyramid),
-                                post_nms_topk=1000)
+
+        return localization_pred, classification_pred, anchors
 
     def compute_loss(self, localization_pred, classification_pred, anchors, ground_truths):
         """Compute the loss
@@ -241,7 +200,7 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
 
     - *recall*: Among all the boxes that we had to find how much did we found.
     """
-    # Force the cast to avoid type issue when the mixed precision is activated  
+    # Force the cast to avoid type issue when the mixed precision is activated
     y_true, y_pred, weights = tf.cast(y_true, tf.float32), tf.cast(y_pred, tf.float32), tf.cast(
         weights, tf.float32)
 

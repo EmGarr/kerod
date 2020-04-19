@@ -25,22 +25,14 @@ class RegionProposalNetworkGraphSupport(RegionProposalNetwork):
 @pytest.mark.parametrize("rpn_class", [RegionProposalNetwork, RegionProposalNetworkGraphSupport])
 def test_rpn(rpn_class):
     rpn = rpn_class()
-    image_information = tf.constant([[200, 200], [200, 200]])
     features = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20]]
-    ground_truths = {
-        BoxField.BOXES:
-            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
-        BoxField.LABELS:
-            tf.constant([[[0, 0], [0, 0]]], tf.float32),
-        BoxField.NUM_BOXES:
-            tf.constant([[2], [1]], tf.int32),
-    }
-    boxes, scores = rpn([features, image_information, ground_truths], training=True)
-    assert (2, 2000, 4) == boxes.shape
-    assert (2, 2000) == scores.shape
-    boxes, scores = rpn([features, image_information])
-    assert (2, 1000, 4) == boxes.shape
-    assert (2, 1000) == scores.shape
+
+    localization_pred, logit_scores, anchors = rpn(features)
+
+    num_anchors = (160**2 + 80**2 + 40**2 + 20**2) * 3
+    assert (2, num_anchors, 4) == localization_pred.shape
+    assert (2, num_anchors, 2) == logit_scores.shape
+    assert (num_anchors, 4) == anchors.shape
 
 
 # We are forced to Mock the add_metric and add_loss because Keras want it to be used inside the call
@@ -89,4 +81,4 @@ def test_compute_rpn_metrics():
         [-100, 100],
     ]], tf.float32)
     recall = compute_rpn_metrics(y_true, y_pred, weights)
-    assert recall == 2/3
+    assert recall == 2 / 3

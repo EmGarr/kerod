@@ -34,31 +34,6 @@ class AbstractDetectionHead(KL.Layer):
             the `kernel` weights matrix of every layers
             (see [regularizer](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
         - *use_mask*: Boolean define if the segmentation_head will be used.
-        - *serving*: Will allow to bypass the save_model behavior the graph in serving mode.
-            Currently, the issue is that in training the ground_truths are passed to the call method but
-            not in inference. For the serving only the `images` and `images_information` are defined.
-            It means the inputs link to the ground_truths won't be defined in serving. However, in tensorflow
-            when the `training` arguments is defined int the method `call`, `tf.save_model.save` method
-            performs a check on the graph for training=False and training=True.
-            However, we don't want this check to be perform because our ground_truths inputs aren't defined.
-
-        ```python
-        def call(self, inputs, training=None):
-           tensor = inputs[0] # your tensors
-           if training:
-               ground_truths = inputs[1] # inputs 1 is not defined so an exception is raised
-        ```
-
-        to avoid that the serving arguments is used
-
-        ```python
-        def call(self, inputs, training=None):
-           tensor = inputs[0] # your tensors
-           if training and not self.serving:
-               ground_truths = inputs[1] # inputs 1 is not defined so an exception is raised
-        ```
-
-        TODO find a better way than serving to avoid this issue
         """
 
     def __init__(self,
@@ -72,7 +47,6 @@ class AbstractDetectionHead(KL.Layer):
                  kernel_initializer_box_prediction_head=None,
                  kernel_regularizer=None,
                  use_mask=False,
-                 serving=False,
                  **kwargs):
 
         super().__init__(**kwargs)
@@ -91,8 +65,6 @@ class AbstractDetectionHead(KL.Layer):
             self._kernel_regularizer = regularizers.l2(0.0005)
         else:
             self._kernel_regularizer = regularizers.get()
-
-        self.serving = serving
 
     def build(self, input_shape):
         self._conv_classification_head = KL.Conv2D(
@@ -234,5 +206,4 @@ class AbstractDetectionHead(KL.Layer):
         base_config['localization_loss_weight'] = self._localization_loss_weight
         base_config['multiples'] = self._multiples
         base_config['use_mask'] = self._use_mask
-        base_config['serving'] = self.serving
         return base_config

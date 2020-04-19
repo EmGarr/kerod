@@ -57,5 +57,6 @@ def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
               validation_data=data,
               epochs=2,
               callbacks=[ModelCheckpoint(os.path.join(tmpdir, 'checkpoints'))])
+    model.predict(data, batch_size=2)
 
-    # model.save(path_save_model, signatures=model.serve.get_concrete_function())
+    # model.save(tmpdir)

@@ -108,49 +108,8 @@ base_lr = 0.02
 optimizer = tf.keras.optimizers.SGD(learning_rate=base_lr)
 model.compile(optimizer=optimizer, loss=None)
 model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
-```
 
-### Basic blocks
-
-`od` provides simple blocks to create the state of the art object detection algorithms.
-
-```python
-from od.model.backbone.fpn import Pyramid
-from od.model.backbone.resnet import Resnet50
-from od.model.detection.fast_rcnn import FastRCNN
-from od.model.detection.rpn import RegionProposalNetwork
-from od.core.standard_fields import DatasetField
-
-class MyOwnFasterRcnn(tf.keras.Model):
-    def __init__(self, num_classes, **kwargs):
-        super().__init__(**kwargs)
-
-        self.num_classes = num_classes
-        self.resnet = Resnet50()
-        self.fpn = Pyramid()
-        self.rpn = RegionProposalNetwork()
-        self.fast_rcnn = FastRCNN(num_classes + 1)
-
-    def call(self, inputs, training=None):
-        images = inputs[DatasetField.IMAGES]
-        images_information = inputs[DatasetField.IMAGES_INFO]
-        x = self.resnet(images)
-        pyramid = self.fpn(x)
-        if training:
-            # During the saving operation the check_mutation method raise
-            # an error if we modify the inputs dictionary
-            ground_truths = {
-                key: value
-                for key, value in inputs.items()
-                if key not in [DatasetField.IMAGES, DatasetField.IMAGES_INFO]
-            }
-            rois, _ = self.rpn([pyramid, images_information, ground_truths], training=training)
-            outputs = self.fast_rcnn([pyramid, rois, ground_truths], training=training)
-        else:
-            rois, _ = self.rpn([pyramid, images_information], training=training)
-            outputs = self.fast_rcnn([pyramid, rois], training=training)
-        return outputs
-
+results = model.predict(data, batch_size=1)
 ```
 
 ### Notebooks
@@ -175,21 +134,6 @@ You can find examples in the [notebooks folder](./notebooks). There are no runne
 
 ### Serving
 
-#### Export
-
-1. Export a model for tensorflow serving:
-
-```python
-# Your model just trained
-model.export_for_serving('your_path')
-```
-
-2. Why can't you just do a `model.save`
-
-Currently, the issue is that in training the ground_truths are passed to the call method but not in inference. For the serving only the `images` and `images_information` are defined. It means the inputs linked to the ground_truths won't be defined in serving. However, in tensorflow when the `training` arguments is defined in the method `call`, `tf.save_model.save` method performs a check on the graph for training=False and training=True. We don't want this check to be perform because our ground_truths inputs aren't defined. The method `export_for_serving` allows to bypass this behavior.
-
-
-#### Serving
 You can then use it in production with [tensorflow model server](https://www.tensorflow.org/tfx/serving/docker).
 
 ```python
