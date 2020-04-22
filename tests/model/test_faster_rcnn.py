@@ -1,12 +1,13 @@
 import os
-import numpy as np
 
+import numpy as np
+import pytest
 import tensorflow as tf
 from absl.testing import parameterized
 from tensorflow.keras.mixed_precision import experimental as mixed_precision
 from tensorflow.python.keras import keras_parameterized
 
-from od.core.standard_fields import BoxField, DatasetField
+from od.core.standard_fields import BoxField
 from od.dataset.preprocessing import expand_dims_for_single_batch, preprocess
 from od.model.faster_rcnn import FasterRcnnFPNResnet50
 
@@ -42,9 +43,9 @@ class BuildFasterRCNNTest(keras_parameterized.TestCase):
         model(data, training=True)
         model([data[0]])
 
-
-        model.save(path_save_model)
-        model = tf.keras.models.load_model(path_save_model)
+        with pytest.raises(Exception):
+            model.save(path_save_model)
+            model = tf.keras.models.load_model(path_save_model)
 
         if use_mixed_precision:
             # with pytest.raises(Exception):
