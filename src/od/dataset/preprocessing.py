@@ -133,7 +133,7 @@ def filter_bad_area(boxes: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
     return tf.gather_nd(boxes, tf.where(area > 0)), tf.gather_nd(labels, tf.where(area > 0))
 
 
-def preprocess_coco_example(inputs, bgr=True):
+def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True):
     """This operations performs a classical preprocessing operations for localization datasets:
 
     - COCO
@@ -160,6 +160,8 @@ def preprocess_coco_example(inputs, bgr=True):
     If you have open your image with `tf.image.decode_image` will open an image in RGB. However,
     OpenCV will open it in BGR by default.
 
+    -*horizontal_flip*: Activate the random horizontal flip.
+
     Returns:
 
     - *inputs*:
@@ -183,7 +185,8 @@ def preprocess_coco_example(inputs, bgr=True):
     boxes, labels = inputs['objects'][BoxField.BOXES], inputs['objects'][BoxField.LABELS]
     boxes, labels = filter_crowded_boxes(boxes, labels, inputs['objects']['is_crowd'])
     boxes, labels = filter_bad_area(boxes, labels)
-    image, boxes = random_horizontal_flip(image, boxes)
+    if horizontal_flip:
+        image, boxes = random_horizontal_flip(image, boxes)
     boxes *= tf.tile(tf.expand_dims(image_information, axis=0), [1, 2])
 
     inputs = {DatasetField.IMAGES: image, DatasetField.IMAGES_INFO: image_information}
