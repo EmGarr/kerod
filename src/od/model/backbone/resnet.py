@@ -29,7 +29,7 @@ def preprocess_input(images: tf.Tensor):
     """Will preprocess the images for the resnet trained on Tensorpack.
     The network has been trained using BGR.
     """
-    mean = tf.constant([-103.53, -116.28, -123.675], dtype=images.dtype)
+    mean = tf.constant([103.53, 116.28, 123.675], dtype=images.dtype)
     std = tf.constant([57.375, 57.12, 58.395], dtype=images.dtype)
     images = (images - mean) / std
     return images
