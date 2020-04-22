@@ -54,7 +54,6 @@ class WarmupLearningRateScheduler(Callback):
             raise ValueError('Optimizer must have an "iterations" attribute.')
 
         global_step = K.get_value(self.model.optimizer.iterations)
-        tmp_lr = None
 
         target_epochs = [
             e for e in self._epochs if epoch >= e and global_step > self._num_warmup_steps
@@ -123,10 +122,12 @@ class ManualStepping(LearningRateSchedule):
             rates = warmup_rates + rates[1:]
         else:
             boundaries = [0] + boundaries
+        self.warmup = warmup
         self.rates = rates
         self.boundaries = boundaries
         self.num_boundaries = len(boundaries)
         self.dtype = tf.convert_to_tensor(rates[0]).dtype
+
 
     def __call__(self, step):
         with tf.name_scope(self.name or "ManualStepping"):
