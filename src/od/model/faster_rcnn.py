@@ -36,8 +36,8 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
 
         self.num_classes = num_classes
         # Seems that kernel regularizer make the network diverge
-        # self.resnet = Resnet50(kernel_regularizer=tf.keras.regularizers.l2(1e-4))
-        self.resnet = Resnet50()
+        self.resnet = Resnet50(kernel_regularizer=tf.keras.regularizers.l2(1e-4))
+        # self.resnet = Resnet50()
         self.fpn = Pyramid()
         self.rpn = RegionProposalNetwork()
         self.fast_rcnn = FastRCNN(num_classes + 1)
