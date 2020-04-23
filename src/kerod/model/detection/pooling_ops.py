@@ -2,7 +2,7 @@ import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import backend as K
 
-from od.core.box_ops import (compute_area, normalize_box_coordinates, transform_fpcoor_for_tf)
+from kerod.core.box_ops import (compute_area, normalize_box_coordinates, transform_fpcoor_for_tf)
 
 
 def _crop_and_resize(tensor, boxes, box_indices, crop_size: int):

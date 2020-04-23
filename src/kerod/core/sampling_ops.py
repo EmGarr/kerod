@@ -31,7 +31,7 @@ when number of examples set to True in indicator is less than sample_size.
 
 import tensorflow as tf
 
-from od.utils import ops
+from kerod.utils import ops
 
 
 def subsample_indicator(indicator, num_samples):

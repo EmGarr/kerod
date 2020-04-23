@@ -5,14 +5,14 @@ import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 from tensorflow.keras.losses import CategoricalCrossentropy, MeanAbsoluteError
 
-from od.core.argmax_matcher import ArgMaxMatcher
-from od.core.box_coder import encode_boxes_faster_rcnn
-from od.core.box_ops import compute_iou
-from od.core.sampling_ops import batch_sample_balanced_positive_negative
-from od.core.standard_fields import BoxField, LossField
-from od.core.target_assigner import TargetAssigner, batch_assign_targets
-from od.model.detection.abstract_detection_head import AbstractDetectionHead
-from od.model.detection.pooling_ops import multilevel_roi_align
+from kerod.core.argmax_matcher import ArgMaxMatcher
+from kerod.core.box_coder import encode_boxes_faster_rcnn
+from kerod.core.box_ops import compute_iou
+from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
+from kerod.core.standard_fields import BoxField, LossField
+from kerod.core.target_assigner import TargetAssigner, batch_assign_targets
+from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
+from kerod.model.detection.pooling_ops import multilevel_roi_align
 
 
 class FastRCNN(AbstractDetectionHead):
@@ -85,7 +85,7 @@ class FastRCNN(AbstractDetectionHead):
         Raw predictions from the FastRCNN head you can post_process them using:
 
         ```python
-        from od.model.post_processing import post_process_fast_rcnn_boxes
+        from kerod.model.post_processing import post_process_fast_rcnn_boxes
 
         outputs = post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
                                     images_information, num_classes)

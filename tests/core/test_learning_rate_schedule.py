@@ -1,8 +1,8 @@
 import numpy as np
 import tensorflow as tf
-from od.core.learning_rate_schedule import ManualStepping, WarmupLearningRateScheduler
-from tensorflow.python.keras import testing_utils
-from tensorflow.python.keras import keras_parameterized
+from tensorflow.python.keras import keras_parameterized, testing_utils
+
+from kerod.core.learning_rate_schedule import (ManualStepping, WarmupLearningRateScheduler)
 
 
 def test_manual_stepping_without_warmup():
@@ -65,11 +65,8 @@ class KerasCallbacksTest(keras_parameterized.TestCase):
             # Here the epochs scheduling won't apply because the warmup hasn't been done
             num_warmup_steps = 16
             init_lr = 1e-2 / 3
-            callback = WarmupLearningRateScheduler(1,
-                                                   16,
-                                                   epochs,
-                                                   num_warmup_steps=num_warmup_steps)
-            expected_slope = (1 - init_lr * 0.5 )/ num_warmup_steps
+            callback = WarmupLearningRateScheduler(1, 16, epochs, num_warmup_steps=num_warmup_steps)
+            expected_slope = (1 - init_lr * 0.5) / num_warmup_steps
             assert callback.slope == expected_slope
 
             model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])

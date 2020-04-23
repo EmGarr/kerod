@@ -17,7 +17,7 @@
 import numpy as np
 import tensorflow as tf
 
-from od.utils import ops
+from kerod.utils import ops
 
 
 def test_indices_to_dense_vector():

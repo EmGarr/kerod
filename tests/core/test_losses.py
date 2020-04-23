@@ -1,9 +1,7 @@
-import math
-
 import numpy as np
 import tensorflow as tf
 
-from od.core import losses
+from kerod.core import losses
 
 
 def test_smooth_L1_loss():

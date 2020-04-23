@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from od.model.backbone.resnet import (Group, Resnet50, padd_for_aligning_pixels)
+from kerod.model.backbone.resnet import (Group, Resnet50, padd_for_aligning_pixels)
 
 
 @pytest.mark.parametrize(["input_shape", "output_shape"], [

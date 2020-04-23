@@ -3,10 +3,10 @@ import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
-from od.core.standard_fields import BoxField
-from od.dataset.preprocessing import expand_dims_for_single_batch, preprocess
-from od.model import factory
-from od.model.backbone.resnet import Group
+from kerod.core.standard_fields import BoxField
+from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
+from kerod.model import factory
+from kerod.model.backbone.resnet import Group
 
 
 def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):

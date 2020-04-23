@@ -36,8 +36,8 @@ from typing import List, Callable
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-from od.core import matcher as mat
-from od.core.standard_fields import BoxField, LossField
+from kerod.core import matcher as mat
+from kerod.core.standard_fields import BoxField, LossField
 
 
 class TargetAssigner(object):

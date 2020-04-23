@@ -17,7 +17,7 @@
 import numpy as np
 import tensorflow as tf
 
-from od.core import argmax_matcher
+from kerod.core import argmax_matcher
 
 
 class ArgMaxMatcherTest(tf.test.TestCase):

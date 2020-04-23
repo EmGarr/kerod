@@ -1,9 +1,9 @@
 import os
 import tensorflow as tf
 
-from od.model.faster_rcnn import FasterRcnnFPNResnet50
-from od.core.standard_fields import DatasetField
-from od.utils.training import freeze_layers_before
+from kerod.model.faster_rcnn import FasterRcnnFPNResnet50
+from kerod.core.standard_fields import DatasetField
+from kerod.utils.training import freeze_layers_before
 
 WEIGHTS_PATH = ('https://files.heuritech.com/raw_files/')
 

@@ -1,17 +1,16 @@
 from unittest import mock
-import tensorflow as tf
+
 import numpy as np
-
-from od.core import box_ops
-from od.dataset.augmentation import random_horizontal_flip
-
 import pytest
+import tensorflow as tf
+
+from kerod.core import box_ops
+from kerod.dataset.augmentation import random_horizontal_flip
 
 
 @pytest.mark.parametrize("flip", [True, False])
-@mock.patch('od.dataset.augmentation.tf.random.uniform', spec=True)
+@mock.patch('kerod.dataset.augmentation.tf.random.uniform', spec=True)
 def test_random_horizontal_flip(mock, flip):
-    """"""
     # Above 0.5 perform a flip
     if flip:
         mock.return_value = 0.6

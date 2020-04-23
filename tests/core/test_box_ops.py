@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-from od.core import box_ops
+from kerod.core import box_ops
 
 
 def test_transform_fpcoor_for_tf():

@@ -1,5 +1,5 @@
 import tensorflow as tf
-from od.core import box_ops
+from kerod.core import box_ops
 
 
 def random_horizontal_flip(image, boxes, seed=None):

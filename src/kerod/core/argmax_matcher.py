@@ -28,7 +28,7 @@ factory function for popular implementations.
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-from od.core import matcher
+from kerod.core import matcher
 
 
 class ArgMaxMatcher(matcher.Matcher):

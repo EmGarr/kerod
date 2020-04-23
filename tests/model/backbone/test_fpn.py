@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from od.model.backbone.fpn import Pyramid
+from kerod.model.backbone.fpn import Pyramid
 
 
 def test_build_fpn():

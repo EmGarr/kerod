@@ -15,7 +15,7 @@
 import tensorflow as tf
 import numpy as np
 
-from od.core import box_coder
+from kerod.core import box_coder
 
 
 def test_get_correct_relative_codes_after_encoding():

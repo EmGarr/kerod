@@ -3,6 +3,6 @@ install:
 	pip install ./
 
 tests:
-	pytest --cov od tests/
+	pytest --cov kerod tests/
 
 .PHONY: tests

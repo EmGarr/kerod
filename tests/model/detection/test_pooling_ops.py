@@ -1,8 +1,10 @@
+import numpy as np
 import pytest
 import tensorflow as tf
-import numpy as np
 
-from od.model.detection.pooling_ops import assign_pyramid_level_to_boxes, match_boxes_to_their_pyramid_level, multilevel_roi_align
+from kerod.model.detection.pooling_ops import (assign_pyramid_level_to_boxes,
+                                               match_boxes_to_their_pyramid_level,
+                                               multilevel_roi_align)
 
 
 @pytest.mark.parametrize("level_target,max_level,expected_target",
@@ -45,9 +47,9 @@ def test_match_boxes_to_their_pyramid_level():
 
 def test_match_boxes_to_their_pyramid_level_single_batch():
     """test empty output and single batch"""
-    boxes = tf.constant([[[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10],
-                          [0, 0, 250, 250],  [0, 0, 112, 112]]],
-                        dtype=tf.float32)
+    boxes = tf.constant(
+        [[[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10], [0, 0, 250, 250], [0, 0, 112, 112]]],
+        dtype=tf.float32)
     exp_boxes_per_level = [
         [[0, 0, 100, 100], [0, 0, 1, 1], [0, 0, 10, 10]],
         [[0, 0, 112, 112]],

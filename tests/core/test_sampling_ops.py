@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import tensorflow as tf
 
-from od.core import sampling_ops
+from kerod.core import sampling_ops
 
 
 @pytest.mark.parametrize(

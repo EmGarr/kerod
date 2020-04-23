@@ -7,9 +7,9 @@ from absl.testing import parameterized
 from tensorflow.keras.mixed_precision import experimental as mixed_precision
 from tensorflow.python.keras import keras_parameterized
 
-from od.core.standard_fields import BoxField
-from od.dataset.preprocessing import expand_dims_for_single_batch, preprocess
-from od.model.faster_rcnn import FasterRcnnFPNResnet50
+from kerod.core.standard_fields import BoxField
+from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
+from kerod.model.faster_rcnn import FasterRcnnFPNResnet50
 
 TESTCASES = [{
     'testcase_name': 'base',

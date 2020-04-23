@@ -4,7 +4,7 @@ import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers, regularizers
 
-from od.core.standard_fields import LossField
+from kerod.core.standard_fields import LossField
 
 
 class AbstractDetectionHead(KL.Layer):

@@ -16,11 +16,11 @@
 import numpy as np
 import tensorflow as tf
 
-from od.core.standard_fields import BoxField
-from od.core import target_assigner as targetassigner
-from od.core.box_ops import compute_iou
-from od.core import argmax_matcher
-from od.core.standard_fields import LossField
+from kerod.core.standard_fields import BoxField
+from kerod.core import target_assigner as targetassigner
+from kerod.core.box_ops import compute_iou
+from kerod.core import argmax_matcher
+from kerod.core.standard_fields import LossField
 
 
 def encode_mean_stddev(boxes, anchors, stddev=0.1):

@@ -1,21 +1,21 @@
 <h3 align="center">
-<p>OD - Faster R-CNN for TensorFlow 2.2
+<p>KEROD - Faster R-CNN for TensorFlow 2.2
 </h3>
 
-[![Build Status](https://img.shields.io/travis/TheAlgorithms/Python.svg?label=Travis%20CI&logo=travis&style=flat-square)](https://travis-ci.com/EmGarr/od)
-[![codecov.io](https://codecov.io/gh/EmGarr/od/coverage.svg?branch=master)](https://codecov.io/gh/EmGarr/od/?branch=master)
+[![Build Status](https://img.shields.io/travis/TheAlgorithms/Python.svg?label=Travis%20CI&logo=travis&style=flat-square)](https://travis-ci.com/Emgarr/kerod)
+[![codecov.io](https://codecov.io/gh/Emgarr/kerod/coverage.svg?branch=master)](https://codecov.io/gh/Emgarr/kerod/?branch=master)
 _________________
 
-[Read Latest Documentation](https://emgarr.github.io/od/) - [Browse GitHub Code Repository](https://github.com/EmGarr/od)
+[Read Latest Documentation](https://emgarr.github.io/od/) - [Browse GitHub Code Repository](https://github.com/Emgarr/kerod)
 _________________
 
 
-Od is pure `tensorflow 2` implementation of object detection algorithms (Faster R-CNN) aiming production.
+**Kerod** is pure `tensorflow 2` implementation of object detection algorithms (Faster R-CNN) aiming production. It stands for Keras Object Detection.
 
 It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.2.
 
 Many ideas have been based on [google object detection](https://github.com/tensorflow/models/tree/master/research/object_detection) and [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN).
- `Warning`: It is still a work in progress and some breaking changes could arrive soon. If you need to have good performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for now but my aim is too match its benchmarks soon. The current AP@[.5:.95] on the [coco notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb) is `27.4` (at commit e311bdf9a7c7f977bc7a82180d6877fb9f287372) which is quite low (but it was the first run so let's found those bugs). 
+ `Warning`: It is still a work in progress and some breaking changes could arrive soon. If you need to have good performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for now but my aim is too match its benchmarks soon. The current AP@[.5:.95] on the [coco notebook](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb) is `27.4` (at commit e311bdf9a7c7f977bc7a82180d6877fb9f287372) which is quite low (but it was the first run so let's found those bugs). 
 
 
 ## Features
@@ -23,12 +23,12 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 - As powerful and concise as Keras
 - Low barrier to entry for educators and practitioners
 - Handle batch in training and inference
-- [Documentation](https://emgarr.github.io/od/)
+- [Documentation](https://emgarr.github.io/kerod/)
 - Simple (again)
 
 ### WIP features
 
-- The mixed_precision is almost supported (should investigate). You can try it with this [notebook](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
+- The mixed_precision is almost supported (should investigate). You can try it with this [notebook](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
 
 ### Algorithms
 
@@ -48,18 +48,18 @@ Why: In deep learning each parameter is important. You must think thoroughly bef
 
 This repo is tested on Python 3.6, 3.7, 3.8 and TensorFlow 2.2.
 
-You may want to install 'od' in a [virtual environment](https://docs.python.org/3/library/venv.html) or with [pyenv](https://github.com/pyenv/pyenv). Create a virtual environment with the version of Python you wanna use and activate it.
+You may want to install 'kerod' in a [virtual environment](https://docs.python.org/3/library/venv.html) or with [pyenv](https://github.com/pyenv/pyenv). Create a virtual environment with the version of Python you wanna use and activate it.
 
 ### With pip
 
 ```bash
-pip install git+https://github.com/EmGarr/od.git
+pip install git+https://github.com/EmGarr/kerod.git
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/EmGarr/od.git
+git clone https://github.com/EmGarr/kerod.git
 cd od 
 pip install .
 ```
@@ -85,8 +85,8 @@ To run a training you just need to write the following.
 
 ```python
 import numpy as np
-from od.dataset.preprocessing import expand_dims_for_single_batch, preprocess
-from od.model import factory
+from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
+from kerod.model import factory
 
 num_classes = 20
 model = factory.build_model(num_classes, weights='imagenet')
@@ -128,9 +128,9 @@ Training an algorithm on COCO or Pascal VOC has never been so easy. You just nee
 
 You can find examples in the [notebooks folder](./notebooks). There are no runners shipped with the library.
 
-- Pascal VOC training example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/pascal_voc_training_fpn50.ipynb).
-- Mixed precision Pascal VOC training (single GPU)[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb).
-- Coco example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EmGarr/od/blob/master/notebooks/coco_training.ipynb).
+- Pascal VOC training example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/pascal_voc_training_fpn50.ipynb).
+- Mixed precision Pascal VOC training (single GPU)[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb).
+- Coco example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb).
 
 ### Serving
 
@@ -139,7 +139,7 @@ You can then use it in production with [tensorflow model server](https://www.ten
 ```python
 import requests
 
-from od.core.standard_fields import DatasetField
+from kerod.core.standard_fields import DatasetField
 
 url = 'https://my_server:XXX/v1/models/serving:predict'
 

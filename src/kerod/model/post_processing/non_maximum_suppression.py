@@ -2,9 +2,9 @@
 """
 import tensorflow as tf
 
-from od.core.box_coder import decode_boxes_faster_rcnn
-from od.core.box_ops import clip_boxes
-from od.core.standard_fields import BoxField
+from kerod.core.box_coder import decode_boxes_faster_rcnn
+from kerod.core.box_ops import clip_boxes
+from kerod.core.standard_fields import BoxField
 
 
 def get_full_indices(indices, k, batch_size):

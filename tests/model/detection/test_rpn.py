@@ -2,10 +2,9 @@ from unittest import mock
 
 import pytest
 import tensorflow as tf
-from tensorflow.keras import backend as K
 
-from od.core.standard_fields import BoxField, LossField
-from od.model.detection.rpn import RegionProposalNetwork, compute_rpn_metrics
+from kerod.core.standard_fields import BoxField, LossField
+from kerod.model.detection.rpn import RegionProposalNetwork, compute_rpn_metrics
 
 
 def mocked_random_shuffle(indices):
@@ -37,8 +36,8 @@ def test_rpn(rpn_class):
 
 # We are forced to Mock the add_metric and add_loss because Keras want it to be used inside the call
 # You can see it works automatically in test_rpn
-@mock.patch('od.model.detection.rpn.RegionProposalNetwork.add_metric', spec=True, return_value=None)
-@mock.patch('od.model.detection.rpn.RegionProposalNetwork.add_loss', spec=True, return_value=None)
+@mock.patch('kerod.model.detection.rpn.RegionProposalNetwork.add_metric', spec=True, return_value=None)
+@mock.patch('kerod.model.detection.rpn.RegionProposalNetwork.add_loss', spec=True, return_value=None)
 @mock.patch('tensorflow.random.shuffle', side_effect=mocked_random_shuffle)
 def test_compute_loss_rpn(mock_add_metric, mock_add_loss, mock_shuffle):
     localization_pred = tf.constant(

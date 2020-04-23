@@ -2,8 +2,8 @@ from unittest import mock
 
 import numpy as np
 
-from od.core.standard_fields import BoxField, DatasetField
-from od.dataset.preprocessing import (expand_dims_for_single_batch, preprocess,
+from kerod.core.standard_fields import BoxField, DatasetField
+from kerod.dataset.preprocessing import (expand_dims_for_single_batch, preprocess,
                                       preprocess_coco_example, resize_to_min_dim)
 
 
@@ -43,7 +43,7 @@ def test_preprocess():
 
 
 # Since the return value is 0.6 it means the image and the boxes will be flipped
-@mock.patch('od.dataset.augmentation.tf.random.uniform', spec=True, return_value=0.6)
+@mock.patch('kerod.dataset.augmentation.tf.random.uniform', spec=True, return_value=0.6)
 def test_preprocess_coco_example(mock):
     inputs = {
         'image': np.zeros((100, 50, 3)),

@@ -1,8 +1,8 @@
 import tensorflow as tf
 
-from od.core.box_ops import compute_area
-from od.core.standard_fields import BoxField, DatasetField
-from od.dataset.augmentation import random_horizontal_flip
+from kerod.core.box_ops import compute_area
+from kerod.core.standard_fields import BoxField, DatasetField
+from kerod.dataset.augmentation import random_horizontal_flip
 
 
 def resize_to_min_dim(image, short_edge_length, max_dimension):

@@ -117,7 +117,7 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
    The axis x correspond to boxes2 and y the boxes1:
 
     ```python
-    from od.core.box_ops import compute_iou
+    from kerod.core.box_ops import compute_iou
     import numpy as np
 
     boxes1 = np.array([[548.26666, 364.57202, 706.1333 , 524.472  ],

@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from od.core.anchor_generator import generate_anchors
+from kerod.core.anchor_generator import generate_anchors
 
 
 def get_all_anchors(stride, sizes, ratios, max_size):

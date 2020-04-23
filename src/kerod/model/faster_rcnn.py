@@ -2,14 +2,14 @@ import tensorflow as tf
 
 from tensorflow.python.keras.engine import data_adapter, training
 
-from od.model.backbone.fpn import Pyramid
-from od.model.backbone.resnet import Resnet50
-from od.model.detection.fast_rcnn import FastRCNN
-from od.model.detection.rpn import RegionProposalNetwork
-from od.model.post_processing import post_process_fast_rcnn_boxes
-from od.core.standard_fields import DatasetField, BoxField
+from kerod.model.backbone.fpn import Pyramid
+from kerod.model.backbone.resnet import Resnet50
+from kerod.model.detection.fast_rcnn import FastRCNN
+from kerod.model.detection.rpn import RegionProposalNetwork
+from kerod.model.post_processing import post_process_fast_rcnn_boxes
+from kerod.core.standard_fields import DatasetField, BoxField
 
-from od.model.post_processing import post_process_rpn
+from kerod.model.post_processing import post_process_rpn
 
 
 class FasterRcnnFPNResnet50(tf.keras.Model):

@@ -5,15 +5,15 @@ import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 from tensorflow.keras.losses import CategoricalCrossentropy
 
-from od.core.anchor_generator import generate_anchors
-from od.core.argmax_matcher import ArgMaxMatcher
-from od.core.box_coder import encode_boxes_faster_rcnn
-from od.core.box_ops import compute_iou
-from od.core.losses import SmoothL1Localization
-from od.core.sampling_ops import batch_sample_balanced_positive_negative
-from od.core.standard_fields import BoxField, LossField
-from od.core.target_assigner import TargetAssigner, batch_assign_targets
-from od.model.detection.abstract_detection_head import AbstractDetectionHead
+from kerod.core.anchor_generator import generate_anchors
+from kerod.core.argmax_matcher import ArgMaxMatcher
+from kerod.core.box_coder import encode_boxes_faster_rcnn
+from kerod.core.box_ops import compute_iou
+from kerod.core.losses import SmoothL1Localization
+from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
+from kerod.core.standard_fields import BoxField, LossField
+from kerod.core.target_assigner import TargetAssigner, batch_assign_targets
+from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 
 SAMPLING_SIZE = 256
 SAMPLING_POSITIVE_RATIO = 0.5
