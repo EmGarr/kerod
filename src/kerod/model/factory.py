@@ -14,7 +14,7 @@ def build_model(num_classes, weights: str = 'imagenet'):
     features = tf.zeros((1, 1300, 650, 3), tf.float32)
 
     # Blank shot to init weights
-    model([{DatasetField.IMAGES: features, DatasetField.IMAGES_INFO: images_information}])
+    model({DatasetField.IMAGES: features, DatasetField.IMAGES_INFO: images_information})
 
     # The weights need to be loaded here before freezing any layers
     if weights == 'imagenet':

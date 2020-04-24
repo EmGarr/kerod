@@ -1,6 +1,8 @@
 import tensorflow as tf
 
 from tensorflow.python.keras.engine import data_adapter, training
+from tensorflow.python.keras.utils import losses_utils
+from tensorflow.keras import metrics
 
 from kerod.model.backbone.fpn import Pyramid
 from kerod.model.backbone.resnet import Resnet50
@@ -41,6 +43,8 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         self.fpn = Pyramid()
         self.rpn = RegionProposalNetwork()
         self.fast_rcnn = FastRCNN(num_classes + 1)
+
+        self._loss_metric = metrics.Mean(name='loss')  # Total loss.
 
     def call(self, inputs, training=None):
         """Perform an inference in training.
@@ -84,8 +88,11 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
         - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
         """
-        images = inputs[0][DatasetField.IMAGES]
-        images_information = inputs[0][DatasetField.IMAGES_INFO]
+        if training:
+            inputs, ground_truths = inputs
+
+        images = inputs[DatasetField.IMAGES]
+        images_information = inputs[DatasetField.IMAGES_INFO]
 
         x = self.resnet(images)
         pyramid = self.fpn(x)
@@ -93,8 +100,7 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         localization_pred, classification_pred, anchors = self.rpn(pyramid)
 
         if training:
-            loss_rpn = self.rpn.compute_loss(localization_pred, classification_pred, anchors,
-                                             inputs[1])
+            self._arg_loss_rpn = [localization_pred, classification_pred, anchors, ground_truths]
 
         num_boxes = 2000 if training else 1000
         rois, _ = post_process_rpn(tf.nn.softmax(classification_pred),
@@ -105,7 +111,6 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
                                    post_nms_topk=num_boxes)
 
         if training:
-            ground_truths = inputs[1]
             # Include the ground_truths as RoIs for the training
             rois = tf.concat([rois, ground_truths[BoxField.BOXES]], axis=1)
             # Sample the boxes needed for inference
@@ -114,8 +119,7 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         classification_pred, localization_pred = self.fast_rcnn([pyramid, rois])
 
         if training:
-            loss_fast_rcnn = self.fast_rcnn.compute_loss(y_true, weights, classification_pred,
-                                                         localization_pred)
+            self._arg_loss_fast_rcnn = [y_true, weights, classification_pred, localization_pred]
 
         classification_pred = tf.nn.softmax(classification_pred)
 
@@ -125,7 +129,7 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         data = data_adapter.expand_1d(data)
         x, _, _ = data_adapter.unpack_x_y_sample_weight(data)
 
-        classification_pred, localization_pred, rois = self([x], training=False)
+        classification_pred, localization_pred, rois = self(x, training=False)
 
         return post_process_fast_rcnn_boxes(classification_pred, localization_pred, rois,
                                             x[DatasetField.IMAGES_INFO], self.num_classes + 1)
@@ -139,9 +143,7 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
 
         with tf.GradientTape() as tape:
             y_pred = self([x, y], training=True)
-            # All the losses are computed in the call. It's weird but it those the job
-            # They are added automatically to self.losses
-            loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
+            loss = self.compute_loss()
 
         training._minimize(self.distribute_strategy, tape, self.optimizer, loss,
                            self.trainable_variables)
@@ -157,6 +159,31 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         # Of course there is no backpropagation at the test step
         y_pred = self([x, y], training=True)
 
-        loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
+        loss = self.compute_loss()
 
         return {m.name: m.result() for m in self.metrics}
+
+    def compute_loss(self):
+        loss_values = []  # Used for gradient calculation.
+        loss_metric_values = []  # Used for loss metric calculation.
+
+        rpn_loss = self.rpn.compute_loss(*self._arg_loss_rpn)
+        loss_values.append(losses_utils.scale_loss_for_distribution(rpn_loss))
+        loss_metric_values.append(rpn_loss)
+
+        fast_rcnn_loss = self.fast_rcnn.compute_loss(*self._arg_loss_fast_rcnn)
+        loss_values.append(losses_utils.scale_loss_for_distribution(fast_rcnn_loss))
+        loss_metric_values.append(fast_rcnn_loss)
+
+        regularization_losses = losses_utils.cast_losses_to_common_dtype(self.losses)
+        reg_loss = tf.math.add_n(regularization_losses)
+        loss_metric_values.append(reg_loss)
+        loss_values.append(losses_utils.scale_loss_for_distribution(reg_loss))
+
+        loss_metric_values = losses_utils.cast_losses_to_common_dtype(loss_metric_values)
+        total_loss_metric_value = tf.math.add_n(loss_metric_values)
+        self._loss_metric.update_state(total_loss_metric_value)
+
+        loss_values = losses_utils.cast_losses_to_common_dtype(loss_values)
+        total_loss = tf.math.add_n(loss_values)
+        return total_loss

@@ -59,4 +59,4 @@ def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
               callbacks=[ModelCheckpoint(os.path.join(tmpdir, 'checkpoints'))])
     model.predict(data, batch_size=2)
 
-    # model.save(tmpdir)
+    model.save(tmpdir)

@@ -175,12 +175,9 @@ class AbstractDetectionHead(KL.Layer):
 
         localization_loss = _compute_loss(self._localization_loss, self._localization_loss_weight,
                                           LossField.LOCALIZATION)
-
         self.add_metric(localization_loss,
                         name=f'{self.name}_localization_loss',
                         aggregation='mean')
-
-        self.add_loss([classification_loss, localization_loss])
 
         if self._use_mask:
             segmentation_loss = _compute_loss(self._segmentation_loss,
@@ -190,17 +187,9 @@ class AbstractDetectionHead(KL.Layer):
             self.add_metric(segmentation_loss,
                             name=f'{self.name}_segmentation_loss',
                             aggregation='mean')
-            self.add_loss(segmentation_loss)
-            return {
-                LossField.CLASSIFICATION: classification_loss,
-                LossField.LOCALIZATION: localization_loss,
-                LossField.INSTANCE_SEGMENTATION: segmentation_loss
-            }
+            return classification_loss + localization_loss + segmentation_loss
 
-        return {
-            LossField.CLASSIFICATION: classification_loss,
-            LossField.LOCALIZATION: localization_loss
-        }
+        return classification_loss + localization_loss
 
     def get_config(self):
         base_config = super().get_config()

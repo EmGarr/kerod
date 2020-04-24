@@ -43,10 +43,6 @@ class BuildFasterRCNNTest(keras_parameterized.TestCase):
         model(data, training=True)
         model([data[0]])
 
-        with pytest.raises(Exception):
-            model.save(path_save_model)
-            model = tf.keras.models.load_model(path_save_model)
-
         if use_mixed_precision:
             # with pytest.raises(Exception):
             #     my_model = tf.keras.models.load_model(path_save_model)
