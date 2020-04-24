@@ -9,43 +9,45 @@ from kerod.core.standard_fields import LossField
 
 class AbstractDetectionHead(KL.Layer):
     """Abstract object detector. It encapsulates the main functions of an object detector.
-        The build of the detection head, the segmentation head, the post_processing.
+    The build of the detection head, the segmentation head, the post_processing.
 
-        Arguments:
+    Arguments:
 
-        - *num_classes*: Number of classes of the classification head (e.g: Your n classes +
-            the background class)
-        - *classification_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
-            This object should have a reduction value to None and the parameter from_y_pred to True.
-        - *localization_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
-            This object should have a reduction value to None and the parameter from_y_pred to True.
-        - *classification_loss_weight*: A float 32 representing the weight of the loss in the
-            total loss.
-        - *localization_loss_weight*: A float 32 representing the weight of the loss in the
-            total loss.
-        - *multiples*: How many time will you replicate the output of the head.
-            For a rpn multiples can be the number of anchors.
-            For a fast_rcnn multiples is 1 we just want the number of classes
-        - *kernel_initializer_classification_head*: Initializer for the `kernel` weights matrix of
-        the classification head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
-        - *kernel_initializer_box_prediction_head*: Initializer for the `kernel` weights matrix of
+    - *num_classes*: Number of classes of the classification head (e.g: Your n classes +
+        the background class)
+    - *classification_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
+        This object should have a reduction value to None and the parameter from_y_pred to True.
+    - *localization_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
+        This object should have a reduction value to None and the parameter from_y_pred to True.
+    - *segmentation_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
+        This object should have a reduction value to None and the parameter from_y_pred to True.
+    - *classification_loss_weight*: A float 32 representing the weight of the loss in the
+        total loss.
+    - *localization_loss_weight*: A float 32 representing the weight of the loss in the
+        total loss.
+    - *segmentation_loss_weight*: A float 32 representing the weight of the loss in the
+        total loss.
+    - *multiples*: How many time will you replicate the output of the head.
+        For a rpn multiples can be the number of anchors.
+        For a fast_rcnn multiples is 1 we just want the number of classes
+    - *kernel_initializer_classification_head*: Initializer for the `kernel` weights matrix of
+    the classification head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
+    - *kernel_initializer_box_prediction_head*: Initializer for the `kernel` weights matrix of
         the box prediction head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
-        - *kernel_regularizer*: Regularizer function applied to
-            the `kernel` weights matrix of every layers
-            (see [regularizer](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
-        - *use_mask*: Boolean define if the segmentation_head will be used.
-        """
+    - *use_mask*: Boolean define if the segmentation_head will be used.
+    """
 
     def __init__(self,
                  num_classes,
                  classification_loss,
                  localization_loss,
+                 segmentation_loss=None,
                  classification_loss_weight=1.0,
                  localization_loss_weight=1.0,
+                 segmentation_loss_weight=1.0,
                  multiples=1,
                  kernel_initializer_classification_head=None,
                  kernel_initializer_box_prediction_head=None,
-                 kernel_regularizer=None,
                  use_mask=False,
                  **kwargs):
 
@@ -61,10 +63,11 @@ class AbstractDetectionHead(KL.Layer):
         self._kernel_initializer_box_prediction_head = kernel_initializer_box_prediction_head
         self._use_mask = use_mask
 
-        if kernel_regularizer is None:
-            self._kernel_regularizer = regularizers.l2(0.0005)
-        else:
-            self._kernel_regularizer = regularizers.get()
+        self._kernel_regularizer = regularizers.l2(0.0005)
+
+        if self._use_mask:
+            self._segmentation_loss_weight = segmentation_loss_weight
+            self._segmentation_loss = segmentation_loss
 
     def build(self, input_shape):
         self._conv_classification_head = KL.Conv2D(
@@ -204,6 +207,7 @@ class AbstractDetectionHead(KL.Layer):
         base_config['num_classes'] = self._num_classes
         base_config['classification_loss_weight'] = self._classification_loss_weight
         base_config['localization_loss_weight'] = self._localization_loss_weight
+        base_config['segmentation_loss_weight'] = self._segmentation_loss_weight
         base_config['multiples'] = self._multiples
         base_config['use_mask'] = self._use_mask
         return base_config
