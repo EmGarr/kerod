@@ -13,9 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 """ResNet models for Keras.
+
 Reference paper:
-  - [Deep Residual Learning for Image Recognition]
-    (https://arxiv.org/abs/1512.03385) (CVPR 2015)
+
+  - [Deep Residual Learning for Image Recognition] (https://arxiv.org/abs/1512.03385) (CVPR 2015)
 """
 
 import os
@@ -29,16 +30,20 @@ from tensorflow.python.keras.applications import resnet
 from tensorflow.python.keras.engine import training
 from tensorflow.python.keras.utils import data_utils, layer_utils
 
-BASE_WEIGHTS_PATH = ('https://storage.googleapis.com/tensorflow/keras-applications/resnet/')
+OFFICIAL_WEIGHTS_PATH = ('https://storage.googleapis.com/tensorflow/keras-applications/resnet/')
+CUSTOM_WEIGHTS_PATH = ('https://files.heuritech.com/raw_files/')
+
 WEIGHTS_HASHES = {
-    'resnet50': '4d473c1dd8becc155b73f8504c6f6626',
-    'resnet101': '88cf7a10940856eca736dc7b7e228a21',
-    'resnet152': 'ee4c566cf9a93f14d82f913c2dc6dd0c',
-    'resnet50v2': 'fac2f116257151a9d068a22e544a4917',
-    'resnet101v2': 'c0ed64b8031c3730f411d2eb4eea35b5',
-    'resnet152v2': 'ed17cf2e0169df9d443503ef94b23b33',
-    'resnext50': '62527c363bdd9ec598bed41947b379fc',
-    'resnext101': '0f678c91647380debd923963594981b3'
+    'resnet50': ('4d473c1dd8becc155b73f8504c6f6626', OFFICIAL_WEIGHTS_PATH, None),
+    'resnet50_pytorch': ('3ffd584081cc56435a3689d12afd7cf9', CUSTOM_WEIGHTS_PATH,
+                         'resnet50_tensorpack_conversion.h5'),
+    'resnet101': ('88cf7a10940856eca736dc7b7e228a21', OFFICIAL_WEIGHTS_PATH, None),
+    'resnet152': ('ee4c566cf9a93f14d82f913c2dc6dd0c', OFFICIAL_WEIGHTS_PATH, None),
+    'resnet50v2': ('fac2f116257151a9d068a22e544a4917', OFFICIAL_WEIGHTS_PATH, None),
+    'resnet101v2': ('c0ed64b8031c3730f411d2eb4eea35b5', OFFICIAL_WEIGHTS_PATH, None),
+    'resnet152v2': ('ed17cf2e0169df9d443503ef94b23b33', OFFICIAL_WEIGHTS_PATH, None),
+    'resnext50': ('62527c363bdd9ec598bed41947b379fc', OFFICIAL_WEIGHTS_PATH, None),
+    'resnext101': ('0f678c91647380debd923963594981b3', OFFICIAL_WEIGHTS_PATH, None)
 }
 
 
@@ -163,10 +168,12 @@ def ResNet(stack_fn: Callable,
 
     # Load weights.
     if (weights == 'imagenet') and (model_name in WEIGHTS_HASHES):
-        file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_notop.h5'
-        file_hash = WEIGHTS_HASHES[model_name]
+        file_hash, base_weight_path, file_name = WEIGHTS_HASHES[model_name]
+        if file_name is None:
+            file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_notop.h5'
+
         weights_path = data_utils.get_file(file_name,
-                                           BASE_WEIGHTS_PATH + file_name,
+                                           base_weight_path + file_name,
                                            cache_subdir='models',
                                            file_hash=file_hash)
         model.load_weights(weights_path)
@@ -188,3 +195,115 @@ def ResNet50(weights='imagenet', input_tensor=None, input_shape=None, **kwargs):
 
     return ResNet(stack_fn, resnet.preprocess_input, False, True, 'resnet50', weights, input_tensor,
                   input_shape, **kwargs)
+
+
+def ResNet50PytorchStyle(weights='imagenet', input_tensor=None, input_shape=None, **kwargs):
+    """Instantiates the ResNet50 with the pytorch style architecture.
+    In the bottleneck residual block, pytorch-style ResNet uses a 1x1 stride-1 convolutional layer
+    followed by a 3x3 stride-2 convolutional layer.
+
+    **Warning**: Do not forget to use `bgr` instead of `rgb`.
+
+    ```python
+    import functools
+    import tensorflow_datasets as tfds
+    from kerod.preprocessing import preprocess_coco_example
+
+    ds_train, ds_info = tfds.load(name="coco/2017", split="train", shuffle_files=True, with_info=True)
+    ds_train = ds_train.map(functools.partial(preprocess_coco_example, bgr=True),
+    num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    ```
+    """
+
+    def stack_fn(x):
+        c2 = Group(x, 64, 3, strides=1, name='resnet50/group0')
+        c3 = Group(c2, 128, 4, strides=2, name='resnet50/group1')
+        c4 = Group(c3, 256, 6, strides=2, name='resnet50/group2')
+        c5 = Group(c4, 512, 3, strides=2, name='resnet50/group3')
+        return [c2, c3, c4, c5]
+
+    return ResNet(stack_fn, preprocess_input_pytorch, False, False, 'resnet50_pytorch', weights,
+                  input_tensor, input_shape, **kwargs)
+
+
+def preprocess_input_pytorch(images: tf.Tensor):
+    """Will preprocess the images for the resnet trained on Tensorpack.
+    The network has been trained using BGR.
+    """
+    mean = tf.constant([103.53, 116.28, 123.675], dtype=images.dtype)
+    std = tf.constant([57.375, 57.12, 58.395], dtype=images.dtype)
+    images = (images - mean) / std
+    return images
+
+
+def Group(inputs: tf.Tensor, filters: int, blocks: int, strides: int, name=None):
+    """A set of stacked residual blocks with the pytorch style
+
+    Arguments:
+
+    - *filters*: integer, filters of the bottleneck layer in a block.
+    - *blocks*: number of blocks in the stacked blocks.
+    - *strides*: Stride of the second conv layer in the first block.
+    """
+
+    x = Block(inputs, filters, strides, use_conv_shortcut=True, name=f'{name}/block0')
+    for i in range(1, blocks):
+        x = Block(x, filters, 1, use_conv_shortcut=False, name=f'{name}/block{i}')
+    return x
+
+
+def Block(inputs: tf.Tensor, filters: int, strides: int = 1, use_conv_shortcut=True, name=None):
+    """A residual block with the pytorch_style
+
+    Arguments:
+
+
+    - *inputs*: The inputs tensor
+    - *filters*: integer, filters of the bottleneck layer.
+    - *strides*: default 1, stride of the second convolution layer. In the official Keras
+    implementation the stride is performed on the first convolution. This is different in
+    the pytorch implementation.
+    - *use_conv_shortcut*: Use convolution shortcut if True, otherwise identity shortcut.
+    """
+
+    bn_axis = 3 if backend.image_data_format() == 'channels_last' else 1
+
+    if use_conv_shortcut:
+        shortcut = layers.Conv2D(4 * filters,
+                                 1,
+                                 strides=strides,
+                                 use_bias=False,
+                                 padding='same',
+                                 name=f'{name}/convshortcut')(inputs)
+        shortcut = layers.BatchNormalization(axis=bn_axis, name=f'{name}/convshortcut/bn')(shortcut)
+    else:
+        shortcut = inputs
+
+    x = layers.Conv2D(filters, 1, strides=1, use_bias=False, padding='same',
+                      name=f'{name}/conv1')(inputs)
+    x = layers.BatchNormalization(axis=bn_axis, name=f'{name}/conv1/bn')(x)
+    x = layers.Activation('relu', name=f'{name}/conv1/relu')(x)
+
+    if strides == 2:
+        x = layers.ZeroPadding2D(padding=((1, 0), (1, 0)), name=f'{name}/pad2')(x)
+        x = layers.Conv2D(filters,
+                          3,
+                          padding='valid',
+                          use_bias=False,
+                          strides=strides,
+                          name=f'{name}/conv2')(x)
+    else:
+        x = layers.Conv2D(filters,
+                          3,
+                          use_bias=False,
+                          padding='same',
+                          strides=strides,
+                          name=f'{name}/conv2')(x)
+
+    x = layers.BatchNormalization(axis=bn_axis, name=f'{name}/conv2/bn')(x)
+    x = layers.Activation('relu', name=f'{name}/conv2/relu')(x)
+
+    x = layers.Conv2D(filters * 4, 1, use_bias=False, padding='same', name=f'{name}/conv3')(x)
+    x = layers.BatchNormalization(axis=bn_axis, name=f'{name}/conv3/bn')(x)
+    x = layers.Add()([shortcut, x])
+    return layers.Activation('relu', name=f'{name}/last_relu')(x)

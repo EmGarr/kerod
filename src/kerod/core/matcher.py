@@ -1,170 +1,151 @@
-# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-"""Matcher interface and Match class.
-
-This module defines the Matcher interface and the Match object. The job of the
-matcher is to match row and column indices based on the similarity matrix and
-other optional parameters. Each column is matched to at most one row. There
-are three possibilities for the matching:
-
-1. match: A column matches a row.
-2. no_match: A column does not match any row.
-3. ignore: A column that is neither 'match' nor no_match.
-
-The ignore case is regularly encountered in object detection: when an anchor has
-a relatively small overlap with a ground-truth box, one neither wants to
-consider this box a positive example (match) nor a negative example (no match).
-
-The Match class is used to store the match results and it provides simple apis
-to query the results.
-"""
-import abc
+# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
+# From detectron2 and Modified by Emilien Garreau
+from typing import List
 import tensorflow as tf
+from kerod.utils import item_assignment
 
 
-class Match(object):
-    """Class to store results from the matcher.
+class Matcher(object):
+    """This class assigns to each predicted "element" (e.g., a box) a ground-truth
+    element. Each predicted element will have exactly zero or one matches; each
+    ground-truth element may be matched to zero or more predicted elements.
 
-  This class is used to store the results from the matcher. It provides
-  convenient methods to query the matching results.
-  """
+    The matching is determined by the MxN match_quality_matrix, that characterizes
+    how well each (ground-truth, prediction)-pair match each other. For example,
+    if the elements are boxes, this matrix may contain box intersection-over-union
+    overlap values.
 
-    def __init__(self, match_results):
-        """Constructs a Match object.
+    The matcher returns (a) a vector of length N containing the index of the
+    ground-truth element m in [0, M) that matches to prediction n in [0, N).
+    (b) a vector of length N containing the labels for each prediction.
+
+    Arguments:
+
+    - *thresholds*: a list of thresholds used to stratify predictions
+                into levels.
+
+    - *labels*: a list of values to label predictions belonging at
+                each level. A label can be one of {-1, 0, 1} signifying
+                {ignore, negative class, positive class}, respectively.
+
+    - *allow_low_quality_matches*: if True, produce additional matches
+            for predictions with maximum match quality lower than high_threshold.
+                See set_low_quality_matches_ for more details.
+
+    Example:
+
+    thresholds = [0.3, 0.5]
+    labels = [0, -1, 1]
+    All predictions with iou < 0.3 will be marked with 0 and
+    thus will be considered as false positives while training.
+    All predictions with 0.3 <= iou < 0.5 will be marked with -1 and
+    thus will be ignored.
+    All predictions with 0.5 <= iou will be marked with 1 and
+    thus will be considered as true positives.
+
+    """
+
+    def __init__(self,
+                 thresholds: List[float],
+                 labels: List[int],
+                 allow_low_quality_matches: bool = False):
+        # Add -inf and +inf to first and last position in thresholds
+        thresholds = thresholds[:]
+        assert thresholds[0] > 0
+        thresholds.insert(0, -float("inf"))
+        thresholds.append(float("inf"))
+        assert all(low <= high for (low, high) in zip(thresholds[:-1], thresholds[1:]))
+        assert all(l in [-1, 0, 1] for l in labels)
+        assert len(labels) == len(thresholds) - 1
+        self.thresholds = thresholds
+        self.labels = labels
+        self.allow_low_quality_matches = allow_low_quality_matches
+
+    def __call__(self, match_quality_matrix: tf.Tensor, num_valid_boxes: tf.Tensor):
+        """
+        Arguments:
+
+        - *match_quality_matrix*: A tensor or shape [batch_size, M, N], containing the
+        pairwise quality between M ground-truth elements and N predicted
+        elements.
+
+        - *num_valid_boxes*: A tensor of shape [batch_size, 1] indicating where is the padding on
+        the ground_truth_boxes. E.g: If your quality_matrix is of shape [2, 4, 6] and `num_valid_boxes` 
+        is equal to [3, 4] the boxes for the `batch=0` is padded from `pos=3`. It means,
+        that `quality_matrix[0, 3:]` all the values from this pattern should not be considered because
+        of the padding.
+
+        Returns:
+
+        - *matches*: a tensor of float32 and shape [batch_size, N], where matches[b, i] is a matched
+               ground-truth index in [b, 0, M)
+        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates
+                whether a prediction is a true (1) or false positive (0) or ignored (-1)
+        """
+        assert len(match_quality_matrix.shape) == 3
+        num_valid_boxes = tf.squeeze(num_valid_boxes, -1)
+        # match_quality_matrix is B (batch) x M (gt) x N (predicted)
+        # Max over gt elements (dim 0) to find best gt candidate for each prediction
+        matches = tf.argmax(match_quality_matrix, axis=1, output_type=tf.int32)
+        matched_vals = tf.math.reduce_max(match_quality_matrix, axis=1)
+        # matched_vals, matches = match_quality_matrix.max(dim=0)
+
+        match_labels = matches
+
+        for (l, low, high) in zip(self.labels, self.thresholds[:-1], self.thresholds[1:]):
+            low_high = (matched_vals >= low) & (matched_vals < high)
+            match_labels = item_assignment(match_labels, low_high, l)
+
+        if self.allow_low_quality_matches:
+            match_labels = self._set_low_quality_matches(match_labels, match_quality_matrix,
+                                                         num_valid_boxes)
+
+        mask_padded_boxes = matches >= num_valid_boxes[:, None]
+        # Will flag to -1 all the padded boxes to avoid sampling them
+        match_labels = item_assignment(match_labels, mask_padded_boxes, -1)
+
+        return matches, match_labels
+
+    def _set_low_quality_matches(self, match_labels, match_quality_matrix, num_valid_boxes):
+        """
+        Produce additional matches for predictions that have only low-quality matches.
+        Specifically, for each ground-truth G find the set of predictions that have
+        maximum overlap with it (including ties); for each prediction in that set, if
+        it is unmatched, then match it to the ground-truth G.
+
+        This function implements the RPN assignment case (i) in Sec. 3.1.2 of the
+        Faster R-CNN paper: https://arxiv.org/pdf/1506.01497v3.pdf.
 
         Arguments:
 
-        - *match_results*: Integer tensor of shape [N] with:
-            1. match_results[i]>=0, meaning that column i is matched with row match_results[i].
-            2. match_results[i]=-1, meaning that column i is not matched.
-            3. match_results[i]=-2, meaning that column i is ignored.
+        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates
+        whether a prediction is a true (1) or false positive (0) or ignored (-1)
 
-        Raises:
+        - *match_quality_matrix*: A tensor or shape [batch_size, M, N], containing the
+        pairwise quality between M ground-truth elements and N predicted
+        elements.
 
-        *ValueError*: if match_results does not have rank 1 or is not an
-            integer int32 scalar tensor
+        - *num_valid_boxes*: A tensor of shape [batch_size] indicating where is the padding on
+        the ground_truth_boxes. E.g: If your quality_matrix is of shape [2, 4, 6] and `num_valid_boxes` 
+        is equal to [3, 4] the boxes for the `batch=0` is padded from `pos=3`. It means,
+        that `quality_matrix[0, 3:]` all the values from this pattern should not be considered because
+        of the padding.
         """
-        if match_results.shape.ndims != 1:
-            raise ValueError('match_results should have rank 1')
-        if match_results.dtype != tf.int32:
-            raise ValueError('match_results should be an int32 or int64 scalar ' 'tensor')
-        self._match_results = match_results
+        # For each gt, find the prediction with which it has highest quality: shape [batch_size, M]
+        highest_quality_gt = tf.math.reduce_max(match_quality_matrix, axis=2)
 
-    @property
-    def match_results(self):
-        """The accessor for match results.
+        # Find the highest quality match available, even if it is low, including ties.
+        hq_foreach_gt_mask = match_quality_matrix == highest_quality_gt[..., None]
+        # Create a mask for the valid_boxes, shape = [batch_size, M]
+        mask_valid_boxes = tf.sequence_mask(num_valid_boxes,
+                                            maxlen=tf.shape(match_quality_matrix)[1],
+                                            dtype=tf.bool)
+        hq_foreach_gt_mask = hq_foreach_gt_mask & mask_valid_boxes[..., None]
 
-        Returns:
-        the tensor which encodes the match results.
-        """
-        return self._match_results
-
-    def matched_column_indicator(self):
-        """Returns column indices that are matched.
-
-        Returns:
-
-        *column_indices*: int32 tensor of shape [K] with column indices.
-        """
-        return tf.greater_equal(self._match_results, 0)
-
-
-    def unmatched_column_indicator(self):
-        """Returns column indices that are unmatched.
-
-        Returns:
-
-        *column_indices*: int32 tensor of shape [K] with column indices.
-        """
-        return tf.equal(self._match_results, -1)
-
-    def _reshape_and_cast(self, t):
-        return tf.cast(tf.reshape(t, [-1]), tf.int32)
-
-    def gather_based_on_match(self, input_tensor, unmatched_value, ignored_value):
-        """Gathers elements from `input_tensor` based on match results.
-
-        For columns that are matched to a row, gathered_tensor[col] is set to
-        input_tensor[match_results[col]]. For columns that are unmatched,
-        gathered_tensor[col] is set to unmatched_value. Finally, for columns that
-        are ignored gathered_tensor[col] is set to ignored_value.
-
-        Note that the input_tensor.shape[1:] must match with unmatched_value.shape
-        and ignored_value.shape
-
-        Arguments:
-
-        - *input_tensor*: Tensor to gather values from.
-        - *unmatched_value*: Constant tensor value for unmatched columns.
-        - *ignored_value*: Constant tensor value for ignored columns.
-
-        Returns:
-
-        *gathered_tensor*: A tensor containing values gathered from input_tensor.
-            The shape of the gathered tensor is [match_results.shape[0]] +
-            input_tensor.shape[1:].
-        """
-        input_tensor = tf.concat([tf.stack([ignored_value, unmatched_value]), input_tensor], axis=0)
-        gather_indices = tf.maximum(self.match_results + 2, 0)
-        gathered_tensor = tf.gather(input_tensor, gather_indices)
-        return gathered_tensor
-
-
-class Matcher(metaclass=abc.ABCMeta):
-    """Abstract base class for matcher."""
-
-    def match(self, similarity_matrix, valid_rows=None):
-        """Computes matches among row and column indices and returns the result.
-
-        Computes matches among the row and column indices based on the similarity
-        matrix and optional arguments.
-
-        Arguments:
-
-        - *similarity_matrix*: Float tensor of shape [N, M] with pairwise similarity
-            where higher value means more similar.
-        - *valid_rows*: A boolean tensor of shape [N] indicating the rows that are
-            valid for matching.
-        - *scope*: Op scope name. Defaults to 'Match' if None.
-
-        Returns:
-
-        A Match object with the results of matching.
-        """
-        with tf.name_scope('Match'):
-            if valid_rows is None:
-                valid_rows = tf.ones(tf.shape(similarity_matrix)[0], dtype=tf.bool)
-            return Match(self._match(similarity_matrix, valid_rows))
-
-    @abc.abstractmethod
-    def _match(self, similarity_matrix, valid_rows):
-        """Method to be overridden by implementations.
-
-        Arguments:
-
-        - *similarity_matrix*: Float tensor of shape [N, M] with pairwise similarity
-            where higher value means more similar.
-        - *valid_rows*: A boolean tensor of shape [N] indicating the rows that are
-            valid for matching.
-
-        Returns:
-
-        *match_results*: Integer tensor of shape [M]: match_results[i]>=0 means
-            that column i is matched to row match_results[i], match_results[i]=-1
-            means that the column is not matched. match_results[i]=-2 means that
-            the column is ignored (usually this happens when there is a very weak
-            match which one neither wants as positive nor negative example).
-        """
-        pass
+        # If an anchor was labeled positive only due to a low-quality match
+        # with gt_A, but it has larger overlap with gt_B, it's matched index will still be gt_B.
+        # This follows the implementation in Detectron, and is found to have no significant impact.
+        # shape = [batch_size, N]
+        masks_for_labels = tf.reduce_max(tf.cast(hq_foreach_gt_mask, tf.int8), 1)
+        match_labels = item_assignment(match_labels, masks_for_labels, 1)
+        return match_labels

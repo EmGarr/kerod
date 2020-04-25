@@ -19,10 +19,14 @@ from kerod.core import box_coder
 
 
 def test_get_correct_relative_codes_after_encoding():
-    boxes = tf.constant([[10.0, 10.0, 20.0, 15.0], [0.2, 0.1, 0.5, 0.4]])
-    anchors = tf.constant([[15.0, 12.0, 30.0, 18.0], [0.1, 0.0, 0.7, 0.9]])
-    expected_rel_codes = [[-0.5, -0.416666, -0.405465, -0.182321],
-                          [-0.083333, -0.222222, -0.693147, -1.098612]]
+    boxes = tf.constant([[[10.0, 10.0, 20.0, 15.0], [0.2, 0.1, 0.5, 0.4]],
+                         [[10.0, 10.0, 20.0, 15.0], [0.2, 0.1, 0.5, 0.4]]])
+    anchors = tf.constant([[[15.0, 12.0, 30.0, 18.0], [0.1, 0.0, 0.7, 0.9]],
+                           [[15.0, 12.0, 30.0, 18.0], [0.1, 0.0, 0.7, 0.9]]])
+    expected_rel_codes = [[[-0.5, -0.416666, -0.405465, -0.182321],
+                           [-0.083333, -0.222222, -0.693147, -1.098612]],
+                          [[-0.5, -0.416666, -0.405465, -0.182321],
+                           [-0.083333, -0.222222, -0.693147, -1.098612]]]
     rel_codes = box_coder.encode_boxes_faster_rcnn(boxes, anchors, scale_factors=None)
     np.testing.assert_allclose(rel_codes, expected_rel_codes, rtol=1e-5)
 

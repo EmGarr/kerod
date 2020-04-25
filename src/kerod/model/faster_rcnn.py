@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.python.keras.engine import data_adapter, training
 
 from kerod.utils.training import apply_kernel_regularization
-from kerod.model.backbone.resnet import ResNet50
+from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
 from kerod.model.backbone.fpn import FPN
 from kerod.model.detection.fast_rcnn import FastRCNN
 from kerod.model.detection.rpn import RegionProposalNetwork
@@ -13,7 +13,7 @@ from kerod.core.standard_fields import DatasetField, BoxField
 from kerod.model.post_processing import post_process_rpn
 
 
-class FasterRcnnFPNResnet50(tf.keras.Model):
+class FasterRcnnFPN(tf.keras.Model):
     """Build a FPN Resnet 50 Faster RCNN network ready to use for training.
 
     You can use it as follow:
@@ -32,13 +32,13 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
     (**do not include the background class** it is handle for you)
     """
 
-    def __init__(self, num_classes, **kwargs):
+    def __init__(self, num_classes, backbone, **kwargs):
         super().__init__(**kwargs)
 
         self.num_classes = num_classes
         self.l2 = tf.keras.regularizers.l2(1e-4)
 
-        self.resnet = ResNet50(input_shape=[None, None, 3], weights='imagenet')
+        self.backbone = backbone
         self.fpn = FPN(kernel_regularizer=self.l2)
         self.rpn = RegionProposalNetwork(kernel_regularizer=self.l2)
         self.fast_rcnn = FastRCNN(self.num_classes + 1, kernel_regularizer=self.l2)
@@ -92,24 +92,24 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         images = inputs[DatasetField.IMAGES]
         images_information = inputs[DatasetField.IMAGES_INFO]
 
-        # The preprocessing dedicated to the resnet is done inside the model.
-        x = self.resnet(images)
+        # The preprocessing dedicated to the backbone is done inside the model.
+        x = self.backbone(images)
         pyramid = self.fpn(x)
 
-        localization_pred, classification_pred, anchors = self.rpn(pyramid)
+        rpn_loc_pred_per_lvl, rpn_cls_pred_per_lvl, anchors_per_lvl = self.rpn(pyramid)
 
         if training and not self._serving:
-            apply_kernel_regularization(self.l2, self.resnet)
-            loss_rpn = self.rpn.compute_loss(localization_pred, classification_pred, anchors,
-                                             inputs['ground_truths'])
+            apply_kernel_regularization(self.l2, self.backbone)
+            loss_rpn = self.rpn.compute_loss(rpn_loc_pred_per_lvl, rpn_cls_pred_per_lvl,
+                                             anchors_per_lvl, inputs['ground_truths'])
 
         num_boxes = 2000 if training else 1000
-        rois, _ = post_process_rpn(tf.nn.softmax(classification_pred),
-                                   localization_pred,
-                                   anchors,
-                                   images_information,
-                                   pre_nms_topk=num_boxes * len(pyramid),
-                                   post_nms_topk=num_boxes)
+        rois = post_process_rpn(rpn_cls_pred_per_lvl,
+                                rpn_loc_pred_per_lvl,
+                                anchors_per_lvl,
+                                images_information,
+                                pre_nms_topk_per_lvl=num_boxes,
+                                post_nms_topk=num_boxes)
 
         if training and not self._serving:
             ground_truths = inputs['ground_truths']
@@ -155,6 +155,7 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         # So we set training to True to benefit from those metrics
         # Of course there is no backpropagation at the test step
         x['ground_truths'] = y
+
         y_pred = self(x, training=True)
 
         loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
@@ -185,8 +186,9 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
                          signatures=signatures,
                          options=options)
         except Exception as e:
-            raise Exception('Saving does not work if the batch_size is set to None. Please'
-                            ' use export_model method instead to bypass this error.')
+            raise Exception(
+                'Saving does not work with dynamic inputs the ground_truths are injected in the inputs. '
+                'Please use export_model method instead to bypass this error.')
 
     def export_model(self, filepath):
         """Allow to bypass the save_model behavior the graph in serving mode.
@@ -200,3 +202,17 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         self._serving = True
         tf.saved_model.save(self, filepath)
         self._serving = False
+
+
+class FasterRcnnFPNResnet50Caffe(FasterRcnnFPN):
+
+    def __init__(self, num_classes, **kwargs):
+        resnet = ResNet50(input_shape=[None, None, 3], weights='imagenet')
+        super().__init__(num_classes, resnet, **kwargs)
+
+
+class FasterRcnnFPNResnet50Pytorch(FasterRcnnFPN):
+
+    def __init__(self, num_classes, **kwargs):
+        resnet = ResNet50PytorchStyle(input_shape=[None, None, 3], weights='imagenet')
+        super().__init__(num_classes, resnet, **kwargs)

@@ -46,7 +46,7 @@ def resize_to_min_dim(image, short_edge_length, max_dimension):
                            method=tf.image.ResizeMethod.BILINEAR)[0]
 
 
-def preprocess(inputs, bgr=False):
+def preprocess(inputs, bgr=True):
     """This operations performs a classical preprocessing operations for localization datasets:
 
     - COCO
@@ -96,7 +96,7 @@ def preprocess(inputs, bgr=False):
     x = {DatasetField.IMAGES: image, DatasetField.IMAGES_INFO: image_information}
     ground_truths = {
         BoxField.BOXES: boxes,
-        BoxField.LABELS: inputs['objects'][BoxField.LABELS],
+        BoxField.LABELS: tf.cast(inputs['objects'][BoxField.LABELS], tf.int32),
         BoxField.NUM_BOXES: tf.shape(inputs['objects'][BoxField.LABELS]),
         BoxField.WEIGHTS: tf.fill(tf.shape(inputs['objects'][BoxField.LABELS]), 1.0)
     }
@@ -141,7 +141,7 @@ def filter_bad_area(boxes: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
     return tf.gather_nd(boxes, tf.where(area > 0)), tf.gather_nd(labels, tf.where(area > 0))
 
 
-def preprocess_coco_example(inputs, bgr=False, horizontal_flip=True):
+def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True):
     """This operations performs a classical preprocessing operations for localization datasets:
 
     - COCO
@@ -180,7 +180,7 @@ def preprocess_coco_example(inputs, bgr=False, horizontal_flip=True):
     - *ground_truths*:
         1. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
         2. BoxField.LABELS: A tensor of shape [num_boxes, ]
-        53. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
+        3. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
     """
     if bgr:
         images = inputs['image'][:, :, ::-1]
@@ -200,7 +200,7 @@ def preprocess_coco_example(inputs, bgr=False, horizontal_flip=True):
     inputs = {DatasetField.IMAGES: image, DatasetField.IMAGES_INFO: image_information}
     ground_truths = {
         BoxField.BOXES: boxes,
-        BoxField.LABELS: labels,
+        BoxField.LABELS: tf.cast(labels, tf.int32),
         BoxField.NUM_BOXES: tf.shape(labels),
         BoxField.WEIGHTS: tf.fill(tf.shape(labels), 1.0)
     }
@@ -253,16 +253,17 @@ def expand_dims_for_single_batch(inputs, ground_truths):
         1. BoxField.BOXES: A tensor of shape [1, num_boxes, (y1, x1, y2, x2)] and resized to the image shape
         2. BoxField.LABELS: A tensor of shape [1, num_boxes, ]
         3. BoxField.NUM_BOXES: A tensor of shape [1, 1]. It is usefull to unpad the data in case of a batched training
+        4. BoxField.WEIGHTS: A tensor of shape [1]
     """
     inputs = {
-        DatasetField.IMAGES: tf.expand_dims(inputs[DatasetField.IMAGES], axis=0),
-        DatasetField.IMAGES_INFO: tf.expand_dims(inputs[DatasetField.IMAGES_INFO], axis=0)
+        DatasetField.IMAGES: inputs[DatasetField.IMAGES][None],
+        DatasetField.IMAGES_INFO: inputs[DatasetField.IMAGES_INFO][None]
     }
 
     ground_truths = {
-        BoxField.BOXES: tf.expand_dims(ground_truths[BoxField.BOXES], axis=0),
-        BoxField.LABELS: tf.expand_dims(ground_truths[BoxField.LABELS], axis=0),
-        BoxField.NUM_BOXES: tf.expand_dims(ground_truths[BoxField.NUM_BOXES], axis=0),
-        BoxField.WEIGHTS: tf.expand_dims(ground_truths[BoxField.WEIGHTS], axis=0)
+        BoxField.BOXES: ground_truths[BoxField.BOXES][None],
+        BoxField.LABELS: ground_truths[BoxField.LABELS][None],
+        BoxField.NUM_BOXES: ground_truths[BoxField.NUM_BOXES][None],
+        BoxField.WEIGHTS: ground_truths[BoxField.WEIGHTS][None]
     }
     return inputs, ground_truths

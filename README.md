@@ -141,8 +141,7 @@ padded_shape = ({
     })    
 
 data = tf.data.Dataset.from_tensor_slices(inputs)
-# Drop remainder should be set to True or the training won't work
-data =  data.padded_batch(batch_size, padded_shape, drop_remainder=True)
+data =  data.padded_batch(batch_size, padded_shape)
 data = data.prefetch(tf.data.experimental.AUTOTUNE)
 
 mirrored_strategy = tf.distribute.MirroredStrategy()

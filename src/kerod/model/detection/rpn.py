@@ -3,16 +3,16 @@ from typing import List
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
-from tensorflow.keras.losses import CategoricalCrossentropy
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
 from kerod.core.anchor_generator import Anchors
-from kerod.core.argmax_matcher import ArgMaxMatcher
+from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.box_ops import compute_iou
 from kerod.core.losses import SmoothL1Localization
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.standard_fields import BoxField, LossField
-from kerod.core.target_assigner import TargetAssigner, batch_assign_targets
+from kerod.core.target_assigner import TargetAssigner
 from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 
 SAMPLING_SIZE = 256
@@ -35,7 +35,8 @@ class RegionProposalNetwork(AbstractDetectionHead):
         delta = 1. / 9
         super().__init__(
             2,
-            CategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE, from_logits=True),
+            SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE,
+                                          from_logits=True),
             SmoothL1Localization(delta),
             localization_loss_weight=1. / delta,
             multiples=len(anchor_ratios),
@@ -44,7 +45,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
             **kwargs)
 
         #Force each ground_truths to match to at least one anchor
-        matcher = ArgMaxMatcher(0.7, 0.3, force_match_for_each_row=True, dtype=self._compute_dtype)
+        matcher = Matcher([0.3, 0.7], [0, -1, 1], allow_low_quality_matches=True)
         self.target_assigner = TargetAssigner(compute_iou,
                                               matcher,
                                               encode_boxes_faster_rcnn,
@@ -96,15 +97,15 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         Returns:
         
-        - *localization_pred*: A logit 3-D tensor of shape [batch_size, num_anchors, 4]
-        - *classification_pred*: A logit 3-D tensor of shape [batch_size, num_anchors, 2]
-        - *anchors*: A tensor of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
+        - *localization_pred*: A list of logits 3-D tensor of shape [batch_size, num_anchors, 4]
+        - *classification_pred*: A lost of logits 3-D tensor of shape [batch_size, num_anchors, 2]
+        - *anchors*: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
         """
-        anchors = tf.concat([anchors(tensor) for tensor, anchors in zip(inputs, self._anchors)], 0)
+        anchors = [anchors(tensor) for tensor, anchors in zip(inputs, self._anchors)]
 
         rpn_predictions = [self.build_rpn_head(tensor) for tensor in inputs]
-        localization_pred = tf.concat([prediction[1] for prediction in rpn_predictions], 1)
-        classification_pred = tf.concat([prediction[0] for prediction in rpn_predictions], 1)
+        localization_pred = [prediction[1] for prediction in rpn_predictions]
+        classification_pred = [prediction[0] for prediction in rpn_predictions]
 
         return localization_pred, classification_pred, anchors
 
@@ -113,9 +114,9 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         Arguments:
 
-        - *localization_pred*: A tensor of shape [batch_size, num_anchors, 4]
-        - *classification_pred*: A tensor of shape [batch_size, num_anchors, 2]
-        - *anchors*: A tensor of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
+        - *localization_pred*: A list of tensors of shape [batch_size, num_anchors, 4].
+        - *classification_pred*: A list of tensors of shape [batch_size, num_anchors, 2]
+        - *anchors*: A list of tensors of shape [num_anchors, (y_min, x_min, y_max, x_max)]
         - *ground_truths*: A dict with BoxField as key and a tensor as value.
 
         ```python
@@ -138,35 +139,38 @@ class RegionProposalNetwork(AbstractDetectionHead):
         - *classification_loss*: A scalar in tf.float32
         - *localization_loss*: A scalar in tf.float32
         """
-        # Will be auto batch by the target assigner
-        anchors = {BoxField.BOXES: anchors}
+        localization_pred = tf.concat(localization_pred, 1)
+        classification_pred = tf.concat(classification_pred, 1)
+        anchors = tf.concat(anchors, 0)
 
-        # We only want the Localization field here the target assigner will understand that
-        # it is the RPN mode.
-        gt_boxes = tf.unstack(ground_truths[BoxField.BOXES])
-        num_boxes = tf.unstack(ground_truths[BoxField.NUM_BOXES])
-        ground_truths = [{BoxField.BOXES: b[:nb[0]]} for b, nb in zip(gt_boxes, num_boxes)]
-
-        y_true, weights, _ = batch_assign_targets(self.target_assigner, anchors, ground_truths)
-
+        ground_truths = {
+            # We add one because the background is not counted in ground_truths[BoxField.LABELS]
+            BoxField.LABELS:
+                ground_truths[BoxField.LABELS] + 1,
+            BoxField.BOXES:
+                ground_truths[BoxField.BOXES],
+            BoxField.WEIGHTS:
+                ground_truths[BoxField.WEIGHTS],
+            BoxField.NUM_BOXES:
+                ground_truths[BoxField.NUM_BOXES]
+        }
+        # anchors are deterministic duplicate them to create a batch
+        anchors = tf.tile(anchors[None], (tf.shape(ground_truths[BoxField.BOXES])[0], 1, 1))
+        y_true, weights = self.target_assigner.assign(anchors, ground_truths)
+        y_true[LossField.CLASSIFICATION] = tf.minimum(y_true[LossField.CLASSIFICATION], 1)
         ## Compute metrics
-        recall = compute_rpn_metrics(tf.squeeze(y_true[LossField.CLASSIFICATION], axis=-1),
-                                     classification_pred, weights[LossField.CLASSIFICATION])
+        recall = compute_rpn_metrics(y_true[LossField.CLASSIFICATION], classification_pred,
+                                     weights[LossField.CLASSIFICATION])
         self.add_metric(recall, name='rpn_recall', aggregation='mean')
 
-        ## Samling
-        # y_true[LossField.CLASSIFICATION] is a [batch_size, num_anchors, 1]
-        labels = tf.cast(y_true[LossField.CLASSIFICATION][:, :, 0], dtype=bool)
+        # All the boxes which are not -1 can be sampled
+        labels = y_true[LossField.CLASSIFICATION] > 0
         sample_idx = batch_sample_balanced_positive_negative(
             weights[LossField.CLASSIFICATION],
             SAMPLING_SIZE,
             labels,
             positive_fraction=SAMPLING_POSITIVE_RATIO,
             dtype=self._compute_dtype)
-        # Create one_hot encoding [batch_size, num_anchors, 1] -> [batch_size, num_anchors, 2]
-        y_true[LossField.CLASSIFICATION] = tf.one_hot(tf.cast(
-            y_true[LossField.CLASSIFICATION][:, :, 0], tf.int32),
-                                                      depth=2)
 
         weights[LossField.CLASSIFICATION] = tf.multiply(sample_idx,
                                                         weights[LossField.CLASSIFICATION])
@@ -190,7 +194,8 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
 
     Arguments:
 
-    - *y_true*: A one-hot encoded vector with shape [batch_size, num_anchors]
+    - *y_true*: A tensor vector with shape [batch_size, num_anchors] where 0 = background and
+    1 = foreground.
     - *y_pred*: A tensor of shape [batch_size, num_anchors, 2],
     representing the classification logits.
     - *weights*: A tensor of shape [batch_size, num_anchors] where weights should

@@ -34,8 +34,8 @@ def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: t
     spacing_h = (y_max - y_min) / tf.cast(crop_shape[0], boxes.dtype)
     spacing_w = (x_max - x_min) / tf.cast(crop_shape[1], boxes.dtype)
 
-    tensor_shape = (tf.cast(tensor_shape[0] - 1,
-                            boxes.dtype), tf.cast(tensor_shape[1] - 1, boxes.dtype))
+    tensor_shape = (tf.cast(tensor_shape[0] - 1, boxes.dtype),
+                    tf.cast(tensor_shape[1] - 1, boxes.dtype))
 
     ny0 = (y_min + spacing_h / 2 - 0.5) / tensor_shape[0]
     nx0 = (x_min + spacing_w / 2 - 0.5) / tensor_shape[1]
@@ -83,7 +83,7 @@ def compute_area(boxes: tf.Tensor) -> tf.Tensor:
         return tf.squeeze((y_max - y_min) * (x_max - x_min), -1)
 
 
-def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
+def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor, perm=None) -> tf.Tensor:
     """Compute pairwise intersection areas between boxes.
 
     Arguments:
@@ -98,14 +98,14 @@ def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
     with tf.name_scope('Intersection'):
         y_min1, x_min1, y_max1, x_max1 = tf.split(value=boxes1, num_or_size_splits=4, axis=-1)
         y_min2, x_min2, y_max2, x_max2 = tf.split(value=boxes2, num_or_size_splits=4, axis=-1)
-        all_pairs_min_ymax = tf.minimum(y_max1, tf.transpose(y_max2))
-        all_pairs_max_ymin = tf.maximum(y_min1, tf.transpose(y_min2))
-        intersect_heights = tf.maximum(tf.constant(0, boxes1.dtype),
-                                       all_pairs_min_ymax - all_pairs_max_ymin)
-        all_pairs_min_xmax = tf.minimum(x_max1, tf.transpose(x_max2))
-        all_pairs_max_xmin = tf.maximum(x_min1, tf.transpose(x_min2))
-        intersect_widths = tf.maximum(tf.constant(0, boxes1.dtype),
-                                      all_pairs_min_xmax - all_pairs_max_xmin)
+        all_pairs_min_ymax = tf.minimum(y_max1, tf.transpose(y_max2, perm=perm))
+        all_pairs_max_ymin = tf.maximum(y_min1, tf.transpose(y_min2, perm=perm))
+        intersect_heights = tf.maximum(
+            tf.constant(0, boxes1.dtype), all_pairs_min_ymax - all_pairs_max_ymin)
+        all_pairs_min_xmax = tf.minimum(x_max1, tf.transpose(x_max2, perm=perm))
+        all_pairs_max_xmin = tf.maximum(x_min1, tf.transpose(x_min2, perm=perm))
+        intersect_widths = tf.maximum(
+            tf.constant(0, boxes1.dtype), all_pairs_min_xmax - all_pairs_max_xmin)
         return intersect_heights * intersect_widths
 
 
@@ -145,20 +145,35 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
 
     Arguments:
 
-    - *boxes1*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
-    - *boxes2*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes1*: A 2D or 3D Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes2*: A 2D or 3D Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
 
     Returns:
 
     A tensor with shape [N, M] representing pairwise iou scores.
+
+    Raises:
+
+    ValueError: If your tensor is different than 2D or 3D.
     """
     with tf.name_scope('IOU'):
-        intersections = compute_intersection(boxes1, boxes2)
+        if len(boxes1.shape) == 2:
+            perm = None
+            which_dim_expands = 0
+        elif len(boxes1.shape) == 3:
+            perm = (0, 2, 1)
+            which_dim_expands = 1
+        else:
+            raise ValueError('Compute Iou is only suppoted for 2D and 3D Tensor')
+
+        intersections = compute_intersection(boxes1, boxes2, perm=perm)
         areas1 = compute_area(boxes1)
         areas2 = compute_area(boxes2)
-        unions = (tf.expand_dims(areas1, -1) + tf.expand_dims(areas2, 0) - intersections)
-        return tf.where(tf.equal(intersections, 0), tf.zeros_like(intersections),
-                        tf.truediv(intersections, unions))
+        unions = (
+            tf.expand_dims(areas1, -1) + tf.expand_dims(areas2, which_dim_expands) - intersections)
+        return tf.where(
+            tf.equal(intersections, 0), tf.zeros_like(intersections),
+            tf.truediv(intersections, unions))
 
 
 def normalize_box_coordinates(boxes, height: int, width: int):

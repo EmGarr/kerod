@@ -3,14 +3,14 @@ from typing import Dict
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
-from tensorflow.keras.losses import CategoricalCrossentropy, MeanAbsoluteError
+from tensorflow.keras.losses import SparseCategoricalCrossentropy, MeanAbsoluteError
 
-from kerod.core.argmax_matcher import ArgMaxMatcher
+from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.box_ops import compute_iou
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.standard_fields import BoxField, LossField
-from kerod.core.target_assigner import TargetAssigner, batch_assign_targets
+from kerod.core.target_assigner import TargetAssigner
 from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 from kerod.model.detection.pooling_ops import multilevel_roi_align
 
@@ -28,13 +28,14 @@ class FastRCNN(AbstractDetectionHead):
     def __init__(self, num_classes, **kwargs):
         super().__init__(
             num_classes,
-            CategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE, from_logits=True),
+            SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE,
+                                          from_logits=True),
             MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE),  # like in tensorpack
             kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.001),
             **kwargs)
 
-        matcher = ArgMaxMatcher(0.5, dtype=self._compute_dtype)
+        matcher = Matcher([0.5], [0, 1])
         self.target_assigner = TargetAssigner(compute_iou,
                                               matcher,
                                               encode_boxes_faster_rcnn,
@@ -168,42 +169,21 @@ class FastRCNN(AbstractDetectionHead):
         - *ValueError*: If the batch_size is None.
         - *ValueError*: If the batch_size between your ground_truths and the anchors does not match.
         """
-        # In graph mode unstack need to be aware of the batch_shape
-        batch_size = ground_truths[BoxField.BOXES].get_shape().as_list()[0]
-        if batch_size is None:
-            raise ValueError("In training the batch size cannot be None. You should specify it"
-                             " in tf.Keras.layers.Input using the argument batch_size.")
-        anchors.set_shape((batch_size, None, 4))
-        unstack_anchors = [{BoxField.BOXES: anchor} for anchor in tf.unstack(anchors)]
 
-        # Remove the padding and convert the ground_truths to the format
-        # expected by the target_assigner
-        gt_boxes = tf.unstack(ground_truths[BoxField.BOXES])
-        # We add one because the background is not counted in ground_truths[BoxField.LABELS]
-        gt_labels = tf.one_hot(ground_truths[BoxField.LABELS] + 1,
-                               self._num_classes,
-                               dtype=self._compute_dtype)
-        gt_labels = tf.unstack(gt_labels)
-        gt_weights = tf.unstack(ground_truths[BoxField.WEIGHTS])
-        num_boxes = tf.unstack(ground_truths[BoxField.NUM_BOXES])
-        unstack_ground_truths = []
-        for b, l, w, nb in zip(gt_boxes, gt_labels, gt_weights, num_boxes):
-            unstack_ground_truths.append({
-                BoxField.BOXES: b[:nb[0]],
-                BoxField.LABELS: l[:nb[0]],
-                BoxField.WEIGHTS: w[:nb[0]],
-            })
+        ground_truths = {
+            # We add one because the background is not counted in ground_truths[BoxField.LABELS]
+            BoxField.LABELS:
+                ground_truths[BoxField.LABELS] + 1,
+            BoxField.BOXES:
+                ground_truths[BoxField.BOXES],
+            BoxField.WEIGHTS:
+                ground_truths[BoxField.WEIGHTS],
+            BoxField.NUM_BOXES:
+                ground_truths[BoxField.NUM_BOXES]
+        }
+        y_true, weights = self.target_assigner.assign(anchors, ground_truths)
 
-        unmatched_class_label = tf.constant([1] + (self._num_classes - 1) * [0],
-                                            self._compute_dtype)
-        y_true, weights, _ = batch_assign_targets(self.target_assigner, unstack_anchors,
-                                                  unstack_ground_truths, unmatched_class_label)
-
-        # Here we have a tensor of shape [batch_size, num_anchors, num_classes]. We want
-        # to know all the foreground anchors for sampling.
-        # [0, 0, 0, 1] -> [1]
-        # [1, 0, 0, 0] -> [0]
-        labels = tf.logical_not(tf.cast(y_true[LossField.CLASSIFICATION][:, :, 0], dtype=bool))
+        labels = y_true[LossField.CLASSIFICATION] > 0
         sample_idx = batch_sample_balanced_positive_negative(
             weights[LossField.CLASSIFICATION],
             sampling_size,
@@ -215,7 +195,7 @@ class FastRCNN(AbstractDetectionHead):
                                                         weights[LossField.CLASSIFICATION])
         weights[LossField.LOCALIZATION] = tf.multiply(sample_idx, weights[LossField.LOCALIZATION])
 
-        selected_boxes_idx = tf.where(tf.equal(sample_idx, 1))
+        selected_boxes_idx = tf.where(sample_idx == 1)
 
         batch_size = tf.shape(sample_idx)[0]
 
@@ -227,8 +207,7 @@ class FastRCNN(AbstractDetectionHead):
             tf.gather_nd(y_true[LossField.LOCALIZATION], selected_boxes_idx), (batch_size, -1, 4))
 
         y_true[LossField.CLASSIFICATION] = tf.reshape(
-            tf.gather_nd(y_true[LossField.CLASSIFICATION], selected_boxes_idx),
-            (batch_size, -1, self._num_classes))
+            tf.gather_nd(y_true[LossField.CLASSIFICATION], selected_boxes_idx), (batch_size, -1))
 
         for key in y_true.keys():
             weights[key] = tf.reshape(tf.gather_nd(weights[key], selected_boxes_idx),
@@ -268,14 +247,20 @@ class FastRCNN(AbstractDetectionHead):
         # y_true[LossField.CLASSIFICATION] is just 1 and 0 we are using it as mask to extract
         # the corresponding target anchors
         batch_size = tf.shape(classification_pred)[0]
-        targets = tf.reshape(y_true[LossField.CLASSIFICATION], [-1])
+        # We create a boolean mask to extract the desired localization prediction to compute
+        # the loss
+        one_hot_targets = tf.one_hot(y_true[LossField.CLASSIFICATION],
+                                     self._num_classes,
+                                     dtype=tf.int8)
+        one_hot_targets = tf.reshape(one_hot_targets, [-1])
 
         # We need to insert a fake background classes at the position 0
         localization_pred = tf.pad(localization_pred, [[0, 0], [0, 0], [4, 0]])
         localization_pred = tf.reshape(localization_pred, [-1, 4])
 
-        extracted_localization_pred = tf.boolean_mask(localization_pred, tf.greater(targets, 0))
+        extracted_localization_pred = tf.boolean_mask(localization_pred, one_hot_targets > 0)
         extracted_localization_pred = tf.reshape(extracted_localization_pred, (batch_size, -1, 4))
+
         y_pred = {
             LossField.CLASSIFICATION: classification_pred,
             LossField.LOCALIZATION: extracted_localization_pred
@@ -310,15 +295,13 @@ def compute_fast_rcnn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
     """
     # compute usefull metrics
     #Even if the softmax has not been applyed the argmax can be usefull
-    prediction = tf.argmax(y_pred, axis=-1, name='label_prediction')
-    correct_labels = tf.argmax(y_true, axis=-1, name='label_prediction')
-    correct = tf.cast(tf.equal(prediction, correct_labels), tf.float32)
+    prediction = tf.argmax(y_pred, axis=-1, name='label_prediction', output_type=tf.int32)
+    correct = tf.cast(prediction == y_true, tf.float32)
     # The accuracy allows to determine if the models perform well (background included)
     accuracy = tf.reduce_mean(correct, name='accuracy')
 
     # Compute accuracy and false negative on all the foreground boxes
-    # At position 0 the background boxes are equal to 1 which means the ones equal to 0 are foreground
-    fg_inds = tf.where(y_true[:, :, 0] < 1)
+    fg_inds = tf.where(y_true > 0)
     num_fg = tf.shape(fg_inds)[0]
     fg_label_pred = tf.argmax(tf.gather_nd(y_pred, fg_inds), axis=-1)
     num_zero = tf.reduce_sum(tf.cast(tf.equal(fg_label_pred, 0), tf.int32), name='num_zero')

@@ -1,42 +1,19 @@
 """Methods using non maximum_suppression to handle overlaps between boxes.
 """
+from typing import List
 import tensorflow as tf
 
 from kerod.core.box_coder import decode_boxes_faster_rcnn
 from kerod.core.box_ops import clip_boxes
 from kerod.core.standard_fields import BoxField
+from kerod.utils.ops import get_full_indices
 
 
-def get_full_indices(indices, k, batch_size):
-    """ This operation allows to extract full indices from indices.
-    These full-indices have the proper format for gather_nd operations.
-
-    Arguments:
-
-    - *indices*: Indices with the top_k format [batch_size, k].
-    - *k*: k
-    - *batch_size*: N
-
-    Returns:
-
-    Full-indices tensor [batch_size, k, 2]
-    """
-    # We need to create full indices like [[0, 0], [0, 1], [1, 2], [1, 1]]
-    my_range = tf.expand_dims(tf.range(0, batch_size), 1)  # will be [[0], [1]]
-    my_range_repeated = tf.tile(my_range, [1, k])  # will be [[0, 0], [1, 1]]
-    # change shapes to [N, k, 1] and [N, k, 1], to concatenate into [N, k, 2]
-    full_indices = tf.concat(
-        [tf.expand_dims(my_range_repeated, 2),
-         tf.expand_dims(indices, 2)], axis=2
-    )
-    return full_indices
-
-
-def post_process_rpn(classification_pred: tf.Tensor,
-                     localization_pred: tf.Tensor,
-                     anchors: tf.Tensor,
+def post_process_rpn(cls_pred_per_lvl: List[tf.Tensor],
+                     loc_pred_per_lvl: List[tf.Tensor],
+                     anchors_per_lvl: List[tf.Tensor],
                      image_information,
-                     pre_nms_topk,
+                     pre_nms_topk_per_lvl,
                      post_nms_topk=None,
                      iou_threshold: float = 0.7):
     """Sample RPN proposals by the following steps:
@@ -47,13 +24,16 @@ def post_process_rpn(classification_pred: tf.Tensor,
 
     Arguments:
 
-    - *classification_pred*: A Tensor of shape [batch_size, num_boxes, 2]
-    - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_anchors)]
-    - *anchors*: A Tensor of shape [batch_size, num_boxes * num_anchors, 4]
+    - *cls_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes, 2].
+    One item per level of the pyramid.
+    - *loc_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes, 4 * (num_anchors)].
+    One item per level of the pyramid.
+    - *anchors_per_lvl*: A list of Tensor of shape [batch_size, num_boxes * num_anchors, 4]
+    One item per level of the pyramid.
     - *image_informations*: A Tensor of shape [batch_size, (height, width)] The height and the
     width are without the padding.
-    - *pre_nms_topk*, post_nms_topk (int): See above.
-    - post_nms_topk:
+    - *pre_nms_topk_per_lvl*: Will extract at each level this amount of boxes
+    - post_nms_topk: Number of boxes selected after the nms
 
 
     Returns:
@@ -63,35 +43,42 @@ def post_process_rpn(classification_pred: tf.Tensor,
     - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing
       the scores for the boxes.
     """
-    batch_size = tf.shape(classification_pred)[0]
-    localization_pred = tf.reshape(localization_pred, (batch_size, -1, 4))
-    boxes = decode_boxes_faster_rcnn(localization_pred, anchors)
-    boxes = clip_boxes(boxes, image_information)
+    topk_boxes_per_lvl = []
+    topk_scores_per_lvl = []
+    for cls_pred, loc_pred, anchors in zip(cls_pred_per_lvl, loc_pred_per_lvl, anchors_per_lvl):
+        batch_size = tf.shape(cls_pred)[0]
+        loc_pred = tf.reshape(loc_pred, (batch_size, -1, 4))
+        boxes = decode_boxes_faster_rcnn(loc_pred, anchors)
+        boxes = clip_boxes(boxes, image_information)
 
-    # Remove the background classes
-    scores = classification_pred[:, :, 1]
+        # Remove the background classes
+        scores = cls_pred[:, :, 1]
 
-    topk = tf.minimum(pre_nms_topk, tf.size(scores[0]))
-    topk_scores, topk_indices = tf.nn.top_k(scores, k=topk, sorted=False)
-    topk_indices = get_full_indices(topk_indices, pre_nms_topk, batch_size)
-    topk_boxes = tf.cast(tf.gather_nd(boxes, topk_indices), tf.float32)
-    topk_scores = tf.cast(topk_scores, tf.float32)
+        topk = tf.minimum(pre_nms_topk_per_lvl, tf.size(scores[0]))
+        topk_scores, topk_indices = tf.math.top_k(scores, k=topk, sorted=False)
+        topk_indices = get_full_indices(topk_indices)
+        topk_boxes_per_lvl.append(tf.cast(tf.gather_nd(boxes, topk_indices), tf.float32))
+        topk_scores_per_lvl.append(tf.cast(topk_scores, tf.float32))
 
-    nmsed_boxes, nmsed_scores, _, _ = tf.image.combined_non_max_suppression(
-        tf.expand_dims(topk_boxes, 2),
-        tf.expand_dims(topk_scores, -1),
-        post_nms_topk,
-        post_nms_topk,
-        iou_threshold=iou_threshold,
-        score_threshold=0,
-        clip_boxes=False)
+    topk_boxes = tf.concat(topk_boxes_per_lvl, 1)
+    topk_scores = tf.concat(topk_scores_per_lvl, 1)
 
-    return tf.stop_gradient(nmsed_boxes), tf.stop_gradient(nmsed_scores)
+    if post_nms_topk is None:
+        post_nms_topk = pre_nms_topk_per_lvl
+    nmsed_boxes, _, _, _ = tf.image.combined_non_max_suppression(tf.expand_dims(topk_boxes, 2),
+                                                                 tf.expand_dims(topk_scores, -1),
+                                                                 post_nms_topk,
+                                                                 post_nms_topk,
+                                                                 iou_threshold=iou_threshold,
+                                                                 score_threshold=0,
+                                                                 clip_boxes=False)
+
+    return tf.stop_gradient(nmsed_boxes)
 
 
-def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
-                                 localization_pred: tf.Tensor,
-                                 anchors: tf.Tensor,
+def post_process_fast_rcnn_boxes(cls_pred_per_lvl: tf.Tensor,
+                                 loc_pred_per_lvl: tf.Tensor,
+                                 anchors_per_lvl: tf.Tensor,
                                  image_information: tf.Tensor,
                                  num_classes,
                                  max_output_size_per_class: int = 100,
@@ -115,9 +102,9 @@ def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
 
     Arguments:
 
-    - *classification_pred*: A Tensor of shape [batch_size, num_boxes, num_classes]
-    - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
-    - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
+    - *cls_pred_per_lvl*: A Tensor of shape [batch_size, num_boxes, num_classes]
+    - *loc_pred_per_lvl*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
+    - *anchors_per_lvl*: A Tensor of shape [batch_size, num_boxes, 4]
     - *image_informations*: A Tensor of shape [batch_size, (height, width)] The height and the
     width are without the padding.
     - *num_classes*: The number of classes (background is included).
@@ -145,18 +132,19 @@ def post_process_fast_rcnn_boxes(classification_pred: tf.Tensor,
       entries are zero paddings.
     """
 
-    batch_size = tf.shape(classification_pred)[0]
+    batch_size = tf.shape(cls_pred_per_lvl)[0]
     # Remove the background classes
-    classification_pred = classification_pred[:, :, 1:]
-    localization_pred = tf.reshape(localization_pred, (batch_size, -1, 4))
-    anchors = tf.reshape(tf.tile(anchors, [1, 1, num_classes - 1]), (batch_size, -1, 4))
-    boxes = decode_boxes_faster_rcnn(localization_pred, anchors)
+    cls_pred_per_lvl = cls_pred_per_lvl[:, :, 1:]
+    loc_pred_per_lvl = tf.reshape(loc_pred_per_lvl, (batch_size, -1, 4))
+    anchors_per_lvl = tf.reshape(tf.tile(anchors_per_lvl, [1, 1, num_classes - 1]),
+                                 (batch_size, -1, 4))
+    boxes = decode_boxes_faster_rcnn(loc_pred_per_lvl, anchors_per_lvl)
     boxes = clip_boxes(boxes, image_information)
     boxes = tf.reshape(boxes, (batch_size, -1, num_classes - 1, 4))
 
     nmsed_boxes, nmsed_scores, nmsed_labels, valid_detections = tf.image.combined_non_max_suppression(
         tf.cast(boxes, tf.float32),
-        tf.cast(classification_pred, tf.float32),
+        tf.cast(cls_pred_per_lvl, tf.float32),
         max_output_size_per_class,
         max_total_size,
         iou_threshold=iou_threshold,

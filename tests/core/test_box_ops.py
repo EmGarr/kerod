@@ -44,10 +44,21 @@ def test_compute_intersection():
     np.testing.assert_allclose(intersect_output, exp_output)
 
 
-def test_compute_iou():
+def test_compute_iou_2d_tensor():
     boxes1 = tf.constant([[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]])
     boxes2 = tf.constant([[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]])
     exp_output = [[2.0 / 16.0, 0, 6.0 / 400.0], [1.0 / 16.0, 0.0, 5.0 / 400.0]]
+    iou_output = box_ops.compute_iou(boxes1, boxes2)
+    np.testing.assert_allclose(iou_output, exp_output)
+
+
+def test_compute_iou_3d_tensor():
+    boxes1 = tf.constant([[[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]],
+                          [[4.0, 3.0, 7.0, 5.0], [0, 0, 0, 0]]])
+    boxes2 = tf.constant([[[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]],
+                          [[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]]])
+    exp_output = [[[2.0 / 16.0, 0, 6.0 / 400.0], [1.0 / 16.0, 0.0, 5.0 / 400.0]],
+                  [[2.0 / 16.0, 0, 6.0 / 400.0], [0, 0, 0]]]
     iou_output = box_ops.compute_iou(boxes1, boxes2)
     np.testing.assert_allclose(iou_output, exp_output)
 

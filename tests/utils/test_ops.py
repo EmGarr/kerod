@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-
 import numpy as np
 import tensorflow as tf
 
@@ -34,6 +33,7 @@ def test_indices_to_dense_vector():
     np.testing.assert_array_equal(indicator, expected_output)
     assert indicator.dtype == expected_output.dtype
 
+
 def test_indices_to_dense_vector_size_at_inference():
     size = 5000
     num_indices = 250
@@ -43,11 +43,11 @@ def test_indices_to_dense_vector_size_at_inference():
     expected_output = np.zeros(size, dtype=np.float32)
     expected_output[rand_indices] = 1.
 
-    indicator = ops.indices_to_dense_vector(rand_indices,
-                                            tf.shape(all_indices)[0])
+    indicator = ops.indices_to_dense_vector(rand_indices, tf.shape(all_indices)[0])
 
     np.testing.assert_array_equal(indicator, expected_output)
     assert indicator.dtype == expected_output.dtype
+
 
 def test_indices_to_dense_vector_int():
     size = 500
@@ -58,11 +58,11 @@ def test_indices_to_dense_vector_int():
     expected_output[rand_indices] = 1
 
     tf_rand_indices = tf.constant(rand_indices)
-    indicator = ops.indices_to_dense_vector(
-        tf_rand_indices, size, 1, dtype=tf.int64)
+    indicator = ops.indices_to_dense_vector(tf_rand_indices, size, 1, dtype=tf.int64)
 
     np.testing.assert_array_equal(indicator, expected_output)
     assert indicator.dtype == expected_output.dtype
+
 
 def test_indices_to_dense_vector_custom_values():
     size = 100
@@ -76,13 +76,11 @@ def test_indices_to_dense_vector_custom_values():
 
     tf_rand_indices = tf.constant(rand_indices)
     indicator = ops.indices_to_dense_vector(
-        tf_rand_indices,
-        size,
-        indices_value=indices_value,
-        default_value=default_value)
+        tf_rand_indices, size, indices_value=indices_value, default_value=default_value)
 
     np.testing.assert_allclose(indicator, expected_output)
     assert indicator.dtype == expected_output.dtype
+
 
 def test_indices_to_dense_vector_all_indices_as_input():
     size = 500
@@ -97,6 +95,7 @@ def test_indices_to_dense_vector_all_indices_as_input():
     np.testing.assert_array_equal(indicator, expected_output)
     assert indicator.dtype == expected_output.dtype
 
+
 def test_indices_to_dense_vector_empty_indices_as_input():
     size = 500
     rand_indices = []
@@ -110,5 +109,7 @@ def test_indices_to_dense_vector_empty_indices_as_input():
     assert indicator.dtype == expected_output.dtype
 
 
-
-
+def test_item_assignment():
+    tensor = tf.constant([1, 2, 3, 4])
+    out = ops.item_assignment(tensor, tensor >= 2, 6)
+    np.testing.assert_array_equal(out, tf.constant([1, 6, 6, 6]))

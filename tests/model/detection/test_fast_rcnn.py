@@ -27,7 +27,7 @@ def test_fast_rcnn_full_inference_and_training(fast_rcnn_class):
     # args callable
     pyramid = [tf.zeros((2, shape, shape, 256)) for shape in [160, 80, 40, 20, 20]]
     boxes = [[0, 0, i, i] for i in range(1, 1000)]
-    boxes = tf.constant([boxes, boxes], tf.float32) 
+    boxes = tf.constant([boxes, boxes], tf.float32)
     num_classes = 3
     fast_rcnn = fast_rcnn_class(num_classes)
 
@@ -61,12 +61,11 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
                                                              sampling_size=sampling_size,
                                                              sampling_positive_ratio=0.2)
 
-    expected_y_true_classification = np.zeros((2, sampling_size, 3))
-    expected_y_true_classification[:, :, 0] = 1
-    expected_y_true_classification[0, 0] = [0, 0, 1]
-    expected_y_true_classification[1, 2] = [0, 0, 1]
+    expected_y_true_classification = np.zeros((2, sampling_size))
+    expected_y_true_classification[0, 0] = 2
+    expected_y_true_classification[1, 2] = 2
     # boxes 4 does match with 3: iou([0, 0, 3, 3], [0, 0, 4, 4]) = 0.5625 > 0.5
-    expected_y_true_classification[1, 3] = [0, 0, 1]
+    expected_y_true_classification[1, 3] = 2
 
     expected_y_true_localization = np.zeros((2, sampling_size, 4))
 
@@ -125,7 +124,7 @@ def test_fast_rcnn_compute_loss(mock_add_loss, mock_add_metric):
                                        [[100, -100, -100], [-100, -100, 100], [-100, -100, 100]]],
                                       tf.float32)
 
-    y_true_cls = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0]], [[0, 0, 1], [0, 0, 1], [0, 1, 0]]])
+    y_true_cls = tf.constant([[1, 0, 0], [2, 2, 1]])
     y_true_loc = tf.constant([[[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
                               [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]])
 
@@ -154,7 +153,7 @@ def test_compute_fast_rcnn_metrics():
         tf.float32)
     # FP background & FN predicted - TP foreground   - FP
 
-    y_true = tf.constant([[[0, 1, 0], [1, 0, 0], [1, 0, 0]], [[0, 0, 1], [0, 0, 1], [0, 1, 0]]])
+    y_true = tf.constant([[1, 0, 0], [2, 2, 1]])
 
     accuracy, fg_accuracy, false_negative = compute_fast_rcnn_metrics(y_true, y_pred)
     assert accuracy == 4 / 6
