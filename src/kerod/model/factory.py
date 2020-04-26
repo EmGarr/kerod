@@ -1,35 +1,22 @@
-import os
 import tensorflow as tf
 
 from kerod.model.faster_rcnn import FasterRcnnFPNResnet50
-from kerod.core.standard_fields import DatasetField
-from kerod.utils.training import freeze_layers_before
-
-WEIGHTS_PATH = ('https://files.heuritech.com/raw_files/')
+from kerod.utils.training import (freeze_batch_normalization, freeze_layers_before)
 
 
-def build_model(num_classes, weights: str = 'imagenet'):
+def build_model(num_classes: int) -> tf.keras.Model:
+    """Build a FasterRcnnFPNResnet50 with all the `tf.keras.layers.BatchNormalization` frozen and
+    all the layers before second residual block.
+
+    Argument:
+
+    - *num_classes*: Number of classes of your model. Do not include the background class.
+
+    Return:
+
+    A `keras.Model` instance.
+    """
     model = FasterRcnnFPNResnet50(num_classes)
-    images_information = tf.constant([[1300, 650]], tf.float32)
-    features = tf.zeros((1, 1300, 650, 3), tf.float32)
-
-    # Blank shot to init weights
-    model([{DatasetField.IMAGES: features, DatasetField.IMAGES_INFO: images_information}])
-
-    # The weights need to be loaded here before freezing any layers
-    if weights == 'imagenet':
-        weights_path = tf.keras.utils.get_file('resnet50_tensorpack_converted.h5',
-                                               os.path.join(WEIGHTS_PATH,
-                                                            'resnet50_tensorpack_converted.h5'),
-                                               cache_subdir='models',
-                                               md5_hash='f67cc7a3179ec847f2e2073d9533789b')
-        model.resnet.load_weights(weights_path)
-    elif weights is not None:
-        model.load_weights(weights)
-
-    model.resnet.freeze_normalization()
-    # Will freeze all the layers before group number one
-    # Should be done here because the layers won't be registered before the previous inference
-    freeze_layers_before(model.resnet, model.resnet.groups[1].name)
-
+    freeze_batch_normalization(model.resnet)
+    freeze_layers_before(model.resnet, 'conv2_block3_out')
     return model

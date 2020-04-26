@@ -46,7 +46,7 @@ def resize_to_min_dim(image, short_edge_length, max_dimension):
                            method=tf.image.ResizeMethod.BILINEAR)[0]
 
 
-def preprocess(inputs, bgr=True):
+def preprocess(inputs, bgr=False):
     """This operations performs a classical preprocessing operations for localization datasets:
 
     - COCO
@@ -141,7 +141,7 @@ def filter_bad_area(boxes: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
     return tf.gather_nd(boxes, tf.where(area > 0)), tf.gather_nd(labels, tf.where(area > 0))
 
 
-def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True):
+def preprocess_coco_example(inputs, bgr=False, horizontal_flip=True):
     """This operations performs a classical preprocessing operations for localization datasets:
 
     - COCO

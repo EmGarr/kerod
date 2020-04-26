@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.python.keras.engine import data_adapter, training
 
 from kerod.model.backbone.fpn import Pyramid
-from kerod.model.backbone.resnet import Resnet50
+from kerod.model.backbone.resnet import ResNet50
 from kerod.model.detection.fast_rcnn import FastRCNN
 from kerod.model.detection.rpn import RegionProposalNetwork
 from kerod.model.post_processing import post_process_fast_rcnn_boxes
@@ -35,12 +35,10 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         super().__init__(**kwargs)
 
         self.num_classes = num_classes
-        # Seems that kernel regularizer make the network diverge
-        self.resnet = Resnet50(kernel_regularizer=tf.keras.regularizers.l2(1e-4))
-        # self.resnet = Resnet50()
+        self.resnet = ResNet50(input_shape=[None, None, 3], weights='imagenet')
         self.fpn = Pyramid()
         self.rpn = RegionProposalNetwork()
-        self.fast_rcnn = FastRCNN(num_classes + 1)
+        self.fast_rcnn = FastRCNN(self.num_classes + 1)
 
     def call(self, inputs, training=None):
         """Perform an inference in training.
@@ -87,6 +85,7 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         images = inputs[0][DatasetField.IMAGES]
         images_information = inputs[0][DatasetField.IMAGES_INFO]
 
+        # The preprocessing dedicated to the resnet is done inside the model.
         x = self.resnet(images)
         pyramid = self.fpn(x)
 

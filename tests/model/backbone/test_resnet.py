@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from kerod.model.backbone.resnet import (Group, Resnet50, padd_for_aligning_pixels)
+from kerod.model.backbone.resnet import ResNet50, padd_for_aligning_pixels
 
 
 @pytest.mark.parametrize(["input_shape", "output_shape"], [
@@ -23,33 +23,8 @@ def test_padd_for_aligning_pixels(input_shape, output_shape):
 def test_resnet_shape(input_shape, output_shape):
     inputs = np.zeros((1, input_shape[0], input_shape[1], 3))
 
-    model = Resnet50()
+    model = ResNet50(input_shape=[None, None, 3])
     outputs = model(inputs)
 
     for output, stride in zip(outputs, [4, 8, 16, 32]):
         assert output.numpy().shape[:-1] == (1, output_shape[0] / stride, output_shape[1] / stride)
-
-
-def test_freeze_normalization_group():
-    group = Group(64, 3, strides=1, name='group0')
-    group.freeze_normalization()
-
-    for block in group.blocks:
-        if block._use_conv_shortcut:
-            assert not block.bn_shortcut.trainable
-            assert not block.bn1.trainable
-            assert not block.bn2.trainable
-            assert not block.bn3.trainable
-
-
-def test_freeze_normalization_resnet():
-    model = Resnet50()
-    model.freeze_normalization()
-    assert not model.bn0.trainable
-    for group in model.groups:
-        for block in group.blocks:
-            if block._use_conv_shortcut:
-                assert not block.bn_shortcut.trainable
-            assert not block.bn1.trainable
-            assert not block.bn2.trainable
-            assert not block.bn3.trainable

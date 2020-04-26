@@ -3,37 +3,26 @@ import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
+
 from kerod.core.standard_fields import BoxField
-from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
+from kerod.dataset.preprocessing import (expand_dims_for_single_batch,
+                                         preprocess)
 from kerod.model import factory
-from kerod.model.backbone.resnet import Group
 
 
 def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
     num_classes = 20
-    model = factory.build_model(num_classes, weights='imagenet')
+    model = factory.build_model(num_classes)
 
     # Look at the trainable structure after the factory
 
     is_trainable = False
     for layer in model.resnet.layers:
         # All the layers before this one should be frozen
-        if layer.name == 'group1':
+        if layer.name == 'conv2_block3_out':
             is_trainable = True
         if isinstance(layer, tf.keras.layers.BatchNormalization):
             assert not layer.trainable
-        elif isinstance(layer, Group):
-            assert layer.trainable == is_trainable
-            for block in layer.blocks:
-                if block._use_conv_shortcut:
-                    assert not block.bn_shortcut.trainable
-                    assert block.conv_shortcut.trainable == is_trainable
-                assert not block.bn1.trainable
-                assert block.conv1.trainable == is_trainable
-                assert not block.bn2.trainable
-                assert block.conv2.trainable == is_trainable
-                assert not block.bn3.trainable
-                assert block.conv3.trainable == is_trainable
         else:
             assert layer.trainable == is_trainable
 
