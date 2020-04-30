@@ -26,6 +26,7 @@ def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
         else:
             assert layer.trainable == is_trainable
 
+    assert len(model.losses) == 42
     ## test the training
     inputs = {
         'image': np.zeros((2, 100, 50, 3)),
