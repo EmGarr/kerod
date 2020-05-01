@@ -17,8 +17,8 @@ def mocked_random_shuffle(indices):
 class RegionProposalNetworkGraphSupport(RegionProposalNetwork):
 
     @tf.function
-    def call(self, inputs, training=None):
-        return super().call(inputs, training=training)
+    def call(self, inputs):
+        return super().call(inputs)
 
 
 @pytest.mark.parametrize("rpn_class", [RegionProposalNetwork, RegionProposalNetworkGraphSupport])

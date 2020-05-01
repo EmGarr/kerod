@@ -87,7 +87,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         localization_head = tf.reshape(localization_head, (batch_size, -1, 4))
         return classification_head, localization_head
 
-    def call(self, inputs: List[tf.Tensor], training=None):
+    def call(self, inputs: List[tf.Tensor]):
         """Create the computation graph for the rpn inference
 
         Argument:

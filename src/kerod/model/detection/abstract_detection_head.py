@@ -207,7 +207,8 @@ class AbstractDetectionHead(KL.Layer):
         base_config['num_classes'] = self._num_classes
         base_config['classification_loss_weight'] = self._classification_loss_weight
         base_config['localization_loss_weight'] = self._localization_loss_weight
-        base_config['segmentation_loss_weight'] = self._segmentation_loss_weight
         base_config['multiples'] = self._multiples
         base_config['use_mask'] = self._use_mask
+        if self._use_mask:
+            base_config['segmentation_loss_weight'] = self._segmentation_loss_weight
         return base_config

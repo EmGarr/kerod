@@ -18,8 +18,8 @@ def mocked_random_shuffle(indices):
 class FastRCNNGraphSupport(FastRCNN):
 
     @tf.function
-    def call(self, inputs, training=None):
-        return super().call(inputs, training=training)
+    def call(self, inputs):
+        return super().call(inputs)
 
 
 @pytest.mark.parametrize("fast_rcnn_class", [FastRCNN, FastRCNNGraphSupport])

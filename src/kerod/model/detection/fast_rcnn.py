@@ -47,7 +47,7 @@ class FastRCNN(AbstractDetectionHead):
         ]
         super().build(input_shape)
 
-    def call(self, inputs, training=None):
+    def call(self, inputs):
         """Build the computational graph of the fast RCNN HEAD.
 
         Arguments:
@@ -219,8 +219,7 @@ class FastRCNN(AbstractDetectionHead):
 
         # Extract the selected anchors corresponding anchors
         # tf.gather_nd collaps the batch_together so we reshape with the proper batch_size
-        anchors = tf.reshape(
-            tf.gather_nd(anchors, selected_boxes_idx), (batch_size, -1, 4))
+        anchors = tf.reshape(tf.gather_nd(anchors, selected_boxes_idx), (batch_size, -1, 4))
 
         y_true[LossField.LOCALIZATION] = tf.reshape(
             tf.gather_nd(y_true[LossField.LOCALIZATION], selected_boxes_idx), (batch_size, -1, 4))
