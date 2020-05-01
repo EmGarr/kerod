@@ -12,8 +12,7 @@ from tensorflow.keras.optimizers.schedules import LearningRateSchedule
 from tensorflow.python.keras.callbacks import Callback
 
 
-# TODO clean it up it is a bit dirty
-class WarmupLearningRateScheduler(Callback):
+class LearningRateScheduler(Callback):
     """Warmup Learning rate scheduler. It will perform at the beginning of the training
     a linear warmup from `init_lr` to `base_lr`. The learning rate is decreased by 10 according
     to the schedule provided by `epochs`.
@@ -23,6 +22,7 @@ class WarmupLearningRateScheduler(Callback):
     - *base_lr*: The target learning rate value after the linear warmup
     - *num_gpus*: Number of gpus used during the training
     - *epochs*: A list of epoch on which the learning rate should be reduce.
+    - *use_warmup*: Perform the warmup strategy.
     - *init_lr*: Learning rate value from which the warmup will start.
     - *num_warmup_steps*: Number of training step on which the warmup will be performed.
     """
@@ -31,19 +31,22 @@ class WarmupLearningRateScheduler(Callback):
                  base_lr: float,
                  num_gpus: int,
                  epochs: List[int],
+                 use_warmup: bool = True,
                  init_lr: float = 1e-2 / 3,
                  num_warmup_steps: int = 1000):
         super().__init__()
         self._init_lr = init_lr * min(8 / num_gpus, 1)
         self.slope = (base_lr - self._init_lr) / num_warmup_steps
         self._epochs_to_lr = {epoch: base_lr * 1 / 10**(i + 1) for i, epoch in enumerate(epochs)}
+
         self._epochs = epochs
         self._num_gpus = num_gpus
+        self._use_warmup = use_warmup
         self._num_warmup_steps = num_warmup_steps
 
     def on_train_batch_begin(self, batch, logs=None):
         global_step = K.get_value((self.model.optimizer.iterations))
-        if global_step <= self._num_warmup_steps and global_step != 0:
+        if global_step <= self._num_warmup_steps and global_step != 0 and self._use_warmup:
             lr = self._init_lr + global_step * self.slope
             K.set_value(self.model.optimizer.lr, lr)
 
@@ -127,7 +130,6 @@ class ManualStepping(LearningRateSchedule):
         self.boundaries = boundaries
         self.num_boundaries = len(boundaries)
         self.dtype = tf.convert_to_tensor(rates[0]).dtype
-
 
     def __call__(self, step):
         with tf.name_scope(self.name or "ManualStepping"):

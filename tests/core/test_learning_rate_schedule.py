@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.keras import keras_parameterized, testing_utils
 
-from kerod.core.learning_rate_schedule import (ManualStepping, WarmupLearningRateScheduler)
+from kerod.core.learning_rate_schedule import (ManualStepping, LearningRateScheduler)
 
 
 def test_manual_stepping_without_warmup():
@@ -48,7 +48,7 @@ class KerasCallbacksTest(keras_parameterized.TestCase):
                                                            input_dim=input_dim)
 
             epochs = [1, 2]
-            callback = WarmupLearningRateScheduler(1, 1, epochs, num_warmup_steps=1)
+            callback = LearningRateScheduler(1, 1, epochs, num_warmup_steps=1)
             assert callback.slope == 1 - 1e-2 / 3
 
             model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
@@ -65,7 +65,7 @@ class KerasCallbacksTest(keras_parameterized.TestCase):
             # Here the epochs scheduling won't apply because the warmup hasn't been done
             num_warmup_steps = 16
             init_lr = 1e-2 / 3
-            callback = WarmupLearningRateScheduler(1, 16, epochs, num_warmup_steps=num_warmup_steps)
+            callback = LearningRateScheduler(1, 16, epochs, num_warmup_steps=num_warmup_steps)
             expected_slope = (1 - init_lr * 0.5) / num_warmup_steps
             assert callback.slope == expected_slope
 
@@ -81,3 +81,14 @@ class KerasCallbacksTest(keras_parameterized.TestCase):
             # There are 2 epochs wich will two a total of 4 steps (train_samples = 10 with batch_size 5)
             expected_lr = init_lr * 0.5 + expected_slope * 3
             self.assertAllClose(tf.keras.backend.get_value(model.optimizer.lr), expected_lr)
+
+            callback = LearningRateScheduler(1, 16, epochs, num_warmup_steps=num_warmup_steps, use_warmup=False)
+            model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
+            model.fit(x_train,
+                      y_train,
+                      batch_size=batch_size,
+                      validation_data=(x_test, y_test),
+                      callbacks=[callback],
+                      epochs=2,
+                      verbose=0)
+            self.assertAllClose(tf.keras.backend.get_value(model.optimizer.lr), 0.01)
