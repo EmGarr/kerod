@@ -3,8 +3,8 @@ import tensorflow as tf
 from tensorflow.python.keras.engine import data_adapter, training
 
 from kerod.utils.training import apply_kernel_regularization
-from kerod.model.backbone.fpn import FPN
 from kerod.model.backbone.resnet import ResNet50
+from kerod.model.backbone.fpn import FPN
 from kerod.model.detection.fast_rcnn import FastRCNN
 from kerod.model.detection.rpn import RegionProposalNetwork
 from kerod.model.post_processing import post_process_fast_rcnn_boxes
@@ -36,13 +36,12 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         super().__init__(**kwargs)
 
         self.num_classes = num_classes
-        l2 = tf.keras.regularizers.l2(1e-4)
+        self.l2 = tf.keras.regularizers.l2(1e-4)
 
         self.resnet = ResNet50(input_shape=[None, None, 3], weights='imagenet')
-        apply_kernel_regularization(l2, self.resnet)
-        self.fpn = FPN(kernel_regularizer=l2)
-        self.rpn = RegionProposalNetwork(kernel_regularizer=l2)
-        self.fast_rcnn = FastRCNN(self.num_classes + 1, kernel_regularizer=l2)
+        self.fpn = FPN(kernel_regularizer=self.l2)
+        self.rpn = RegionProposalNetwork(kernel_regularizer=self.l2)
+        self.fast_rcnn = FastRCNN(self.num_classes + 1, kernel_regularizer=self.l2)
         # FasterRcnn cannot handle batch of unknown shape in training.
         # It will raise an error if you save.
         # serving false allows to bypass the check
@@ -90,8 +89,8 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
         - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
         """
-        images = inputs[0][DatasetField.IMAGES]
-        images_information = inputs[0][DatasetField.IMAGES_INFO]
+        images = inputs[DatasetField.IMAGES]
+        images_information = inputs[DatasetField.IMAGES_INFO]
 
         # The preprocessing dedicated to the resnet is done inside the model.
         x = self.resnet(images)
@@ -99,9 +98,10 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
 
         localization_pred, classification_pred, anchors = self.rpn(pyramid)
 
-        if training:
+        if training and not self._serving:
+            apply_kernel_regularization(self.l2, self.resnet)
             loss_rpn = self.rpn.compute_loss(localization_pred, classification_pred, anchors,
-                                             inputs[1])
+                                             inputs['ground_truths'])
 
         num_boxes = 2000 if training else 1000
         rois, _ = post_process_rpn(tf.nn.softmax(classification_pred),
@@ -111,8 +111,8 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
                                    pre_nms_topk=num_boxes * len(pyramid),
                                    post_nms_topk=num_boxes)
 
-        if training:
-            ground_truths = inputs[1]
+        if training and not self._serving:
+            ground_truths = inputs['ground_truths']
             # Include the ground_truths as RoIs for the training
             rois = tf.concat([rois, ground_truths[BoxField.BOXES]], axis=1)
             # Sample the boxes needed for inference
@@ -120,22 +120,13 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
 
         classification_pred, localization_pred = self.fast_rcnn([pyramid, rois])
 
-        if training:
+        if training and not self._serving:
             loss_fast_rcnn = self.fast_rcnn.compute_loss(y_true, weights, classification_pred,
                                                          localization_pred)
 
         classification_pred = tf.nn.softmax(classification_pred)
 
         return classification_pred, localization_pred, rois
-
-    def predict_step(self, data):
-        data = data_adapter.expand_1d(data)
-        x, _, _ = data_adapter.unpack_x_y_sample_weight(data)
-
-        classification_pred, localization_pred, rois = self([x], training=False)
-
-        return post_process_fast_rcnn_boxes(classification_pred, localization_pred, rois,
-                                            x[DatasetField.IMAGES_INFO], self.num_classes + 1)
 
     def train_step(self, data):
         # These are the only transformations `Model.fit` applies to user-input
@@ -145,7 +136,8 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         x, y, _ = data_adapter.unpack_x_y_sample_weight(data)
 
         with tf.GradientTape() as tape:
-            y_pred = self([x, y], training=True)
+            x['ground_truths'] = y
+            y_pred = self(x, training=True)
             # All the losses are computed in the call. It's weird but it those the job
             # They are added automatically to self.losses
             loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
@@ -162,8 +154,49 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         # In our graph all the metrics are computed inside the call method
         # So we set training to True to benefit from those metrics
         # Of course there is no backpropagation at the test step
-        y_pred = self([x, y], training=True)
+        x['ground_truths'] = y
+        y_pred = self(x, training=True)
 
         loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
 
         return {m.name: m.result() for m in self.metrics}
+
+    def predict_step(self, data):
+        data = data_adapter.expand_1d(data)
+        x, _, _ = data_adapter.unpack_x_y_sample_weight(data)
+
+        classification_pred, localization_pred, rois = self(x, training=False)
+
+        return post_process_fast_rcnn_boxes(classification_pred, localization_pred, rois,
+                                            x[DatasetField.IMAGES_INFO], self.num_classes + 1)
+
+    def save(self,
+             filepath,
+             overwrite=True,
+             include_optimizer=True,
+             save_format=None,
+             signatures=None,
+             options=None):
+        try:
+            super().save(filepath,
+                         overwrite=overwrite,
+                         include_optimizer=include_optimizer,
+                         save_format=save_format,
+                         signatures=signatures,
+                         options=options)
+        except Exception as e:
+            raise Exception('Saving does not work if the batch_size is set to None. Please'
+                            ' use export_model method instead to bypass this error.')
+
+    def export_model(self, filepath):
+        """Allow to bypass the save_model behavior the graph in serving mode.
+        Currently, the issue is that in training the ground_truths are passed to the call method but
+        not in inference. For the serving only the `images` and `images_information` are defined.
+        It means the inputs link to the ground_truths won't be defined in serving. However, in tensorflow
+        when the `training` arguments is defined int the method `call`, `tf.save_model.save` method
+        performs a check on the graph for training=False and training=True.
+        However, we don't want this check to be perform because our ground_truths inputs aren't defined.
+        """
+        self._serving = True
+        tf.saved_model.save(self, filepath)
+        self._serving = False

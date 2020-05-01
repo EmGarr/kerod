@@ -1,12 +1,12 @@
 import os
+import pytest
 
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
 
 from kerod.core.standard_fields import BoxField
-from kerod.dataset.preprocessing import (expand_dims_for_single_batch,
-                                         preprocess)
+from kerod.dataset.preprocessing import (expand_dims_for_single_batch, preprocess)
 from kerod.model import factory
 
 
@@ -48,12 +48,15 @@ def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
               callbacks=[ModelCheckpoint(os.path.join(tmpdir, 'checkpoints'))])
 
     # Ensure kernel regularization has been applied
-    assert len(model.resnet.losses) == 53
+    assert len(model.resnet.losses) == 42
     assert len(model.rpn.losses) == 5
     assert len(model.fast_rcnn.losses) == 6
     assert len(model.fpn.losses) == 8
-    assert len(model.losses) == 72
+    assert len(model.losses) == 61
 
     model.predict(data, batch_size=2)
 
-    # model.save(tmpdir)
+    serving_path = os.path.join(tmpdir, 'serving')
+    # with pytest.raises(Exception):
+    #     model.save(serving_path)
+    model.export_model(serving_path)

@@ -23,12 +23,14 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 - As powerful and concise as Keras
 - Low barrier to entry for educators and practitioners
 - Handle batch in training and inference
-- [Documentation](https://emgarr.github.io/kerod/)
+- Rich [Documentation](https://emgarr.github.io/kerod/)
+- Multi-GPU
 - Simple (again)
 
-### WIP features
+### WIP
 
 - The mixed_precision is almost supported (should investigate). You can try it with this [notebook](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
+- Remove the needs of a fix batch_size in training. It leads to bugs with the `save` method from `tf.keras.Model`.
 
 ### Algorithms
 
@@ -110,6 +112,9 @@ model.compile(optimizer=optimizer, loss=None)
 model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
 
 results = model.predict(data, batch_size=1)
+
+# Please use this method instead of the classical save which won't work
+model.export_model('saved_model')
 ```
 
 ### Multi-GPU training

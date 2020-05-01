@@ -1,5 +1,5 @@
 import tensorflow as tf
-from typing import Callable, Union
+from typing import Callable
 
 
 def freeze_layers_before(model: tf.keras.Model, layer_name: str):
@@ -22,6 +22,6 @@ def freeze_batch_normalization(model: tf.keras.Model):
 
 def apply_kernel_regularization(func: Callable, model: tf.keras.Model):
     """Apply kernel regularization on all the trainable layers of a Layer or a Model"""
-    for l in model.layers:
-        if hasattr(l, 'kernel') and l.trainable:
-            model.add_loss(lambda l=l: func(l.kernel))
+    for layer in model.layers:
+        if hasattr(layer, 'kernel') and layer.trainable:
+            model.add_loss(func(layer.kernel))

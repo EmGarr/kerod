@@ -26,7 +26,6 @@ class BuildFasterRCNNTest(keras_parameterized.TestCase):
         if use_mixed_precision:
             mixed_precision.set_policy('mixed_float16')
         tmp_dir = self.get_temp_dir()
-        path_save_model = os.path.join(tmp_dir, 'save_model')
         num_classes = 20
         model = FasterRcnnFPNResnet50(num_classes)
 
@@ -38,14 +37,11 @@ class BuildFasterRCNNTest(keras_parameterized.TestCase):
             }
         }
 
-        data = expand_dims_for_single_batch(*preprocess(inputs))
+        x, y = expand_dims_for_single_batch(*preprocess(inputs))
 
-        model(data, training=True)
-        model([data[0]])
-
-        with pytest.raises(Exception):
-            model.save(path_save_model)
-            model = tf.keras.models.load_model(path_save_model)
+        model(x)
+        x['ground_truths'] = y
+        model(x, training=True)
 
         if use_mixed_precision:
             # with pytest.raises(Exception):
