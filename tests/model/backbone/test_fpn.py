@@ -1,12 +1,12 @@
 import tensorflow as tf
 
-from kerod.model.backbone.fpn import Pyramid
+from kerod.model.backbone.fpn import FPN
 
 
 def test_build_fpn():
     shapes = [160, 80, 40, 20]
     features = [tf.zeros((1, shape, shape, 3)) for shape in shapes]
-    pyramid = Pyramid()(features)
+    pyramid = FPN()(features)
     assert len(pyramid) == len(shapes) + 1
     for p, shape in zip(pyramid[:-1], shapes):
         assert p.shape[1] == shape

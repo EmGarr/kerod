@@ -42,8 +42,10 @@ class FastRCNN(AbstractDetectionHead):
 
     def build(self, input_shape):
         self.denses = [
-            KL.Dense(1024, kernel_initializer=initializers.VarianceScaling(), activation='relu')
-            for _ in range(2)
+            KL.Dense(1024,
+                     kernel_initializer=initializers.VarianceScaling(),
+                     kernel_regularizer=self._kernel_regularizer,
+                     activation='relu') for _ in range(2)
         ]
         super().build(input_shape)
 

@@ -34,6 +34,8 @@ class AbstractDetectionHead(KL.Layer):
     the classification head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
     - *kernel_initializer_box_prediction_head*: Initializer for the `kernel` weights matrix of
         the box prediction head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
+    - *kernel_regularizer*: Regularizer function applied to the kernel weights matrix
+    ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
     - *use_mask*: Boolean define if the segmentation_head will be used.
     """
 
@@ -48,6 +50,7 @@ class AbstractDetectionHead(KL.Layer):
                  multiples=1,
                  kernel_initializer_classification_head=None,
                  kernel_initializer_box_prediction_head=None,
+                 kernel_regularizer=None,
                  use_mask=False,
                  **kwargs):
 
@@ -61,9 +64,8 @@ class AbstractDetectionHead(KL.Layer):
         self._multiples = multiples
         self._kernel_initializer_classification_head = kernel_initializer_classification_head
         self._kernel_initializer_box_prediction_head = kernel_initializer_box_prediction_head
+        self._kernel_regularizer = kernel_regularizer
         self._use_mask = use_mask
-
-        self._kernel_regularizer = regularizers.l2(0.0005)
 
         if self._use_mask:
             self._segmentation_loss_weight = segmentation_loss_weight

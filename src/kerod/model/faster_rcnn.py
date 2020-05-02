@@ -2,7 +2,8 @@ import tensorflow as tf
 
 from tensorflow.python.keras.engine import data_adapter, training
 
-from kerod.model.backbone.fpn import Pyramid
+from kerod.utils.training import apply_kernel_regularization
+from kerod.model.backbone.fpn import FPN
 from kerod.model.backbone.resnet import ResNet50
 from kerod.model.detection.fast_rcnn import FastRCNN
 from kerod.model.detection.rpn import RegionProposalNetwork
@@ -35,10 +36,17 @@ class FasterRcnnFPNResnet50(tf.keras.Model):
         super().__init__(**kwargs)
 
         self.num_classes = num_classes
+        l2 = tf.keras.regularizers.l2(1e-4)
+
         self.resnet = ResNet50(input_shape=[None, None, 3], weights='imagenet')
-        self.fpn = Pyramid()
-        self.rpn = RegionProposalNetwork()
-        self.fast_rcnn = FastRCNN(self.num_classes + 1)
+        apply_kernel_regularization(l2, self.resnet)
+        self.fpn = FPN(kernel_regularizer=l2)
+        self.rpn = RegionProposalNetwork(kernel_regularizer=l2)
+        self.fast_rcnn = FastRCNN(self.num_classes + 1, kernel_regularizer=l2)
+        # FasterRcnn cannot handle batch of unknown shape in training.
+        # It will raise an error if you save.
+        # serving false allows to bypass the check
+        self._serving = False
 
     def call(self, inputs, training=None):
         """Perform an inference in training.

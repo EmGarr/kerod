@@ -3,26 +3,29 @@ from tensorflow.keras import layers
 from tensorflow.keras.initializers import VarianceScaling
 
 
-class Pyramid(layers.Layer):
+class FPN(layers.Layer):
     """Over your backbone feature build a FPN (inspired from tensorpack)"""
 
-    def __init__(self, dim=256, **kwargs):
+    def __init__(self, dim=256, kernel_regularizer=None, **kwargs):
         super().__init__(**kwargs)
         self._dim = dim
+        self._kernel_regularizer = kernel_regularizer
 
     def build(self, input_shape):
         num_level_pyramid = len(input_shape[0])
         self.lateral_connection_2345 = [
             layers.Conv2D(self._dim, (1, 1),
                           padding='same',
-                          kernel_initializer=VarianceScaling(scale=1.))
+                          kernel_initializer=VarianceScaling(scale=1.),
+                          kernel_regularizer=self._kernel_regularizer)
             for _ in range(num_level_pyramid)
         ]
 
         self.anti_aliasing_conv = [
             layers.Conv2D(self._dim, (3, 3),
                           padding='same',
-                          kernel_initializer=VarianceScaling(scale=1.))
+                          kernel_initializer=VarianceScaling(scale=1.),
+                          kernel_regularizer=self._kernel_regularizer)
             for _ in range(num_level_pyramid)
         ]
 

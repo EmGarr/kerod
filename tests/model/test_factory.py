@@ -26,7 +26,6 @@ def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
         else:
             assert layer.trainable == is_trainable
 
-    assert len(model.losses) == 42
     ## test the training
     inputs = {
         'image': np.zeros((2, 100, 50, 3)),
@@ -47,6 +46,14 @@ def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
               validation_data=data,
               epochs=2,
               callbacks=[ModelCheckpoint(os.path.join(tmpdir, 'checkpoints'))])
+
+    # Ensure kernel regularization has been applied
+    assert len(model.resnet.losses) == 53
+    assert len(model.rpn.losses) == 5
+    assert len(model.fast_rcnn.losses) == 6
+    assert len(model.fpn.losses) == 8
+    assert len(model.losses) == 72
+
     model.predict(data, batch_size=2)
 
     # model.save(tmpdir)
