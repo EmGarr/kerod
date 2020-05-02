@@ -89,7 +89,7 @@ from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
 from kerod.model import factory
 
 num_classes = 20
-model = factory.build_model(num_classes, weights='imagenet')
+model = factory.build_model(num_classes)
 
 # Same format than COCO and Pascal VOC in tensorflow datasets
 inputs = {
@@ -112,6 +112,44 @@ model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
 results = model.predict(data, batch_size=1)
 ```
 
+### Multi-GPU training
+
+```python
+
+import numpy as np
+from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
+from kerod.model import factory
+
+batch_size_per_gpu = 2
+num_gpus = 8
+batch_size = batch_size_per_gpu * num_gpus
+
+padded_shape = ({
+      DatasetField.IMAGES: [None, None, 3],
+      DatasetField.IMAGES_INFO: [2]
+    },
+    {
+      BoxField.BOXES: [None, 4],
+      BoxField.LABELS: [None],
+      BoxField.NUM_BOXES: [1],
+      BoxField.WEIGHTS: [None]
+    })    
+
+data = tf.data.Dataset.from_tensor_slices(inputs)
+# Drop remainder should be set to True or the training won't work
+data =  data.padded_batch(batch_size, padded_shape, drop_remainder=True)
+data = data.prefetch(tf.data.experimental.AUTOTUNE)
+
+mirrored_strategy = tf.distribute.MirroredStrategy()
+with mirrored_strategy.scope(): 
+    model = factory.build_model(num_classes)
+    base_lr = 0.02
+    optimizer = tf.keras.optimizers.SGD(learning_rate=base_lr)
+    model.compile(optimizer=optimizer, loss=None)
+
+model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
+```
+
 ### Notebooks
 
 #### Requirements
@@ -131,6 +169,7 @@ You can find examples in the [notebooks folder](./notebooks). There are no runne
 - Pascal VOC training example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/pascal_voc_training_fpn50.ipynb).
 - Mixed precision Pascal VOC training (single GPU)[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb).
 - Coco example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb).
+- Coco example (Multi-GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training_multi_gpu.ipynb).
 
 ### Serving
 
