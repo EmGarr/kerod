@@ -1,2 +1,2 @@
-tensorflow==2.2.0rc4
+tensorflow>=2.2.0
 matplotlib
