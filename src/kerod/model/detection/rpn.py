@@ -3,13 +3,12 @@ from typing import List
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.losses import SparseCategoricalCrossentropy, MeanAbsoluteError
 
 from kerod.core.anchor_generator import Anchors
 from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.box_ops import compute_iou
-from kerod.core.losses import SmoothL1Localization
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.standard_fields import BoxField, LossField
 from kerod.core.target_assigner import TargetAssigner
@@ -31,14 +30,11 @@ class RegionProposalNetwork(AbstractDetectionHead):
     """
 
     def __init__(self, anchor_ratios=(0.5, 1, 2), **kwargs):
-        # Hyper parameter from tensorpack
-        delta = 1. / 9
         super().__init__(
             2,
             SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE,
                                           from_logits=True),
-            SmoothL1Localization(delta),
-            localization_loss_weight=1. / delta,
+            MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE),
             multiples=len(anchor_ratios),
             kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.01),
@@ -158,6 +154,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         anchors = tf.tile(anchors[None], (tf.shape(ground_truths[BoxField.BOXES])[0], 1, 1))
         y_true, weights = self.target_assigner.assign(anchors, ground_truths)
         y_true[LossField.CLASSIFICATION] = tf.minimum(y_true[LossField.CLASSIFICATION], 1)
+
         ## Compute metrics
         recall = compute_rpn_metrics(y_true[LossField.CLASSIFICATION], classification_pred,
                                      weights[LossField.CLASSIFICATION])
@@ -172,9 +169,8 @@ class RegionProposalNetwork(AbstractDetectionHead):
             positive_fraction=SAMPLING_POSITIVE_RATIO,
             dtype=self._compute_dtype)
 
-        weights[LossField.CLASSIFICATION] = tf.multiply(sample_idx,
-                                                        weights[LossField.CLASSIFICATION])
-        weights[LossField.LOCALIZATION] = tf.multiply(sample_idx, weights[LossField.LOCALIZATION])
+        weights[LossField.CLASSIFICATION] = sample_idx * weights[LossField.CLASSIFICATION]
+        weights[LossField.LOCALIZATION] = sample_idx * weights[LossField.LOCALIZATION]
 
         y_pred = {
             LossField.CLASSIFICATION: classification_pred,

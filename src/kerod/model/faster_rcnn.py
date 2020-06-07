@@ -171,7 +171,7 @@ class FasterRcnnFPN(tf.keras.Model):
         # Remove the background classes
         classification_pred = classification_pred[:, :, 1:]
         return post_process_fast_rcnn_boxes(classification_pred, localization_pred, rois,
-                                            x[DatasetField.IMAGES_INFO], self.num_classes + 1)
+                                            x[DatasetField.IMAGES_INFO], self.num_classes)
 
     def save(self,
              filepath,

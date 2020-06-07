@@ -1,3 +1,4 @@
+import functools
 from typing import Dict
 
 import tensorflow as tf
@@ -36,9 +37,11 @@ class FastRCNN(AbstractDetectionHead):
             **kwargs)
 
         matcher = Matcher([0.5], [0, 1])
+        # The same scale_factors is used in decoding as well
+        encode = functools.partial(encode_boxes_faster_rcnn, scale_factors=(10.0, 10.0, 5.0, 5.0))
         self.target_assigner = TargetAssigner(compute_iou,
                                               matcher,
-                                              encode_boxes_faster_rcnn,
+                                              encode,
                                               dtype=self._compute_dtype)
 
     def build(self, input_shape):
@@ -191,9 +194,8 @@ class FastRCNN(AbstractDetectionHead):
             positive_fraction=sampling_positive_ratio,
             dtype=self._compute_dtype)
 
-        weights[LossField.CLASSIFICATION] = tf.multiply(sample_idx,
-                                                        weights[LossField.CLASSIFICATION])
-        weights[LossField.LOCALIZATION] = tf.multiply(sample_idx, weights[LossField.LOCALIZATION])
+        weights[LossField.CLASSIFICATION] = sample_idx * weights[LossField.CLASSIFICATION]
+        weights[LossField.LOCALIZATION] = sample_idx * weights[LossField.LOCALIZATION]
 
         selected_boxes_idx = tf.where(sample_idx == 1)
 

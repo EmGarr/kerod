@@ -78,13 +78,12 @@ def roi_align(inputs, boxes, box_indices, image_shape, crop_size: int):
     Returns:
 
     A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].
-
     """
     normalized_boxes = normalize_box_coordinates(boxes, image_shape[0], image_shape[1])
     # Normalized the boxes to the input tensor_shape
     # TODO rewrite this normalization unnomarlization isn't pretty at all
     tensor_shape = tf.shape(inputs)[1:3]
-    normalized_boxes *= tf.cast(tf.tile(tf.expand_dims(tensor_shape, axis=0), [1, 2]),
+    normalized_boxes *= tf.cast(tf.tile(tensor_shape[None], [1, 2]),
                                 normalized_boxes.dtype)
     ret = _crop_and_resize(inputs, normalized_boxes, box_indices, crop_size * 2)
     return KL.AveragePooling2D(padding='same')(ret)

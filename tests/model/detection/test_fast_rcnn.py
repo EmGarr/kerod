@@ -72,7 +72,7 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
     # boxe num 4 does match with num 3: iou([0, 0, 3, 3], [0, 0, 4, 4]) = 0.5625 > 0.5
     # You can recompute the encoding with this methods
     # encode_boxes_faster_rcnn(tf.constant([0, 0, 3, 3], tf.float32), tf.constant([0, 0, 4, 4], tf.float32))
-    expected_y_true_localization[1, 3] = [-0.125, -0.125, -0.2876821, -0.2876821]
+    expected_y_true_localization[1, 3] = [-0.125 * 10, -0.125 * 10, -0.2876821 * 5, -0.2876821 * 5]
 
     expected_weights_classification = np.ones((2, sampling_size))
     expected_weights_localization = np.zeros((2, sampling_size))

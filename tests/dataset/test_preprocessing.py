@@ -39,9 +39,9 @@ def test_preprocess():
     }
     x, y = preprocess(inputs)
 
-    np.testing.assert_array_equal(np.zeros((1300, 650, 3)), x[DatasetField.IMAGES])
-    np.testing.assert_array_equal(np.array([1300, 650]), x[DatasetField.IMAGES_INFO])
-    np.testing.assert_array_equal(np.array([[0, 0, 1300, 650]]), y[BoxField.BOXES])
+    np.testing.assert_array_equal(np.zeros((1333, 666, 3)), x[DatasetField.IMAGES])
+    np.testing.assert_array_equal(np.array([1333, 666]), x[DatasetField.IMAGES_INFO])
+    np.testing.assert_array_equal(np.array([[0, 0, 1333, 666]]), y[BoxField.BOXES])
     np.testing.assert_array_equal(np.array([1]), y[BoxField.LABELS])
     np.testing.assert_array_equal(np.array([1.]), y[BoxField.WEIGHTS])
     assert y[BoxField.NUM_BOXES].shape == (1,)
@@ -64,9 +64,9 @@ def test_preprocess_coco_example(mock):
     }
     x, y = preprocess_coco_example(inputs)
 
-    np.testing.assert_array_equal(np.zeros((1300, 650, 3)), x[DatasetField.IMAGES])
-    np.testing.assert_array_equal(np.array([1300, 650]), x[DatasetField.IMAGES_INFO])
-    np.testing.assert_allclose(np.array([[0, 130., 1300, 585]]), y[BoxField.BOXES], 1e-5)
+    np.testing.assert_array_equal(np.zeros((1333, 666, 3)), x[DatasetField.IMAGES])
+    np.testing.assert_array_equal(np.array([1333, 666]), x[DatasetField.IMAGES_INFO])
+    np.testing.assert_allclose(np.array([[0, 133.2, 1333, 599.39996]]), y[BoxField.BOXES], 1e-5)
     np.testing.assert_array_equal(np.array([4]), y[BoxField.LABELS])
     np.testing.assert_array_equal(np.array([1.]), y[BoxField.WEIGHTS])
     assert y[BoxField.NUM_BOXES].shape == (1,)
@@ -83,9 +83,9 @@ def test_expand_dims_for_single_batch():
 
     x, y = expand_dims_for_single_batch(*preprocess(inputs))
 
-    np.testing.assert_array_equal(np.zeros((1, 1300, 650, 3)), x[DatasetField.IMAGES])
-    np.testing.assert_array_equal(np.array([[1300, 650]]), x[DatasetField.IMAGES_INFO])
-    np.testing.assert_array_equal(np.array([[[0, 0, 1300, 650]]]), y[BoxField.BOXES])
+    np.testing.assert_array_equal(np.zeros((1, 1333, 666, 3)), x[DatasetField.IMAGES])
+    np.testing.assert_array_equal(np.array([[1333, 666]]), x[DatasetField.IMAGES_INFO])
+    np.testing.assert_array_equal(np.array([[[0, 0, 1333, 666]]]), y[BoxField.BOXES])
     np.testing.assert_array_equal(np.array([[1]]), y[BoxField.LABELS])
     np.testing.assert_array_equal(np.array([[1.]]), y[BoxField.WEIGHTS])
     assert y[BoxField.NUM_BOXES].shape == (1, 1)

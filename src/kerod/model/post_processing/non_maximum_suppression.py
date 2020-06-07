@@ -65,8 +65,8 @@ def post_process_rpn(cls_pred_per_lvl: List[tf.Tensor],
 
     if post_nms_topk is None:
         post_nms_topk = pre_nms_topk_per_lvl
-    nmsed_boxes, _, _, _ = tf.image.combined_non_max_suppression(tf.expand_dims(topk_boxes, 2),
-                                                                 tf.expand_dims(topk_scores, -1),
+    nmsed_boxes, _, _, _ = tf.image.combined_non_max_suppression(topk_boxes[:, :, None],
+                                                                 topk_scores[..., None],
                                                                  post_nms_topk,
                                                                  post_nms_topk,
                                                                  iou_threshold=iou_threshold,
@@ -137,7 +137,7 @@ def post_process_fast_rcnn_boxes(cls_pred: tf.Tensor,
     loc_pred = tf.reshape(loc_pred, (batch_size, -1, 4))
     anchors = tf.reshape(tf.tile(anchors, [1, 1, num_classes]), (batch_size, -1, 4))
 
-    boxes = decode_boxes_faster_rcnn(loc_pred, anchors)
+    boxes = decode_boxes_faster_rcnn(loc_pred, anchors, scale_factors=(10.0, 10.0, 5.0, 5.0))
     boxes = clip_boxes(boxes, image_information)
     boxes = tf.reshape(boxes, (batch_size, -1, num_classes, 4))
 

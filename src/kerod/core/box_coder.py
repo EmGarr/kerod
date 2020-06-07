@@ -51,6 +51,7 @@ def encode_boxes_faster_rcnn(boxes, anchors, scale_factors=None):
     # Scales location targets as used in paper for joint training.
 
     if scale_factors:
+        scale_factors = tf.convert_to_tensor(scale_factors, dtype=anchors.dtype)
         ty *= scale_factors[0]
         tx *= scale_factors[1]
         th *= scale_factors[2]
@@ -92,6 +93,7 @@ def decode_boxes_faster_rcnn(rel_codes, anchors, scale_factors=None):
 
     ty, tx, th, tw = tf.split(value=rel_codes, num_or_size_splits=4, axis=-1)
     if scale_factors:
+        scale_factors = tf.convert_to_tensor(scale_factors, dtype=anchors.dtype)
         ty /= scale_factors[0]
         tx /= scale_factors[1]
         th /= scale_factors[2]

@@ -89,7 +89,7 @@ def preprocess(inputs, bgr=True):
         images = inputs['image'][:, :, ::-1]
     else:
         images = inputs['image']
-    image = resize_to_min_dim(images, 800.0, 1300.0)
+    image = resize_to_min_dim(images, 800.0, 1333.0)
     image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
     boxes = inputs['objects'][BoxField.BOXES] * tf.tile(tf.expand_dims(image_information, axis=0),
                                                         [1, 2])
@@ -187,7 +187,7 @@ def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True):
     else:
         images = inputs['image']
 
-    image = resize_to_min_dim(images, 800.0, 1300.0)
+    image = resize_to_min_dim(images, 800.0, 1333.0)
     image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
 
     boxes, labels = inputs['objects'][BoxField.BOXES], inputs['objects'][BoxField.LABELS]
