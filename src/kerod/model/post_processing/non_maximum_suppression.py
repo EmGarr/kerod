@@ -76,9 +76,9 @@ def post_process_rpn(cls_pred_per_lvl: List[tf.Tensor],
     return tf.stop_gradient(nmsed_boxes)
 
 
-def post_process_fast_rcnn_boxes(cls_pred_per_lvl: tf.Tensor,
-                                 loc_pred_per_lvl: tf.Tensor,
-                                 anchors_per_lvl: tf.Tensor,
+def post_process_fast_rcnn_boxes(cls_pred: tf.Tensor,
+                                 loc_pred: tf.Tensor,
+                                 anchors: tf.Tensor,
                                  image_information: tf.Tensor,
                                  num_classes,
                                  max_output_size_per_class: int = 100,
@@ -102,12 +102,12 @@ def post_process_fast_rcnn_boxes(cls_pred_per_lvl: tf.Tensor,
 
     Arguments:
 
-    - *cls_pred_per_lvl*: A Tensor of shape [batch_size, num_boxes, num_classes]
-    - *loc_pred_per_lvl*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
-    - *anchors_per_lvl*: A Tensor of shape [batch_size, num_boxes, 4]
+    - *cls_pred*: A Tensor of shape [batch_size, num_boxes, num_classes]
+    - *loc_pred*: A Tensor of shape [batch_size, num_boxes, 4 * num_classes]
+    - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
     - *image_informations*: A Tensor of shape [batch_size, (height, width)] The height and the
     width are without the padding.
-    - *num_classes*: The number of classes (background is included).
+    - *num_classes*: The number of classes (background is not included).
     - *max_output_size_per_class*: A scalar integer `Tensor` representing the
       maximum number of boxes to be selected by non max suppression per class
     - *max_total_size*: A scalar representing maximum number of boxes retained over
@@ -132,26 +132,25 @@ def post_process_fast_rcnn_boxes(cls_pred_per_lvl: tf.Tensor,
       entries are zero paddings.
     """
 
-    batch_size = tf.shape(cls_pred_per_lvl)[0]
-    # Remove the background classes
-    cls_pred_per_lvl = cls_pred_per_lvl[:, :, 1:]
-    loc_pred_per_lvl = tf.reshape(loc_pred_per_lvl, (batch_size, -1, 4))
-    anchors_per_lvl = tf.reshape(tf.tile(anchors_per_lvl, [1, 1, num_classes - 1]),
-                                 (batch_size, -1, 4))
-    boxes = decode_boxes_faster_rcnn(loc_pred_per_lvl, anchors_per_lvl)
+    batch_size = tf.shape(cls_pred)[0]
+
+    loc_pred = tf.reshape(loc_pred, (batch_size, -1, 4))
+    anchors = tf.reshape(tf.tile(anchors, [1, 1, num_classes]), (batch_size, -1, 4))
+
+    boxes = decode_boxes_faster_rcnn(loc_pred, anchors)
     boxes = clip_boxes(boxes, image_information)
-    boxes = tf.reshape(boxes, (batch_size, -1, num_classes - 1, 4))
+    boxes = tf.reshape(boxes, (batch_size, -1, num_classes, 4))
 
     nmsed_boxes, nmsed_scores, nmsed_labels, valid_detections = tf.image.combined_non_max_suppression(
         tf.cast(boxes, tf.float32),
-        tf.cast(cls_pred_per_lvl, tf.float32),
+        tf.cast(cls_pred, tf.float32),
         max_output_size_per_class,
         max_total_size,
         iou_threshold=iou_threshold,
         score_threshold=score_threshold,
         clip_boxes=False)
 
-    normalizer_boxes = tf.tile(tf.expand_dims(image_information, axis=1), [1, 1, 2])
+    normalizer_boxes = tf.tile(image_information[:, None], [1, 1, 2])
     nmsed_boxes = tf.math.divide(nmsed_boxes, normalizer_boxes, name=BoxField.BOXES)
     nmsed_scores = tf.identity(nmsed_scores, name=BoxField.SCORES)
     nmsed_labels = tf.identity(nmsed_labels, name=BoxField.LABELS)

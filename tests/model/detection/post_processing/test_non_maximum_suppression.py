@@ -7,7 +7,7 @@ from kerod.model.post_processing import post_process_fast_rcnn_boxes, post_proce
 def test_post_process_fast_rcnn_boxes():
     # The mocking allows to make the test deterministic
 
-    num_classes = 3
+    num_classes = 2
     anchors1 = [
         [0, 0, 1, 1],
         [0, 0.1, 1, 1.1],
@@ -30,10 +30,10 @@ def test_post_process_fast_rcnn_boxes():
     ]
 
     anchors = tf.constant([anchors1, anchors2], tf.float32)
-    localization_pred = tf.zeros((2, 8, 4 * (num_classes - 1)))
+    localization_pred = tf.zeros((2, 8, 4 * num_classes))
     # We will get every boxes over 0.005
-    classification_pred = [[0.09, .9, 0.01], [.2, .75, 0.05], [0.39, .6, 0.01], [0.05, .95, 0],
-                           [0.49, .5, 0.01], [0.69, .3, 0.01], [0.14, .01, .85], [0.49, .01, .5]]
+    classification_pred = [[.9, 0.01], [.75, 0.05], [.6, 0.01], [.95, 0], [.5, 0.1], [.3, 0.01],
+                           [.01, .85], [.01, .5]]
     # 95, 9,
     classification_pred = tf.constant([classification_pred, classification_pred])
 
