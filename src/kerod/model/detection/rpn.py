@@ -3,7 +3,7 @@ from typing import List
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
-from tensorflow.keras.losses import SparseCategoricalCrossentropy, MeanAbsoluteError
+from tensorflow.keras.losses import BinaryCrossentropy, MeanAbsoluteError
 
 from kerod.core.anchor_generator import Anchors
 from kerod.core.matcher import Matcher
@@ -12,13 +12,12 @@ from kerod.core.box_ops import compute_iou
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.standard_fields import BoxField, LossField
 from kerod.core.target_assigner import TargetAssigner
-from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 
 SAMPLING_SIZE = 256
 SAMPLING_POSITIVE_RATIO = 0.5
 
 
-class RegionProposalNetwork(AbstractDetectionHead):
+class RegionProposalNetwork(tf.keras.Model):
     """RPN which work only a pyramid network.
     It has been introduced in the [Faster R-CNN paper](https://arxiv.org/abs/1506.01497) and
     use the parameters from [Feature Pyramidal Networks for Object Detection](https://arxiv.org/abs/1612.03144).
@@ -27,20 +26,13 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
     - *anchor_ratios*: The ratios are the different shapes that you want to apply on your anchors.
             e.g: (0.5, 1, 2)
+    - *kernel_regularizer*: Regularizer function applied to the kernel weights matrix
+    ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
     """
 
-    def __init__(self, anchor_ratios=(0.5, 1, 2), **kwargs):
-        super().__init__(
-            2,
-            SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE,
-                                          from_logits=True),
-            MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE),
-            multiples=len(anchor_ratios),
-            kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
-            kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.01),
-            **kwargs)
-
-        #Force each ground_truths to match to at least one anchor
+    def __init__(self, anchor_ratios=(0.5, 1, 2), kernel_regularizer=None, **kwargs):
+        super().__init__(**kwargs)
+        # Force each ground_truths to match to at least one anchor
         matcher = Matcher([0.3, 0.7], [0, -1, 1], allow_low_quality_matches=True)
         self.target_assigner = TargetAssigner(compute_iou,
                                               matcher,
@@ -50,6 +42,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         anchor_strides = (4, 8, 16, 32, 64)
         anchor_zises = (32, 64, 128, 256, 512)
         self._anchor_ratios = anchor_ratios
+        self._kernel_regularizer = kernel_regularizer
 
         # Precompute a deterministic grid of anchors for each layer of the pyramid.
         # We will extract a subpart of the anchors according to
@@ -57,12 +50,31 @@ class RegionProposalNetwork(AbstractDetectionHead):
             Anchors(stride, size, self._anchor_ratios)
             for stride, size in zip(anchor_strides, anchor_zises)
         ]
+        self._classification_loss = BinaryCrossentropy(from_logits=True,
+                                                       reduction=tf.keras.losses.Reduction.NONE)
+        self._localization_loss = MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE)
 
     def build(self, input_shape):
         self.rpn_conv2d = KL.Conv2D(512, (3, 3),
                                     padding='same',
-                                    kernel_initializer=self._kernel_initializer_classification_head,
+                                    kernel_initializer=initializers.RandomNormal(stddev=0.01),
                                     kernel_regularizer=self._kernel_regularizer)
+
+        self.conv_classification_head = KL.Conv2D(
+            len(self._anchor_ratios), (1, 1),
+            padding='valid',
+            activation=None,
+            kernel_initializer=initializers.RandomNormal(stddev=0.01),
+            kernel_regularizer=self._kernel_regularizer,
+            name=f'{self.name}classification_head')
+
+        self.conv_box_prediction_head = KL.Conv2D(
+            len(self._anchor_ratios) * 4, (1, 1),
+            padding='valid',
+            activation=None,
+            kernel_initializer=initializers.RandomNormal(stddev=0.01),
+            kernel_regularizer=self._kernel_regularizer,
+            name=f'{self.name}box_prediction_head')
         super().build(input_shape)
 
     def build_rpn_head(self, inputs):
@@ -74,13 +86,14 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         Returns:
 
-        A tuple of tensors of shape ([batch_size, num_anchors, 2], [batch_size, num_anchors, 4])
+        A tuple of tensors of shape ([batch_size, num_anchors, 1], [batch_size, num_anchors, 4])
         """
 
         batch_size = tf.shape(inputs)[0]
         rpn_conv2d = self.rpn_conv2d(inputs)
-        classification_head, localization_head = self.build_detection_head(rpn_conv2d)
-        classification_head = tf.reshape(classification_head, (batch_size, -1, 2))
+        classification_head = self.conv_classification_head(rpn_conv2d)
+        localization_head = self.conv_box_prediction_head(rpn_conv2d)
+        classification_head = tf.reshape(classification_head, (batch_size, -1))
         localization_head = tf.reshape(localization_head, (batch_size, -1, 4))
         return classification_head, localization_head
 
@@ -151,7 +164,8 @@ class RegionProposalNetwork(AbstractDetectionHead):
                 ground_truths[BoxField.NUM_BOXES]
         }
         # anchors are deterministic duplicate them to create a batch
-        anchors = tf.tile(anchors[None], (tf.shape(ground_truths[BoxField.BOXES])[0], 1, 1))
+        batch_size = tf.shape(ground_truths[BoxField.BOXES])[0]
+        anchors = tf.tile(anchors[None], (batch_size, 1, 1))
         y_true, weights = self.target_assigner.assign(anchors, ground_truths)
         y_true[LossField.CLASSIFICATION] = tf.minimum(y_true[LossField.CLASSIFICATION], 1)
 
@@ -172,12 +186,34 @@ class RegionProposalNetwork(AbstractDetectionHead):
         weights[LossField.CLASSIFICATION] = sample_idx * weights[LossField.CLASSIFICATION]
         weights[LossField.LOCALIZATION] = sample_idx * weights[LossField.LOCALIZATION]
 
-        y_pred = {
-            LossField.CLASSIFICATION: classification_pred,
-            LossField.LOCALIZATION: localization_pred
-        }
+        normalizer = tf.cast(SAMPLING_SIZE, tf.float32) * tf.cast(batch_size, tf.float32)
 
-        return self.compute_losses(y_true, y_pred, weights)
+        classification_loss = self._classification_loss(
+            tf.cast(y_true[LossField.CLASSIFICATION][..., None], tf.float32),
+            tf.cast(classification_pred[..., None], tf.float32),
+            sample_weight=tf.cast(weights[LossField.CLASSIFICATION], tf.float32))
+        classification_loss = tf.reduce_sum(classification_loss) / normalizer
+
+        localization_loss = self._localization_loss(
+            tf.cast(y_true[LossField.LOCALIZATION], tf.float32),
+            tf.cast(localization_pred, tf.float32),
+            sample_weight=tf.cast(weights[LossField.LOCALIZATION], tf.float32))
+        localization_loss = tf.reduce_sum(localization_loss) / normalizer
+
+        self.add_metric(classification_loss,
+                        name=f'{self.name}_classification_loss',
+                        aggregation='mean')
+
+        self.add_metric(localization_loss,
+                        name=f'{self.name}_localization_loss',
+                        aggregation='mean')
+
+        self.add_loss([classification_loss, localization_loss])
+
+        return {
+            LossField.CLASSIFICATION: classification_loss,
+            LossField.LOCALIZATION: localization_loss
+        }
 
     def get_config(self):
         base_config = super().get_config()
@@ -192,7 +228,7 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
 
     - *y_true*: A tensor vector with shape [batch_size, num_anchors] where 0 = background and
     1 = foreground.
-    - *y_pred*: A tensor of shape [batch_size, num_anchors, 2],
+    - *y_pred*: A tensor of shape [batch_size, num_anchors] classification logits,
     representing the classification logits.
     - *weights*: A tensor of shape [batch_size, num_anchors] where weights should
 
@@ -204,11 +240,11 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
     y_true, y_pred, weights = tf.cast(y_true, tf.float32), tf.cast(y_pred, tf.float32), tf.cast(
         weights, tf.float32)
 
+    y_pred = tf.nn.sigmoid(y_pred)
     # Sometimes the weights have decimal value we do not want that
     weights = tf.clip_by_value(tf.math.ceil(weights), 0, 1)
     masked_y_true = y_true * weights
-    prediction = tf.cast(tf.argmax(y_pred, axis=-1, name='label_prediction'),
-                         tf.float32) * weights  # 0 or 1
+    prediction = tf.cast(y_pred > 0.5, tf.float32) * weights  # 0 or 1
     correct = tf.cast(tf.equal(prediction, masked_y_true), tf.float32)
 
     fg_inds = tf.where(masked_y_true == 1)

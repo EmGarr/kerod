@@ -33,7 +33,7 @@ def test_rpn(rpn_class):
                                                       logit_scores_per_lvl, anchors_per_lvl,
                                                       num_anchors_per_lvl):
         assert (2, num_anchors, 4) == loc_pred.shape
-        assert (2, num_anchors, 2) == logits.shape
+        assert (2, num_anchors) == logits.shape
         assert (num_anchors, 4) == anchors.shape
 
 
@@ -51,9 +51,7 @@ def test_compute_loss_rpn(mock_add_metric, mock_add_loss, mock_shuffle):
         [[[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]],
         tf.float32)
 
-    classification_pred = tf.constant(
-        [[[-100, 100], [100, -100], [100, -100]], [[-100, 100], [-100, 100], [-100, 100]]],
-        tf.float32)
+    classification_pred = tf.constant([[100, -100, -100], [100, 100, 100]], tf.float32)
 
     anchors = tf.constant([[0, 0, 1, 1], [0, 0, 2, 2], [0, 0, 3, 3]], tf.float32)
 
@@ -67,7 +65,7 @@ def test_compute_loss_rpn(mock_add_metric, mock_add_loss, mock_shuffle):
         BoxField.WEIGHTS:
             tf.constant([[1, 1], [1, 1]], tf.float32),
     }
-    rpn = RegionProposalNetwork(classification_loss_weight=1.0)
+    rpn = RegionProposalNetwork()
     losses = rpn.compute_loss([localization_pred], [classification_pred], [anchors], ground_truths)
 
     assert losses[LossField.CLASSIFICATION] == 100
@@ -79,16 +77,6 @@ def test_compute_rpn_metrics():
     y_true = tf.constant([[0, 0, 0, 1, 1, 0, 1, 0, 0]], tf.float32)
     weights = tf.constant([[0, 1, 1, 2, 1, 1, 0.5, 1, 1]])
 
-    y_pred = tf.constant([[
-        [-100, 100],
-        [100, -100],
-        [100, -100],
-        [-100, 100],
-        [-100, 100],
-        [-100, 100],
-        [100, -100],
-        [-100, 100],
-        [-100, 100],
-    ]], tf.float32)
+    y_pred = tf.constant([[100, -100, -100, 100, 100, 100, -100, 100, 100]], tf.float32)
     recall = compute_rpn_metrics(y_true, y_pred, weights)
     assert recall == 2 / 3

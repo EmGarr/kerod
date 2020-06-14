@@ -24,8 +24,8 @@ def post_process_rpn(cls_pred_per_lvl: List[tf.Tensor],
 
     Arguments:
 
-    - *cls_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes, 2].
-    One item per level of the pyramid.
+    - *cls_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes] representing the
+    classification logit of the rpn. One item per level of the pyramid.
     - *loc_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes, 4 * (num_anchors)].
     One item per level of the pyramid.
     - *anchors_per_lvl*: A list of Tensor of shape [batch_size, num_boxes * num_anchors, 4]
@@ -52,8 +52,7 @@ def post_process_rpn(cls_pred_per_lvl: List[tf.Tensor],
         boxes = clip_boxes(boxes, image_information)
 
         # Remove the background classes
-        scores = cls_pred[:, :, 1]
-
+        scores = tf.nn.sigmoid(cls_pred)
         topk = tf.minimum(pre_nms_topk_per_lvl, tf.size(scores[0]))
         topk_scores, topk_indices = tf.math.top_k(scores, k=topk, sorted=False)
         topk_indices = get_full_indices(topk_indices)

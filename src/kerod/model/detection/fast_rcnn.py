@@ -2,7 +2,6 @@ import functools
 from typing import Dict
 
 import tensorflow as tf
-import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 from tensorflow.keras.losses import SparseCategoricalCrossentropy, MeanAbsoluteError
 
@@ -12,11 +11,10 @@ from kerod.core.box_ops import compute_iou
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.standard_fields import BoxField, LossField
 from kerod.core.target_assigner import TargetAssigner
-from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 from kerod.model.detection.pooling_ops import multilevel_roi_align
 
 
-class FastRCNN(AbstractDetectionHead):
+class FastRCNN(tf.keras.Model):
     """Build the Fast-RCNN on top of the FPN. The parameters used
     are from [Feature Pyramidal Networks for Object Detection](https://arxiv.org/abs/1612.03144).
 
@@ -24,17 +22,12 @@ class FastRCNN(AbstractDetectionHead):
 
     - *num_classes*: The number of classes that predict the classification head (N+1) where N
     is the number of classes of your dataset and 1 is the background.
+    - *kernel_regularizer*: Regularizer function applied to the kernel weights matrix
+    ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
     """
 
-    def __init__(self, num_classes, **kwargs):
-        super().__init__(
-            num_classes,
-            SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE,
-                                          from_logits=True),
-            MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE),  # like in tensorpack
-            kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
-            kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.001),
-            **kwargs)
+    def __init__(self, num_classes, kernel_regularizer=None, **kwargs):
+        super().__init__(**kwargs)
 
         matcher = Matcher([0.5], [0, 1])
         # The same scale_factors is used in decoding as well
@@ -44,14 +37,32 @@ class FastRCNN(AbstractDetectionHead):
                                               encode,
                                               dtype=self._compute_dtype)
 
-    def build(self, input_shape):
+        self._num_classes = num_classes
+
+        self._classification_loss = SparseCategoricalCrossentropy(
+            reduction=tf.keras.losses.Reduction.NONE, from_logits=True)
+        self._localization_loss = MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE)
+
         self.denses = [
-            KL.Dense(1024,
-                     kernel_initializer=initializers.VarianceScaling(),
-                     kernel_regularizer=self._kernel_regularizer,
-                     activation='relu') for _ in range(2)
+            tf.keras.layers.Dense(1024,
+                                  kernel_initializer=initializers.VarianceScaling(),
+                                  kernel_regularizer=kernel_regularizer,
+                                  activation='relu') for _ in range(2)
         ]
-        super().build(input_shape)
+
+        self.dense_classification_head = tf.keras.layers.Dense(
+            self._num_classes,
+            activation=None,
+            kernel_initializer=initializers.RandomNormal(stddev=0.01),
+            kernel_regularizer=kernel_regularizer,
+            name=f'{self.name}classification_head')
+
+        self.dense_box_prediction_head = tf.keras.layers.Dense(
+            (self._num_classes - 1) * 4,
+            activation=None,
+            kernel_initializer=initializers.RandomNormal(stddev=0.001),
+            kernel_regularizer=kernel_regularizer,
+            name=f'{self.name}box_prediction_head')
 
     def call(self, inputs):
         """Build the computational graph of the fast RCNN HEAD.
@@ -108,12 +119,13 @@ class FastRCNN(AbstractDetectionHead):
         # TODO compute it more automatically without knowing that the last layer is stride 32
         image_shape = tf.cast(tf.shape(pyramid[-1])[1:3] * 32, dtype=self._compute_dtype)
         boxe_tensors = multilevel_roi_align(pyramid, anchors, image_shape, crop_size=7)
-        l = KL.Flatten()(boxe_tensors)
+
+        l = tf.keras.layers.Flatten()(boxe_tensors)
         for dense in self.denses:
             l = dense(l)
+        classification_pred = self.dense_classification_head(l)
+        localization_pred = self.dense_box_prediction_head(l)
 
-        classification_pred, localization_pred = self.build_detection_head(
-            tf.reshape(l, (-1, 1, 1, 1024)))
         batch_size = tf.shape(anchors)[0]
         classification_pred = tf.reshape(classification_pred, (batch_size, -1, self._num_classes))
         localization_pred = tf.reshape(localization_pred,
@@ -246,9 +258,11 @@ class FastRCNN(AbstractDetectionHead):
         self.add_metric(fg_accuracy, name='fg_accuracy', aggregation='mean')
         self.add_metric(false_negative, name='false_negative', aggregation='mean')
 
+        batch_size = tf.shape(classification_pred)[0]
+        sampling_size = tf.shape(classification_pred)[1]
+
         # y_true[LossField.CLASSIFICATION] is just 1 and 0 we are using it as mask to extract
         # the corresponding target anchors
-        batch_size = tf.shape(classification_pred)[0]
         # We create a boolean mask to extract the desired localization prediction to compute
         # the loss
         one_hot_targets = tf.one_hot(y_true[LossField.CLASSIFICATION],
@@ -263,12 +277,34 @@ class FastRCNN(AbstractDetectionHead):
         extracted_localization_pred = tf.boolean_mask(localization_pred, one_hot_targets > 0)
         extracted_localization_pred = tf.reshape(extracted_localization_pred, (batch_size, -1, 4))
 
-        y_pred = {
-            LossField.CLASSIFICATION: classification_pred,
-            LossField.LOCALIZATION: extracted_localization_pred
-        }
+        normalizer = tf.cast(sampling_size, tf.float32) * tf.cast(batch_size, tf.float32)
 
-        return self.compute_losses(y_true, y_pred, weights)
+        classification_loss = self._classification_loss(
+            tf.cast(y_true[LossField.CLASSIFICATION], tf.float32),
+            tf.cast(classification_pred, tf.float32),
+            sample_weight=tf.cast(weights[LossField.CLASSIFICATION], tf.float32))
+        classification_loss = tf.reduce_sum(classification_loss) / normalizer
+
+        localization_loss = self._localization_loss(
+            tf.cast(y_true[LossField.LOCALIZATION], tf.float32),
+            tf.cast(extracted_localization_pred, tf.float32),
+            sample_weight=tf.cast(weights[LossField.LOCALIZATION], tf.float32))
+        localization_loss = tf.reduce_sum(localization_loss) / normalizer
+
+        self.add_metric(classification_loss,
+                        name=f'{self.name}_classification_loss',
+                        aggregation='mean')
+
+        self.add_metric(localization_loss,
+                        name=f'{self.name}_localization_loss',
+                        aggregation='mean')
+
+        self.add_loss([classification_loss, localization_loss])
+
+        return {
+            LossField.CLASSIFICATION: classification_loss,
+            LossField.LOCALIZATION: localization_loss
+        }
 
 
 def compute_fast_rcnn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
