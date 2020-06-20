@@ -28,9 +28,15 @@ class RegionProposalNetwork(tf.keras.Model):
             e.g: (0.5, 1, 2)
     - *kernel_regularizer*: Regularizer function applied to the kernel weights matrix
     ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
+    - *bias_regularizer*: Regularizer function applied to the bias 
+    ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
     """
 
-    def __init__(self, anchor_ratios=(0.5, 1, 2), kernel_regularizer=None, **kwargs):
+    def __init__(self,
+                 anchor_ratios=(0.5, 1, 2),
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 **kwargs):
         super().__init__(**kwargs)
         # Force each ground_truths to match to at least one anchor
         matcher = Matcher([0.3, 0.7], [0, -1, 1], allow_low_quality_matches=True)
@@ -43,6 +49,7 @@ class RegionProposalNetwork(tf.keras.Model):
         anchor_zises = (32, 64, 128, 256, 512)
         self._anchor_ratios = anchor_ratios
         self._kernel_regularizer = kernel_regularizer
+        self._bias_regularizer = bias_regularizer
 
         # Precompute a deterministic grid of anchors for each layer of the pyramid.
         # We will extract a subpart of the anchors according to
@@ -55,10 +62,14 @@ class RegionProposalNetwork(tf.keras.Model):
         self._localization_loss = MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE)
 
     def build(self, input_shape):
-        self.rpn_conv2d = KL.Conv2D(512, (3, 3),
-                                    padding='same',
-                                    kernel_initializer=initializers.RandomNormal(stddev=0.01),
-                                    kernel_regularizer=self._kernel_regularizer)
+        self.rpn_conv2d = KL.Conv2D(
+            512,
+            (3, 3),
+            padding='same',
+            kernel_initializer=initializers.RandomNormal(stddev=0.01),
+            kernel_regularizer=self._kernel_regularizer,
+            bias_regularizer=self._bias_regularizer,
+        )
 
         self.conv_classification_head = KL.Conv2D(
             len(self._anchor_ratios), (1, 1),
@@ -66,6 +77,7 @@ class RegionProposalNetwork(tf.keras.Model):
             activation=None,
             kernel_initializer=initializers.RandomNormal(stddev=0.01),
             kernel_regularizer=self._kernel_regularizer,
+            bias_regularizer=self._bias_regularizer,
             name=f'{self.name}classification_head')
 
         self.conv_box_prediction_head = KL.Conv2D(
@@ -74,6 +86,7 @@ class RegionProposalNetwork(tf.keras.Model):
             activation=None,
             kernel_initializer=initializers.RandomNormal(stddev=0.01),
             kernel_regularizer=self._kernel_regularizer,
+            bias_regularizer=self._bias_regularizer,
             name=f'{self.name}box_prediction_head')
         super().build(input_shape)
 

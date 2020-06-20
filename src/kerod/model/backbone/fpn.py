@@ -6,10 +6,11 @@ from tensorflow.keras.initializers import VarianceScaling
 class FPN(layers.Layer):
     """Over your backbone feature build a FPN (inspired from tensorpack)"""
 
-    def __init__(self, dim=256, kernel_regularizer=None, **kwargs):
+    def __init__(self, dim=256, kernel_regularizer=None, bias_regularizer=None, **kwargs):
         super().__init__(**kwargs)
         self._dim = dim
         self._kernel_regularizer = kernel_regularizer
+        self._bias_regularizer = bias_regularizer
 
     def build(self, input_shape):
         num_level_pyramid = len(input_shape[0])
@@ -17,7 +18,9 @@ class FPN(layers.Layer):
             layers.Conv2D(self._dim, (1, 1),
                           padding='same',
                           kernel_initializer=VarianceScaling(scale=1.),
-                          kernel_regularizer=self._kernel_regularizer)
+                          kernel_regularizer=self._kernel_regularizer,
+                          bias_regularizer=self._bias_regularizer,
+            )
             for _ in range(num_level_pyramid)
         ]
 
@@ -25,7 +28,9 @@ class FPN(layers.Layer):
             layers.Conv2D(self._dim, (3, 3),
                           padding='same',
                           kernel_initializer=VarianceScaling(scale=1.),
-                          kernel_regularizer=self._kernel_regularizer)
+                          kernel_regularizer=self._kernel_regularizer,
+                          bias_regularizer=self._bias_regularizer,
+            )
             for _ in range(num_level_pyramid)
         ]
 
@@ -61,7 +66,7 @@ class FPN(layers.Layer):
             conv(tensor) for conv, tensor in zip(self.anti_aliasing_conv, lat_sum_5432[::-1])
         ]
 
-        p6 = layers.MaxPool2D()(lateral_connection_2345[-1])
+        p6 = layers.MaxPool2D(pool_size=1, strides=2)(lateral_connection_2345[-1])
         return lateral_connection_2345 + [p6]
 
     def get_config(self):

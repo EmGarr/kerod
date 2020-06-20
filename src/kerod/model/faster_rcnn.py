@@ -39,9 +39,11 @@ class FasterRcnnFPN(tf.keras.Model):
         self.l2 = tf.keras.regularizers.l2(1e-4)
 
         self.backbone = backbone
-        self.fpn = FPN(kernel_regularizer=self.l2)
-        self.rpn = RegionProposalNetwork(kernel_regularizer=self.l2)
-        self.fast_rcnn = FastRCNN(self.num_classes + 1, kernel_regularizer=self.l2)
+        self.fpn = FPN(kernel_regularizer=self.l2, bias_regularizer=self.l2)
+        self.rpn = RegionProposalNetwork(kernel_regularizer=self.l2, bias_regularizer=self.l2)
+        self.fast_rcnn = FastRCNN(self.num_classes + 1,
+                                  kernel_regularizer=self.l2,
+                                  bias_regularizer=self.l2)
         # FasterRcnn cannot handle batch of unknown shape in training.
         # It will raise an error if you save.
         # serving false allows to bypass the check

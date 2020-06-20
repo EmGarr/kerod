@@ -24,9 +24,11 @@ class FastRCNN(tf.keras.Model):
     is the number of classes of your dataset and 1 is the background.
     - *kernel_regularizer*: Regularizer function applied to the kernel weights matrix
     ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
+    - *bias_regularizer*: Regularizer function applied to the bias
+    ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
     """
 
-    def __init__(self, num_classes, kernel_regularizer=None, **kwargs):
+    def __init__(self, num_classes, kernel_regularizer=None, bias_regularizer=None, **kwargs):
         super().__init__(**kwargs)
 
         matcher = Matcher([0.5], [0, 1])
@@ -41,12 +43,14 @@ class FastRCNN(tf.keras.Model):
 
         self._classification_loss = SparseCategoricalCrossentropy(
             reduction=tf.keras.losses.Reduction.NONE, from_logits=True)
+
         self._localization_loss = MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE)
 
         self.denses = [
             tf.keras.layers.Dense(1024,
                                   kernel_initializer=initializers.VarianceScaling(),
                                   kernel_regularizer=kernel_regularizer,
+                                  bias_regularizer=bias_regularizer,
                                   activation='relu') for _ in range(2)
         ]
 
@@ -55,6 +59,7 @@ class FastRCNN(tf.keras.Model):
             activation=None,
             kernel_initializer=initializers.RandomNormal(stddev=0.01),
             kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
             name=f'{self.name}classification_head')
 
         self.dense_box_prediction_head = tf.keras.layers.Dense(
@@ -62,6 +67,7 @@ class FastRCNN(tf.keras.Model):
             activation=None,
             kernel_initializer=initializers.RandomNormal(stddev=0.001),
             kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
             name=f'{self.name}box_prediction_head')
 
     def call(self, inputs):
