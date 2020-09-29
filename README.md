@@ -10,7 +10,9 @@ _________________
 _________________
 
 
-**Kerod** is pure `tensorflow 2` implementation of object detection algorithms (Faster R-CNN) aiming production. It stands for Keras Object Detection.
+**Kerod** is pure `tensorflow 2` implementation of object detection algorithms (Faster R-CNN** aiming production. It stands for Keras Object Detection.
+
+**WARNING**: Since I don't own a GPU infrastructure I haven't been able to investigate why my performances are so low (I am pretty sure the issue is in the loss).
 
 It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.2.
 
