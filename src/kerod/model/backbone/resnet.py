@@ -185,7 +185,8 @@ def ResNet(stack_fn: Callable,
 
 def ResNet50(weights='imagenet', input_tensor=None, input_shape=None, **kwargs):
     """Instantiates the ResNet50 architecture."""
-
+    # Or set to None
+    resnet.layers = tf.keras.layers
     def stack_fn(x):
         c2 = resnet.stack1(x, 64, 3, stride1=1, name='conv2')
         c3 = resnet.stack1(c2, 128, 4, name='conv3')
@@ -193,8 +194,15 @@ def ResNet50(weights='imagenet', input_tensor=None, input_shape=None, **kwargs):
         c5 = resnet.stack1(c4, 512, 3, name='conv5')
         return [c2, c3, c4, c5]
 
-    return ResNet(stack_fn, resnet.preprocess_input, False, True, 'resnet50', weights, input_tensor,
-                  input_shape, **kwargs)
+    return ResNet(stack_fn,
+                  resnet.preprocess_input,
+                  False,
+                  True,
+                  'resnet50',
+                  weights,
+                  input_tensor,
+                  input_shape,
+                  **kwargs)
 
 
 def ResNet50PytorchStyle(weights='imagenet', input_tensor=None, input_shape=None, **kwargs):
