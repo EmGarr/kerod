@@ -6,7 +6,7 @@
 [![codecov.io](https://codecov.io/gh/Emgarr/kerod/coverage.svg?branch=master)](https://codecov.io/gh/Emgarr/kerod/?branch=master)
 _________________
 
-[Read Latest Documentation](https://emgarr.github.io/od/) - [Browse GitHub Code Repository](https://github.com/Emgarr/kerod)
+[Read Latest Documentation](https://emgarr.github.io/kerod/) - [Browse GitHub Code Repository](https://github.com/Emgarr/kerod)
 _________________
 
 
