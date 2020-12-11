@@ -114,7 +114,8 @@ class FasterRcnnFPN(tf.keras.Model):
         if training and not self._serving:
             ground_truths = inputs['ground_truths']
             # Include the ground_truths as RoIs for the training
-            rois = tf.concat([rois, ground_truths[BoxField.BOXES]], axis=1)
+            rois = tf.concat([tf.cast(rois, self._compute_dtype), ground_truths[BoxField.BOXES]],
+                             axis=1)
             # Sample the boxes needed for inference
             y_true, weights, rois = self.fast_rcnn.sample_boxes(rois, ground_truths)
 

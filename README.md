@@ -10,7 +10,7 @@ _________________
 _________________
 
 
-**Kerod** is pure `tensorflow 2` implementation of object detection algorithms (Faster R-CNN** aiming production. It stands for Keras Object Detection.
+**Kerod** is pure `tensorflow 2` implementation of object detection algorithms (Faster R-CNN) aiming production. It stands for Keras Object Detection.
 
 **WARNING**: Since I don't own a GPU infrastructure I haven't been able to investigate why my performances are so low (I am pretty sure the issue is in the loss).
 
@@ -27,18 +27,15 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 - Handle batch in training and inference
 - Rich [Documentation](https://emgarr.github.io/kerod/)
 - Multi-GPU
+- Mixed_precision. You can try it with this [notebook](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
 - Simple (again)
-
-### WIP
-
-- The mixed_precision is almost supported (should investigate). You can try it with this [notebook](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
 
 ### Algorithms
 
 - [x] [Feature Pyramidal Network](https://arxiv.org/abs/1612.03144) 
 - [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (Much of the pieces are already here just need to put everything together. It will arrive soon.)
 - [ ] [Object Relation Network for object detection](https://arxiv.org/abs/1711.11575): aims to replace the fast-rcnn head multiclass nms. Will allow to make a better usage of the GPU (The NMS is used on CPU and block the serving efficiency).
-- [WIP] [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers).
+- [ ] (checkout **detr*** branch)[End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers).
 
 ### No configuration file
 

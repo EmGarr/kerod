@@ -240,8 +240,9 @@ class FastRCNN(AbstractDetectionHead):
         - *classification_loss*: A scalar
         - *localization_loss*: A scalar
         """
+        y_true_classification = tf.cast(y_true[LossField.CLASSIFICATION], tf.int32)
         accuracy, fg_accuracy, false_negative = compute_fast_rcnn_metrics(
-            y_true[LossField.CLASSIFICATION], classification_pred)
+            y_true_classification, classification_pred)
         self.add_metric(accuracy, name='accuracy', aggregation='mean')
         self.add_metric(fg_accuracy, name='fg_accuracy', aggregation='mean')
         self.add_metric(false_negative, name='false_negative', aggregation='mean')
@@ -251,9 +252,7 @@ class FastRCNN(AbstractDetectionHead):
         batch_size = tf.shape(classification_pred)[0]
         # We create a boolean mask to extract the desired localization prediction to compute
         # the loss
-        one_hot_targets = tf.one_hot(y_true[LossField.CLASSIFICATION],
-                                     self._num_classes,
-                                     dtype=tf.int8)
+        one_hot_targets = tf.one_hot(y_true_classification, self._num_classes, dtype=tf.int8)
         one_hot_targets = tf.reshape(one_hot_targets, [-1])
 
         # We need to insert a fake background classes at the position 0

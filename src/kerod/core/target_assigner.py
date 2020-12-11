@@ -111,8 +111,14 @@ class TargetAssigner:
         reg_weights = self._create_regression_weights(groundtruth_weights, matched_labels)
         cls_weights = self._create_classification_weights(groundtruth_weights, matched_labels)
 
-        y_true = {LossField.CLASSIFICATION: cls_targets, LossField.LOCALIZATION: reg_targets}
-        weights = {LossField.CLASSIFICATION: cls_weights, LossField.LOCALIZATION: reg_weights}
+        y_true = {
+            LossField.CLASSIFICATION: tf.cast(cls_targets, self.dtype),
+            LossField.LOCALIZATION: tf.cast(reg_targets, self.dtype)
+        }
+        weights = {
+            LossField.CLASSIFICATION: tf.cast(cls_weights, self.dtype),
+            LossField.LOCALIZATION: tf.cast(reg_weights, self.dtype)
+        }
 
         return y_true, weights
 
@@ -238,7 +244,7 @@ class TargetAssigner:
         A tensor of shape [batch_size, num_anchors] representing classification weights.
         """
         indicator = matched_labels < 0
-        weights = tf.where(indicator, 0., groundtruth_weights)
+        weights = tf.where(indicator, tf.constant(0., dtype=self.dtype), groundtruth_weights)
         indicator = matched_labels == 0
-        weights = tf.where(indicator, 1., weights)
+        weights = tf.where(indicator, tf.constant(1, dtype=self.dtype), weights)
         return weights

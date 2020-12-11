@@ -82,7 +82,7 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
 
     np.testing.assert_array_equal(expected_y_true_classification, y_true[LossField.CLASSIFICATION])
     np.testing.assert_array_almost_equal(expected_y_true_localization,
-                                         y_true[LossField.LOCALIZATION])
+                                         y_true[LossField.LOCALIZATION], decimal=4)
     np.testing.assert_array_equal(expected_weights_classification,
                                   weights[LossField.CLASSIFICATION])
     np.testing.assert_array_equal(expected_weights_localization, weights[LossField.LOCALIZATION])
