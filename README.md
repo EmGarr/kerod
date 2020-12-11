@@ -1,5 +1,5 @@
 <h3 align="center">
-<p>KEROD - Faster R-CNN for TensorFlow 2.2
+<p>KEROD - Faster R-CNN for TensorFlow 2.X
 </h3>
 
 [![Build Status](https://img.shields.io/travis/TheAlgorithms/Python.svg?label=Travis%20CI&logo=travis&style=flat-square)](https://travis-ci.com/Emgarr/kerod)
@@ -59,7 +59,7 @@ pip install git+https://github.com/EmGarr/kerod.git
 
 ```bash
 git clone https://github.com/EmGarr/kerod.git
-cd od 
+cd kerod
 pip install .
 ```
 
@@ -110,8 +110,25 @@ model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
 
 results = model.predict(data, batch_size=1)
 
-# Please use this method instead of the classical save which won't work
-model.export_model('saved_model')
+# Please use this method for serving instead of the classical save 
+model.export_for_serving('saved_model')
+reload_model = tf.keras.models.load_model('saved_model')
+for x, _ in data:
+    reload_model.serving_step(x[DatasetField.IMAGES], x[DatasetField.IMAGES_INFO])
+```
+
+### Mixed Precision
+
+```python
+from tensorflow.keras.mixed_precision import experimental as mixed_precision
+from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
+from kerod.model import factory
+
+policy = mixed_precision.Policy('mixed_float16')
+mixed_precision.set_policy(policy)
+
+num_classes = 20
+model = factory.build_model(num_classes)
 ```
 
 ### Multi-GPU training
@@ -187,10 +204,10 @@ image = resize_to_min_dim(inputs['image'], 800.0, 1300.0)
 image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
 
 # Will perform a query for a single batch but you can perform query on batch
-inputs = {
-  DatasetField.IMAGES: tf.expand_dims(images, axis=0).numpy().tolist(),
-  DatasetField.IMAGES_INFO: tf.expand_dims(image_information, axis=0).numpy().tolist(),
-}
+inputs = [
+    tf.expand_dims(images, axis=0).numpy().tolist(),
+  tf.expand_dims(image_information, axis=0).numpy().tolist()
+]
 
 headers = {"content-type": "application/json"}
 response = requests.post(url, data=json.dumps(inputs), headers=headers)

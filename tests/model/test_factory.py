@@ -1,11 +1,10 @@
 import os
-import pytest
 
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-from kerod.core.standard_fields import BoxField
+from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.dataset.preprocessing import (expand_dims_for_single_batch, preprocess)
 from kerod.model import factory
 
@@ -56,9 +55,8 @@ def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
 
     model.predict(data, batch_size=2)
 
-    # TODO issue with dynamic inputs
-    # serving_path = os.path.join(tmpdir, 'serving')
-    # model.save(serving_path)
-    # model.export_model(serving_path)
-    # reload_model = tf.keras.models.load_model(serving_path)
-    # reload_model.predict(data, batch_size=2) 
+    serving_path = os.path.join(tmpdir, 'serving')
+    model.export_for_serving(serving_path)
+    reload_model = tf.keras.models.load_model(serving_path)
+    for x, _ in data:
+        reload_model.serving_step(x[DatasetField.IMAGES], x[DatasetField.IMAGES_INFO])

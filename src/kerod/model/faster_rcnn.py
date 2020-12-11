@@ -174,6 +174,23 @@ class FasterRcnnFPN(tf.keras.Model):
         return post_process_fast_rcnn_boxes(classification_pred, localization_pred, rois,
                                             x[DatasetField.IMAGES_INFO], self.num_classes)
 
+    @tf.function(input_signature=[
+        tf.TensorSpec(shape=(None, None, None, 3), dtype=tf.float32, name=DatasetField.IMAGES),
+        tf.TensorSpec(shape=(None, 2), dtype=tf.float32, name=DatasetField.IMAGES_INFO)
+    ])
+    def serving_step(self, images, images_info):
+        """Allow to bypass the save_model behavior the graph in serving mode.
+
+        Currently, the issue is that in training the ground_truths are passed to the call method but
+        not in inference. For the serving only the `images` and `images_information` are defined.
+        It means the inputs link to the ground_truths won't be defined in serving. However, tensorflow
+        absolutely want it and will return an exception if the ground_truth isn't provided.
+        """
+        return self.predict_step({
+            DatasetField.IMAGES: images,
+            DatasetField.IMAGES_INFO: images_info
+        })
+
     def save(self,
              filepath,
              overwrite=True,
@@ -193,7 +210,7 @@ class FasterRcnnFPN(tf.keras.Model):
                 'Saving does not work with dynamic inputs the ground_truths are injected in the inputs. '
                 'Please use export_model method instead to bypass this error.')
 
-    def export_model(self, filepath):
+    def export_for_serving(self, filepath):
         """Allow to bypass the save_model behavior the graph in serving mode.
         Currently, the issue is that in training the ground_truths are passed to the call method but
         not in inference. For the serving only the `images` and `images_information` are defined.
@@ -203,7 +220,8 @@ class FasterRcnnFPN(tf.keras.Model):
         However, we don't want this check to be perform because our ground_truths inputs aren't defined.
         """
         self._serving = True
-        tf.saved_model.save(self, filepath)
+        call_output = self.serving_step.get_concrete_function()
+        tf.saved_model.save(self, filepath, signatures={'serving_default': call_output})
         self._serving = False
 
 
