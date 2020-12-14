@@ -2,7 +2,7 @@
 <p>KEROD - Faster R-CNN for TensorFlow 2.X
 </h3>
 
-[![Build Status](https://img.shields.io/travis/TheAlgorithms/Python.svg?label=Travis%20CI&logo=travis&style=flat-square)](https://travis-ci.com/Emgarr/kerod)
+[![Build Status](https://travis-ci.com/EmGarr/kerod.svg?branch=master)](https://travis-ci.com/EmGarr/kerod)
 [![codecov.io](https://codecov.io/gh/Emgarr/kerod/coverage.svg?branch=master)](https://codecov.io/gh/Emgarr/kerod/?branch=master)
 _________________
 
@@ -14,7 +14,7 @@ _________________
 
 **WARNING**: Since I don't own a GPU infrastructure I haven't been able to investigate why my performances are so low (I am pretty sure the issue is in the loss).
 
-It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.2.
+It aims to build a clear, reusable, tested, simple and documented codebase for tensorflow 2.X.
 
 Many ideas have been based on [google object detection](https://github.com/tensorflow/models/tree/master/research/object_detection), [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) and [mmdetection](https://github.com/open-mmlab/mmdetection).
  `Warning`: It is still a work in progress and some breaking changes could arrive soon. If you need to have good performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for now but my aim is too match its benchmarks soon. The current AP@[.5:.95] on the [coco notebook](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb) is `30` which is quite low (38 for mmdetection or detectron2), so let's found those bugs. 
@@ -28,14 +28,15 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 - Rich [Documentation](https://emgarr.github.io/kerod/)
 - Multi-GPU
 - Mixed_precision. You can try it with this [notebook](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb)
+- No need to struggle to download COCO or PascalVoc. We only used `tensorflow_datasets`
 - Simple (again)
 
 ### Algorithms
 
 - [x] [Feature Pyramidal Network](https://arxiv.org/abs/1612.03144) 
 - [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (Much of the pieces are already here just need to put everything together. It will arrive soon.)
-- [ ] [Object Relation Network for object detection](https://arxiv.org/abs/1711.11575): aims to replace the fast-rcnn head multiclass nms. Will allow to make a better usage of the GPU (The NMS is used on CPU and block the serving efficiency).
 - [ ] (checkout **detr*** branch)[End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers).
+- [ ] [Object Relation Network for object detection](https://arxiv.org/abs/1711.11575): aims to replace the fast-rcnn head multiclass nms. Will allow to make a better usage of the GPU (The NMS is used on CPU and block the serving efficiency).
 
 ### No configuration file
 
@@ -45,7 +46,7 @@ Why: In deep learning each parameter is important. You must think thoroughly bef
 
 ## Installation
 
-This repo is tested on Python 3.6, 3.7, 3.8 and TensorFlow 2.2.
+This repo is tested on Python 3.6, 3.7, 3.8 and TensorFlow 2.3.
 
 You may want to install 'kerod' in a [virtual environment](https://docs.python.org/3/library/venv.html) or with [pyenv](https://github.com/pyenv/pyenv). Create a virtual environment with the version of Python you wanna use and activate it.
 

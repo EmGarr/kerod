@@ -83,7 +83,6 @@ class FastRCNN(AbstractDetectionHead):
 
         Returns:
 
-
         - *classification_pred*: A logit Tensor of shape [batch_size, num_boxes, num_classes]
         - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
         - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
@@ -272,8 +271,6 @@ class FastRCNN(AbstractDetectionHead):
 
 def compute_fast_rcnn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
     """Useful metrics that allows to track how behave the training of the fast rcnn head.
-
-    TODO Handle the sample_weights
 
     Arguments:
 

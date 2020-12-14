@@ -55,9 +55,10 @@ class FasterRcnnFPN(tf.keras.Model):
         - *inputs*: A list with the following schema:
 
         1. *features*:
-        1.1 *pyramid*: A List of tensors the output of the pyramid
-        1.2 *image_informations*: A Tensor of shape [batch_size, (height, width)]
-        The height and the width are without the padding.
+        1.1 *images*: A Tensor of shape [batch_size, height, width, 3]
+        1.2 *image_informations*: A float32 Tensor of shape [batch_size, 2] where
+        the last dimension represents the original height and width of the images
+        (without the padding).
 
         2.. *ground_truths*: If the training is true, a dict with
 

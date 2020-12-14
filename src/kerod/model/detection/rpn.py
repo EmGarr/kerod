@@ -19,8 +19,7 @@ SAMPLING_POSITIVE_RATIO = 0.5
 
 
 class RegionProposalNetwork(AbstractDetectionHead):
-    """RPN which work only a pyramid network.
-    It has been introduced in the [Faster R-CNN paper](https://arxiv.org/abs/1506.01497) and
+    """It has been introduced in the [Faster R-CNN paper](https://arxiv.org/abs/1506.01497) and
     use the parameters from [Feature Pyramidal Networks for Object Detection](https://arxiv.org/abs/1612.03144).
 
     Arguments:

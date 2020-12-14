@@ -13,7 +13,7 @@ def freeze_layers_before(model: tf.keras.Model, layer_name: str):
 
 def freeze_batch_normalization(model: tf.keras.Model):
     """In Object detection we usually do not train on big batch. The BatchNormalization is
-    not useful and need to be frozen.
+    not useful and should be frozen.
     """
     for layer in model.layers:
         if isinstance(layer, tf.keras.layers.BatchNormalization):

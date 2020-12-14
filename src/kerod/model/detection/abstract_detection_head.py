@@ -2,7 +2,7 @@ from typing import Dict
 
 import tensorflow as tf
 import tensorflow.keras.layers as KL
-from tensorflow.keras import initializers, regularizers
+from tensorflow.keras import initializers
 
 from kerod.core.standard_fields import LossField
 
