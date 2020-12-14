@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from tensorflow.python.keras.engine import data_adapter, training
+from tensorflow.python.keras.engine import data_adapter
 
 from kerod.utils.training import apply_kernel_regularization
 from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
@@ -143,9 +143,7 @@ class FasterRcnnFPN(tf.keras.Model):
             # All the losses are computed in the call. It's weird but it those the job
             # They are added automatically to self.losses
             loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
-
-        training._minimize(self.distribute_strategy, tape, self.optimizer, loss,
-                           self.trainable_variables)
+        self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
 
         return {m.name: m.result() for m in self.metrics}
 

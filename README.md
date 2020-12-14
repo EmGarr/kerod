@@ -46,7 +46,7 @@ Why: In deep learning each parameter is important. You must think thoroughly bef
 
 ## Installation
 
-This repo is tested on Python 3.6, 3.7, 3.8 and TensorFlow 2.3.
+This repo is tested on Python 3.6, 3.7, 3.8 and TensorFlow 2.4.0
 
 You may want to install 'kerod' in a [virtual environment](https://docs.python.org/3/library/venv.html) or with [pyenv](https://github.com/pyenv/pyenv). Create a virtual environment with the version of Python you wanna use and activate it.
 
