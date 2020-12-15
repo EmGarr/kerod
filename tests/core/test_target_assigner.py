@@ -3,7 +3,7 @@ import tensorflow as tf
 
 from kerod.core.standard_fields import BoxField
 from kerod.core import target_assigner as targetassigner
-from kerod.core.box_ops import compute_iou
+from kerod.core.similarity import IoUSimilarity
 from kerod.core.matcher import Matcher
 from kerod.core.standard_fields import LossField
 
@@ -13,7 +13,7 @@ def encode_mean_stddev(boxes, anchors, stddev=0.1):
 
 
 def test_assign_multiclass_with_groundtruth_weights():
-    similarity_calc = compute_iou
+    similarity_calc = IoUSimilarity()
     matcher = Matcher([0.5], [0, 1])
     box_coder = encode_mean_stddev
     target_assigner = targetassigner.TargetAssigner(similarity_calc, matcher, box_coder)
@@ -40,7 +40,7 @@ def test_assign_multiclass_with_groundtruth_weights():
         BoxField.NUM_BOXES: num_boxes
     }
 
-    targets, weights = target_assigner.assign(anchor_means, gt_box_batch)
+    targets, weights = target_assigner.assign({BoxField.BOXES: anchor_means}, gt_box_batch)
     cls_targets = targets[LossField.CLASSIFICATION]
     cls_weights = weights[LossField.CLASSIFICATION]
     reg_targets = targets[LossField.LOCALIZATION]
@@ -52,7 +52,7 @@ def test_assign_multiclass_with_groundtruth_weights():
 
 def test_batch_assign_multiclass_targets_with_padded_groundtruth():
 
-    similarity_calc = compute_iou
+    similarity_calc = IoUSimilarity()
     matcher = Matcher([0.5], [0, 1])
     box_coder = encode_mean_stddev
     target_assigner = targetassigner.TargetAssigner(similarity_calc, matcher, box_coder)
@@ -84,7 +84,7 @@ def test_batch_assign_multiclass_targets_with_padded_groundtruth():
         BoxField.NUM_BOXES: num_boxes
     }
 
-    targets, weights = target_assigner.assign(anchor_means, gt_box_batch)
+    targets, weights = target_assigner.assign({BoxField.BOXES: anchor_means}, gt_box_batch)
     cls_targets = targets[LossField.CLASSIFICATION]
     cls_weights = weights[LossField.CLASSIFICATION]
     reg_targets = targets[LossField.LOCALIZATION]
@@ -97,7 +97,7 @@ def test_batch_assign_multiclass_targets_with_padded_groundtruth():
 
 
 def test_target_assigner_with_padded_ground_truths():
-    similarity_calc = compute_iou
+    similarity_calc = IoUSimilarity()
     matcher = Matcher([0.5], [0, 1])
     box_coder = encode_mean_stddev
     target_assigner = targetassigner.TargetAssigner(similarity_calc, matcher, box_coder)
@@ -122,7 +122,7 @@ def test_target_assigner_with_padded_ground_truths():
         BoxField.NUM_BOXES: num_boxes
     }
 
-    targets, weights = target_assigner.assign(anchor_means, gt_box_batch)
+    targets, weights = target_assigner.assign({BoxField.BOXES: anchor_means}, gt_box_batch)
     cls_targets = targets[LossField.CLASSIFICATION]
     cls_weights = weights[LossField.CLASSIFICATION]
     reg_targets = targets[LossField.LOCALIZATION]

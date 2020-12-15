@@ -8,8 +8,8 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy, MeanAbsoluteE
 
 from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
-from kerod.core.box_ops import compute_iou
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
+from kerod.core.similarity import IoUSimilarity
 from kerod.core.standard_fields import BoxField, LossField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
@@ -39,7 +39,7 @@ class FastRCNN(AbstractDetectionHead):
         matcher = Matcher([0.5], [0, 1])
         # The same scale_factors is used in decoding as well
         encode = functools.partial(encode_boxes_faster_rcnn, scale_factors=(10.0, 10.0, 5.0, 5.0))
-        self.target_assigner = TargetAssigner(compute_iou,
+        self.target_assigner = TargetAssigner(IoUSimilarity(),
                                               matcher,
                                               encode,
                                               dtype=self._compute_dtype)
@@ -183,7 +183,7 @@ class FastRCNN(AbstractDetectionHead):
             BoxField.NUM_BOXES:
                 ground_truths[BoxField.NUM_BOXES]
         }
-        y_true, weights = self.target_assigner.assign(anchors, ground_truths)
+        y_true, weights = self.target_assigner.assign({BoxField.BOXES: anchors}, ground_truths)
 
         labels = y_true[LossField.CLASSIFICATION] > 0
         sample_idx = batch_sample_balanced_positive_negative(

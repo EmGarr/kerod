@@ -56,7 +56,7 @@ class TargetAssigner:
     def box_encoder(self):
         return self._box_encoder
 
-    def assign(self, anchors: tf.Tensor, groundtruth: dict):
+    def assign(self, anchors: dict, groundtruth: dict):
         """Assign classification and regression targets to each anchor.
 
         For a given set of anchors and groundtruth detections, match anchors
@@ -69,8 +69,8 @@ class TargetAssigner:
 
         Arguments:
 
-        - *anchors*: A tensor of shape [batch_size, num_anchors, (y1, x1, y2, x2)] representing the boxes
-        and resized to the image shape.
+        - *anchors*: a dict representing a batch of M anchors
+            1. BoxField.BOXES: A tensor of shape [batch_size, num_anchors, (y1, x1, y2, x2)] representing the boxes and resized to the image shape.
         - *groundtruth*: a dict representing a batch of M groundtruth boxes
             1. BoxField.BOXES: A tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)] representing
             the boxes and resized to the image shape
@@ -98,7 +98,7 @@ class TargetAssigner:
         if groundtruth_weights is None:
             groundtruth_weights = tf.ones([batch_size, num_gt_boxes], self.dtype)
 
-        match_quality_matrix = self._similarity_calc(groundtruth[BoxField.BOXES], anchors)
+        match_quality_matrix = self._similarity_calc(groundtruth, anchors)
 
         matches, matched_labels = self._matcher(match_quality_matrix,
                                                 groundtruth[BoxField.NUM_BOXES])
@@ -126,7 +126,7 @@ class TargetAssigner:
         indices = get_full_indices(indices)
         return tf.gather_nd(tensor, indices)
 
-    def _create_regression_targets(self, anchors: tf.Tensor, groundtruth: dict, matches: tf.Tensor,
+    def _create_regression_targets(self, anchors: dict, groundtruth: dict, matches: tf.Tensor,
                                    matched_labels: tf.Tensor) -> tf.Tensor:
         """Returns a regression target for each anchor.
 
@@ -154,7 +154,7 @@ class TargetAssigner:
         """
         matched_gt_boxes = self.gather(groundtruth[BoxField.BOXES], matches)
 
-        matched_reg_targets = self._box_encoder(matched_gt_boxes, anchors)
+        matched_reg_targets = self._box_encoder(matched_gt_boxes, anchors[BoxField.BOXES])
 
         # Zero out the unmatched and ignored regression targets.
         unmatched_ignored_reg_targets = tf.zeros_like(matched_reg_targets,

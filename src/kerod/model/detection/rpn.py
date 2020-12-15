@@ -8,7 +8,7 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy, MeanAbsoluteE
 from kerod.core.anchor_generator import Anchors
 from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
-from kerod.core.box_ops import compute_iou
+from kerod.core.similarity import IoUSimilarity
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.standard_fields import BoxField, LossField
 from kerod.core.target_assigner import TargetAssigner
@@ -41,7 +41,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
 
         #Force each ground_truths to match to at least one anchor
         matcher = Matcher([0.3, 0.7], [0, -1, 1], allow_low_quality_matches=True)
-        self.target_assigner = TargetAssigner(compute_iou,
+        self.target_assigner = TargetAssigner(IoUSimilarity(),
                                               matcher,
                                               encode_boxes_faster_rcnn,
                                               dtype=self._compute_dtype)
@@ -151,7 +151,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         }
         # anchors are deterministic duplicate them to create a batch
         anchors = tf.tile(anchors[None], (tf.shape(ground_truths[BoxField.BOXES])[0], 1, 1))
-        y_true, weights = self.target_assigner.assign(anchors, ground_truths)
+        y_true, weights = self.target_assigner.assign({BoxField.BOXES: anchors}, ground_truths)
         y_true[LossField.CLASSIFICATION] = tf.minimum(y_true[LossField.CLASSIFICATION], 1)
 
         ## Compute metrics

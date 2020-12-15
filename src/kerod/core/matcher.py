@@ -2,10 +2,13 @@
 # From detectron2 and Modified by Emilien Garreau
 from typing import List
 import tensorflow as tf
-from kerod.utils import item_assignment
+from kerod.utils import item_assignment, get_full_indices
+from kerod.core.standard_fields import BoxField
+from kerod.core.box_ops import compute_giou
+from scipy.optimize import linear_sum_assignment
 
 
-class Matcher(object):
+class Matcher:
     """This class assigns to each predicted "element" (e.g., a box) a ground-truth
     element. Each predicted element will have exactly zero or one matches; each
     ground-truth element may be matched to zero or more predicted elements.
@@ -77,15 +80,15 @@ class Matcher(object):
 
         Returns:
 
-        - *matches*: a tensor of float32 and shape [batch_size, N], where matches[b, i] is a matched
+        - *matches*: a tensor of int32 and shape [batch_size, N], where matches[b, i] is a matched
                ground-truth index in [b, 0, M)
-        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates
+        - *match_labels*: a tensor of int32 and shape [batch_size, N], where match_labels[i] indicates
                 whether a prediction is a true (1) or false positive (0) or ignored (-1)
         """
         assert len(match_quality_matrix.shape) == 3
         num_valid_boxes = tf.squeeze(num_valid_boxes, -1)
         # match_quality_matrix is B (batch) x M (gt) x N (predicted)
-        # Max over gt elements (dim 0) to find best gt candidate for each prediction
+        # Max over gt elements to find best gt candidate for each prediction
         matches = tf.argmax(match_quality_matrix, axis=1, output_type=tf.int32)
         matched_vals = tf.math.reduce_max(match_quality_matrix, axis=1)
         # matched_vals, matches = match_quality_matrix.max(dim=0)
@@ -100,6 +103,9 @@ class Matcher(object):
             match_labels = self._set_low_quality_matches(match_labels, match_quality_matrix,
                                                          num_valid_boxes)
 
+        # Remove all the padded groundtruths
+        # e.g: matches = [1, 0, 4, 3] num_valid_boxes = [3]
+        # mask_padded_boxes = [0, 0, 1, 1]
         mask_padded_boxes = matches >= num_valid_boxes[:, None]
         # Will flag to -1 all the padded boxes to avoid sampling them
         match_labels = item_assignment(match_labels, mask_padded_boxes, -1)
@@ -149,3 +155,115 @@ class Matcher(object):
         masks_for_labels = tf.reduce_max(tf.cast(hq_foreach_gt_mask, tf.int8), 1)
         match_labels = item_assignment(match_labels, masks_for_labels, 1)
         return match_labels
+
+
+class HungarianMatcher:
+    """This class computes an assignment between the targets and the predictions of the network
+
+    For efficiency reasons, the targets don't include the no_object. Because of this, in general,
+    there are more predictions than targets. In this case, we do a 1-to-1 matching of the best predictions,
+    while the others are un-matched (and thus treated as non-objects).
+    """
+
+    def __init__(self, cost_class: float = 1, cost_bbox: float = 1, cost_giou: float = 1):
+        """Creates the matcher
+
+        Arguments:
+            cost_class: This is the relative weight of the classification error in the matching cost
+            cost_bbox: This is the relative weight of the L1 error of the bounding box coordinates in the matching cost
+            cost_giou: This is the relative weight of the giou loss of the bounding box in the matching cost
+        """
+        self.cost_class = cost_class
+        self.cost_bbox = cost_bbox
+        self.cost_giou = cost_giou
+        assert cost_class != 0 or cost_bbox != 0 or cost_giou != 0, "all costs can't be 0"
+
+    def __call__(self, classification_logits, localization_pred, ground_truths):
+        """ Performs the matching
+
+        Arguments:
+
+        - *localization_pred*: A list of tensors of shape [batch_size, num_anchors, 4].
+        - *classification_pred*: A list of tensors of shape [batch_size, num_anchors, 2]
+        - *ground_truths*: A dict with BoxField as key and a tensor as value.
+
+        ```python
+        ground_truths = {
+            BoxField.BOXES:
+                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+            BoxField.LABELS:
+                tf.constant([[1, 0], [1, 0]], tf.float32),
+            BoxField.WEIGHTS:
+                tf.constant([[1, 0], [1, 1]], tf.float32),
+            BoxField.NUM_BOXES:
+                tf.constant([[2], [1]], tf.int32)
+        }
+        ```
+
+        where `NUM_BOXES` allows to remove the padding created by tf.Data.
+
+        Returns:
+
+        - *matches*: a tensor of int32 and shape [batch_size, N], where matches[b, i] is a matched
+        ground-truth index in [b, 0, M)
+        - *match_labels*: a tensor of int32 and shape [batch_size, N], where match_labels[i] indicates
+                whether a prediction is a true (1) or false positive (0) or ignored (-1)
+        """
+
+        # TODO investigate to get GPU ops for hungarian_assignment
+        def hungarian_assignment(cost_matrix):
+            return tf.py_function(lambda c: linear_sum_assignment(c), [cost_matrix],
+                                  Tout=(tf.int32, tf.int32))
+
+        cost_matrix = self.compute_cost_matrix(classification_logits, localization_pred,
+                                               ground_truths)
+
+        indices = tf.vectorized_map(hungarian_assignment, cost_matrix)  # [batch_size, num_gt_boxes]
+
+        matches = tf.one_hot(indices[1], tf.shape(classification_logits)[1], dtype=tf.int32)
+        match_labels = tf.cast(tf.reduce_max(matches, axis=1), tf.int32)
+        matches = tf.reduce_max(matches * indices[0][..., None], axis=1)
+
+        # Remove all the padded groundtruths
+        # e.g: matches = [1, 0, 4, 3] num_valid_boxes = [3]
+        # mask_padded_boxes = [0, 0, 1, 1]
+        mask_padded_boxes = matches >= ground_truths[BoxField.NUM_BOXES]
+        # Will flag to -1 all the padded boxes to avoid sampling them
+        match_labels = item_assignment(match_labels, mask_padded_boxes, -1)
+        return tf.stop_gradient(matches), tf.stop_gradient(match_labels)
+
+    def compute_cost_matrix(self, classification_logits, localization_pred, ground_truths):
+        """ Compute the cost matrix according to the paper
+        [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers).
+
+        Return:
+        A 3-D Tensor of float and shape [batch_size, num_groundtruths, num_detection]
+        """
+        out_prob = tf.nn.softmax(classification_logits, -1)
+
+        # Extract the target classes to approximate the classification cost
+        # [batch_size, nb_class, num_detection]
+        out_prob = tf.transpose(out_prob, [0, 2, 1])
+        # [batch_size, nb_target, num_detection]
+        cost = tf.gather_nd(out_prob, get_full_indices(ground_truths[BoxField.LABELS]))
+        # Compute the classification cost. Contrary to the loss, we don't use the NLL,
+        # but approximate it in 1 - proba[target class].
+        # The 1 is a constant that doesn't change the matching, it can be ommitted.
+        # [batch_size, num_detection, nb_target]
+        cost_class = -cost
+
+        gt_boxes = ground_truths[BoxField.BOXES]
+        # Compute the L1 cost between boxes
+        # [batch_size, nb_target, num_detection]
+        cost_bbox = tf.norm(localization_pred[:, None] - gt_boxes[:, :, None], ord=1, axis=-1)
+
+        # Compute the giou cost betwen boxes
+        # [batch_size, nb_target, num_detection]
+        cost_giou = compute_giou(gt_boxes, localization_pred)
+
+        # Final cost matrix
+        cost_matrix = self.cost_bbox * cost_bbox + self.cost_class * cost_class + self.cost_giou * cost_giou
+        # Linear sum assignment or the hungarian_assignment will look for the
+        # minimum weight matching in bipartite graphs. In our case, we are
+        # looking for the highest values of the cost matrix.
+        return -cost_matrix

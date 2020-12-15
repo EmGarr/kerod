@@ -34,8 +34,8 @@ def transform_fpcoor_for_tf(boxes: tf.Tensor, tensor_shape: tuple, crop_shape: t
     spacing_h = (y_max - y_min) / tf.cast(crop_shape[0], boxes.dtype)
     spacing_w = (x_max - x_min) / tf.cast(crop_shape[1], boxes.dtype)
 
-    tensor_shape = (tf.cast(tensor_shape[0] - 1, boxes.dtype),
-                    tf.cast(tensor_shape[1] - 1, boxes.dtype))
+    tensor_shape = (tf.cast(tensor_shape[0] - 1,
+                            boxes.dtype), tf.cast(tensor_shape[1] - 1, boxes.dtype))
 
     ny0 = (y_min + spacing_h / 2 - 0.5) / tensor_shape[0]
     nx0 = (x_min + spacing_w / 2 - 0.5) / tensor_shape[1]
@@ -100,17 +100,16 @@ def compute_intersection(boxes1: tf.Tensor, boxes2: tf.Tensor, perm=None) -> tf.
         y_min2, x_min2, y_max2, x_max2 = tf.split(value=boxes2, num_or_size_splits=4, axis=-1)
         all_pairs_min_ymax = tf.minimum(y_max1, tf.transpose(y_max2, perm=perm))
         all_pairs_max_ymin = tf.maximum(y_min1, tf.transpose(y_min2, perm=perm))
-        intersect_heights = tf.maximum(
-            tf.constant(0, boxes1.dtype), all_pairs_min_ymax - all_pairs_max_ymin)
+        zero = tf.convert_to_tensor(0.0, boxes1.dtype)
+        intersect_heights = tf.maximum(zero, all_pairs_min_ymax - all_pairs_max_ymin)
         all_pairs_min_xmax = tf.minimum(x_max1, tf.transpose(x_max2, perm=perm))
         all_pairs_max_xmin = tf.maximum(x_min1, tf.transpose(x_min2, perm=perm))
-        intersect_widths = tf.maximum(
-            tf.constant(0, boxes1.dtype), all_pairs_min_xmax - all_pairs_max_xmin)
+        intersect_widths = tf.maximum(zero, all_pairs_min_xmax - all_pairs_max_xmin)
         return intersect_heights * intersect_widths
 
 
 def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
-    """Computes pairwise intersection-over-union between box collections.
+    """Computes pairwise intersection-over-union between boxes.
 
     Example:
 
@@ -156,7 +155,28 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
 
     ValueError: If your tensor is different than 2D or 3D.
     """
-    with tf.name_scope('IOU'):
+    return compute_giou(boxes1, boxes2, mode='iou')
+
+
+def compute_giou(boxes1: tf.Tensor, boxes2: tf.Tensor, mode: str = "giou") -> tf.Tensor:
+    """Computes pairwise general intersection-over-union between boxes following:
+    https://giou.stanford.edu/
+
+    Arguments:
+
+    - *boxes1*: A 2D or 3D Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes2*: A 2D or 3D Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *mode*: You can select iou or giou.
+
+    Returns:
+
+    A tensor with shape [N, M] representing pairwise iou scores.
+
+    Raises:
+
+    ValueError: If your tensor is different than 2D or 3D.
+    """
+    with tf.name_scope(mode.upper()):
         if len(boxes1.shape) == 2:
             perm = None
             which_dim_expands = 0
@@ -169,11 +189,26 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
         intersections = compute_intersection(boxes1, boxes2, perm=perm)
         areas1 = compute_area(boxes1)
         areas2 = compute_area(boxes2)
-        unions = (
-            tf.expand_dims(areas1, -1) + tf.expand_dims(areas2, which_dim_expands) - intersections)
-        return tf.where(
-            tf.equal(intersections, 0), tf.zeros_like(intersections),
-            tf.truediv(intersections, unions))
+        unions = areas1[..., None] + tf.expand_dims(areas2, which_dim_expands) - intersections
+        iou = tf.where(intersections == 0, tf.zeros_like(intersections),
+                       tf.truediv(intersections, unions))
+
+        if mode == "iou":
+            return iou
+
+        y_min1, x_min1, y_max1, x_max1 = tf.split(boxes1, 4, axis=-1)
+        y_min2, x_min2, y_max2, x_max2 = tf.split(boxes2, 4, axis=-1)
+        enclose_ymin = tf.minimum(y_min1, tf.transpose(y_min2, perm=perm))
+        enclose_xmin = tf.minimum(x_min1, tf.transpose(x_min2, perm=perm))
+        enclose_ymax = tf.maximum(y_max1, tf.transpose(y_max2, perm=perm))
+        enclose_xmax = tf.maximum(x_max1, tf.transpose(x_max2, perm=perm))
+
+        zero = tf.convert_to_tensor(0.0, boxes1.dtype)
+        enclose_width = tf.maximum(zero, enclose_xmax - enclose_xmin)
+        enclose_height = tf.maximum(zero, enclose_ymax - enclose_ymin)
+        enclose_area = enclose_width * enclose_height
+        giou = iou - tf.math.divide_no_nan((enclose_area - unions), enclose_area)
+        return giou
 
 
 def normalize_box_coordinates(boxes, height: int, width: int):
