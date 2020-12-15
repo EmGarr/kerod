@@ -52,14 +52,6 @@ def test_compute_iou_2d_tensor():
     np.testing.assert_allclose(iou_output, exp_output)
 
 
-def test_compute_iou_2d_tensor():
-    boxes1 = tf.constant([[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]])
-    boxes2 = tf.constant([[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]])
-    exp_output = [[2.0 / 16.0, 0, 6.0 / 400.0], [1.0 / 16.0, 0.0, 5.0 / 400.0]]
-    iou_output = box_ops.compute_giou(boxes1, boxes2, mode='giou')
-    np.testing.assert_allclose(iou_output, exp_output)
-
-
 def test_compute_iou_3d_tensor():
     boxes1 = tf.constant([[[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]],
                           [[4.0, 3.0, 7.0, 5.0], [0, 0, 0, 0]]])
@@ -76,10 +68,12 @@ def test_compute_giou_3d_tensor():
                           [[4.0, 3.0, 7.0, 5.0], [0, 0, 0, 0]]])
     boxes2 = tf.constant([[[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]],
                           [[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]]])
-    exp_output = [[[2.0 / 16.0, 0, 6.0 / 400.0], [1.0 / 16.0, 0.0, 5.0 / 400.0]],
-                  [[2.0 / 16.0, 0, 6.0 / 400.0], [0, 0, 0]]]
+    exp_iou = np.array([[[2.0 / 16.0, 0, 6.0 / 400.0], [1.0 / 16.0, 0.0, 5.0 / 400.0]],
+                        [[2.0 / 16.0, 0, 6.0 / 400.0], [0, 0, 0]]])
+    exp_term2 = np.array([[[4. / 20, 125 / 132, 0.], [12 / 28., 84 / 90., 0.]],
+                          [[4. / 20, 125. / 132, 0.], [36. / 48, 224. / 225, 0.]]])
     iou_output = box_ops.compute_giou(boxes1, boxes2, mode='giou')
-    np.testing.assert_allclose(iou_output, exp_output)
+    np.testing.assert_allclose(iou_output, exp_iou - exp_term2)
 
 
 def test_compute_iou_works_on_empty_inputs():
@@ -92,17 +86,6 @@ def test_compute_iou_works_on_empty_inputs():
     np.testing.assert_array_equal(iou_empty_1.shape, (2, 0))
     np.testing.assert_array_equal(iou_empty_2.shape, (0, 3))
     np.testing.assert_array_equal(iou_empty_3.shape, (0, 0))
-
-
-def test_compute_giou_3d_tensor():
-    boxes1 = tf.constant([[[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]],
-                          [[4.0, 3.0, 7.0, 5.0], [0, 0, 0, 0]]])
-    boxes2 = tf.constant([[[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]],
-                          [[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]]])
-    exp_output = [[[2.0 / 16.0, 0, 6.0 / 400.0], [1.0 / 16.0, 0.0, 5.0 / 400.0]],
-                  [[2.0 / 16.0, 0, 6.0 / 400.0], [0, 0, 0]]]
-    iou_output = box_ops.compute_giou(boxes1, boxes2, mode='giou')
-    np.testing.assert_allclose(iou_output, exp_output)
 
 
 def test_normalize_boxes_coordinates():

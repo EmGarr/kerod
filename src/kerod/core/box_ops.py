@@ -144,12 +144,14 @@ def compute_iou(boxes1: tf.Tensor, boxes2: tf.Tensor) -> tf.Tensor:
 
     Arguments:
 
-    - *boxes1*: A 2D or 3D Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
-    - *boxes2*: A 2D or 3D Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes1*: A 2D Tensor of shape [N, (y_min,x_min,y_max,x_max)] or a or 3D
+    Tensor of shape [batch_size, N, (y_min,x_min,y_max,x_max)]
+    - *boxes2*: A 2D Tensor of shape [M, (y_min,x_min,y_max,x_max)] or a or 3D
+    Tensor of shape [batch_size, M, (y_min,x_min,y_max,x_max)]    Returns:
 
-    Returns:
+    Return:
 
-    A tensor with shape [N, M] representing pairwise iou scores.
+    A tensor with shape [N, M] or [batch_size, N, M] representing pairwise iou scores.
 
     Raises:
 
@@ -164,13 +166,15 @@ def compute_giou(boxes1: tf.Tensor, boxes2: tf.Tensor, mode: str = "giou") -> tf
 
     Arguments:
 
-    - *boxes1*: A 2D or 3D Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
-    - *boxes2*: A 2D or 3D Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]
+    - *boxes1*: A 2D Tensor of shape [N, (y_min,x_min,y_max,x_max)] or a or 3D
+    Tensor of shape [batch_size, N, (y_min,x_min,y_max,x_max)]
+    - *boxes2*: A 2D Tensor of shape [M, (y_min,x_min,y_max,x_max)] or a or 3D
+    Tensor of shape [batch_size, M, (y_min,x_min,y_max,x_max)]
     - *mode*: You can select iou or giou.
 
     Returns:
 
-    A tensor with shape [N, M] representing pairwise iou scores.
+    A tensor with shape [N, M] or [batch_size, N, M] representing pairwise iou scores.
 
     Raises:
 

@@ -1,5 +1,3 @@
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
-# From detectron2 and Modified by Emilien Garreau
 from typing import List
 import tensorflow as tf
 from kerod.utils import item_assignment, get_full_indices
@@ -157,113 +155,45 @@ class Matcher:
         return match_labels
 
 
-class HungarianMatcher:
-    """This class computes an assignment between the targets and the predictions of the network
+def hungarian_matching(match_quality_matrix: tf.Tensor, num_valid_boxes: tf.Tensor):
+    """Find the maximum-weight matching of the match_quality_matrix.
+    A maximum-weight matching is also a perfect matching.
 
-    For efficiency reasons, the targets don't include the no_object. Because of this, in general,
-    there are more predictions than targets. In this case, we do a 1-to-1 matching of the best predictions,
-    while the others are un-matched (and thus treated as non-objects).
+    Arguments:
+
+    - *match_quality_matrix*: A tensor or shape [batch_size, M, N], containing the
+    pairwise quality between M ground-truth elements and N predicted
+    elements.
+
+    - *num_valid_boxes*: A tensor of shape [batch_size, 1] indicating where is the padding on
+    the ground_truth_boxes. E.g: If your quality_matrix is of shape [2, 4, 6] and `num_valid_boxes` 
+    is equal to [3, 4] the boxes for the `batch=0` is padded from `pos=3`. It means,
+    that `quality_matrix[0, 3:]` all the values from this pattern should not be considered because
+    of the padding.
+
+    Returns:
+
+    - *matches*: a tensor of int32 and shape [batch_size, N], where matches[b, i] is a matched
+            ground-truth index in [b, 0, M)
+    - *match_labels*: a tensor of int32 and shape [batch_size, N], where match_labels[i] indicates
+            whether a prediction is a true (1) or false positive (0) or ignored (-1)
     """
 
-    def __init__(self, cost_class: float = 1, cost_bbox: float = 1, cost_giou: float = 1):
-        """Creates the matcher
+    def hungarian_assignment(cost_matrix):
+        return tf.py_function(lambda c: linear_sum_assignment(c), [cost_matrix],
+                              Tout=(tf.int32, tf.int32))
 
-        Arguments:
-            cost_class: This is the relative weight of the classification error in the matching cost
-            cost_bbox: This is the relative weight of the L1 error of the bounding box coordinates in the matching cost
-            cost_giou: This is the relative weight of the giou loss of the bounding box in the matching cost
-        """
-        self.cost_class = cost_class
-        self.cost_bbox = cost_bbox
-        self.cost_giou = cost_giou
-        assert cost_class != 0 or cost_bbox != 0 or cost_giou != 0, "all costs can't be 0"
+    # [batch_size, num_gt_boxes]
+    indices = tf.vectorized_map(hungarian_assignment, match_quality_matrix)
 
-    def __call__(self, classification_logits, localization_pred, ground_truths):
-        """ Performs the matching
+    matches = tf.one_hot(indices[1], tf.shape(match_quality_matrix)[-1], dtype=tf.int32)
+    match_labels = tf.cast(tf.reduce_max(matches, axis=1), tf.int32)
+    matches = tf.reduce_max(matches * indices[0][..., None], axis=1)
 
-        Arguments:
-
-        - *localization_pred*: A list of tensors of shape [batch_size, num_anchors, 4].
-        - *classification_pred*: A list of tensors of shape [batch_size, num_anchors, 2]
-        - *ground_truths*: A dict with BoxField as key and a tensor as value.
-
-        ```python
-        ground_truths = {
-            BoxField.BOXES:
-                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
-            BoxField.LABELS:
-                tf.constant([[1, 0], [1, 0]], tf.float32),
-            BoxField.WEIGHTS:
-                tf.constant([[1, 0], [1, 1]], tf.float32),
-            BoxField.NUM_BOXES:
-                tf.constant([[2], [1]], tf.int32)
-        }
-        ```
-
-        where `NUM_BOXES` allows to remove the padding created by tf.Data.
-
-        Returns:
-
-        - *matches*: a tensor of int32 and shape [batch_size, N], where matches[b, i] is a matched
-        ground-truth index in [b, 0, M)
-        - *match_labels*: a tensor of int32 and shape [batch_size, N], where match_labels[i] indicates
-                whether a prediction is a true (1) or false positive (0) or ignored (-1)
-        """
-
-        # TODO investigate to get GPU ops for hungarian_assignment
-        def hungarian_assignment(cost_matrix):
-            return tf.py_function(lambda c: linear_sum_assignment(c), [cost_matrix],
-                                  Tout=(tf.int32, tf.int32))
-
-        cost_matrix = self.compute_cost_matrix(classification_logits, localization_pred,
-                                               ground_truths)
-
-        indices = tf.vectorized_map(hungarian_assignment, cost_matrix)  # [batch_size, num_gt_boxes]
-
-        matches = tf.one_hot(indices[1], tf.shape(classification_logits)[1], dtype=tf.int32)
-        match_labels = tf.cast(tf.reduce_max(matches, axis=1), tf.int32)
-        matches = tf.reduce_max(matches * indices[0][..., None], axis=1)
-
-        # Remove all the padded groundtruths
-        # e.g: matches = [1, 0, 4, 3] num_valid_boxes = [3]
-        # mask_padded_boxes = [0, 0, 1, 1]
-        mask_padded_boxes = matches >= ground_truths[BoxField.NUM_BOXES]
-        # Will flag to -1 all the padded boxes to avoid sampling them
-        match_labels = item_assignment(match_labels, mask_padded_boxes, -1)
-        return tf.stop_gradient(matches), tf.stop_gradient(match_labels)
-
-    def compute_cost_matrix(self, classification_logits, localization_pred, ground_truths):
-        """ Compute the cost matrix according to the paper
-        [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers).
-
-        Return:
-        A 3-D Tensor of float and shape [batch_size, num_groundtruths, num_detection]
-        """
-        out_prob = tf.nn.softmax(classification_logits, -1)
-
-        # Extract the target classes to approximate the classification cost
-        # [batch_size, nb_class, num_detection]
-        out_prob = tf.transpose(out_prob, [0, 2, 1])
-        # [batch_size, nb_target, num_detection]
-        cost = tf.gather_nd(out_prob, get_full_indices(ground_truths[BoxField.LABELS]))
-        # Compute the classification cost. Contrary to the loss, we don't use the NLL,
-        # but approximate it in 1 - proba[target class].
-        # The 1 is a constant that doesn't change the matching, it can be ommitted.
-        # [batch_size, num_detection, nb_target]
-        cost_class = -cost
-
-        gt_boxes = ground_truths[BoxField.BOXES]
-        # Compute the L1 cost between boxes
-        # [batch_size, nb_target, num_detection]
-        cost_bbox = tf.norm(localization_pred[:, None] - gt_boxes[:, :, None], ord=1, axis=-1)
-
-        # Compute the giou cost betwen boxes
-        # [batch_size, nb_target, num_detection]
-        cost_giou = compute_giou(gt_boxes, localization_pred)
-
-        # Final cost matrix
-        cost_matrix = self.cost_bbox * cost_bbox + self.cost_class * cost_class + self.cost_giou * cost_giou
-        # Linear sum assignment or the hungarian_assignment will look for the
-        # minimum weight matching in bipartite graphs. In our case, we are
-        # looking for the highest values of the cost matrix.
-        return -cost_matrix
+    # Remove all the padded groundtruths
+    # e.g: matches = [1, 0, 4, 3] num_valid_boxes = [3]
+    # mask_padded_boxes = [0, 0, 1, 1]
+    mask_padded_boxes = matches >= num_valid_boxes
+    # Will flag to -1 all the padded boxes to avoid sampling them
+    match_labels = item_assignment(match_labels, mask_padded_boxes, -1)
+    return tf.stop_gradient(matches), tf.stop_gradient(match_labels)

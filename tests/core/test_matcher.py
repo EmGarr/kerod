@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from kerod.core.matcher import Matcher, HungarianMatcher
-from kerod.core.standard_fields import BoxField
+from kerod.core.matcher import Matcher, hungarian_matching
 
 
 def test_matcher():
@@ -125,23 +124,17 @@ def test_matcher_with_one_threshold():
 
 
 def test_hungarian_matcher_compute_cost_matrix():
-    num_classes = 10
-    ground_truths = {
-        BoxField.BOXES:
-            tf.constant([[[0, 0, 1, 1], [0, 0, 0.1, .1]], [[0, 0, .3, .3], [0, 0, 0, 0]]],
-                        tf.float32),
-        BoxField.LABELS:
-            tf.constant([[1, 0], [1, 0]], tf.int32),
-        BoxField.WEIGHTS:
-            tf.constant([[1, 0], [1, 1]], tf.float32),
-        BoxField.NUM_BOXES:
-            tf.constant([[2], [1]], tf.int32)
-    }
+    similarity = np.array([
+        [[0., 1, 1, 3, -1], [2, -1, 2, 0, 4]],
+        [[1., 0.1, 1, 3, 0], [8, 0.4, 2, 0, 0.2]],
+    ])
+    num_valid_boxes = np.array([[2], [1]], np.int32)
+    matches, match_labels = hungarian_matching(similarity, num_valid_boxes)
+    expected_matched = np.array([[0, 1, 0, 0, 0], [0, 0, 0, 1, 0]])
+    # For the second batch notice that the number of valid boxes is 1 instead of 2
+    # It means that the second row (groundtruth = 1) is a padding. Hence we flag
+    # it has -1.
+    expected_matched_labels = np.array([[0, 1, 0, 0, 1], [0, 0, 0, -1, 1]])
 
-    classification_logits = tf.random.normal((2, 50, num_classes))
-    localisation_pred = tf.random.normal((2, 50, 4))
-    matcher = HungarianMatcher()
-    out = matcher.compute_cost_matrix(classification_logits, localisation_pred, ground_truths)
-    matches, match_labels = matcher(classification_logits, localisation_pred, ground_truths)
-    import pdb; pdb.set_trace()
-
+    np.testing.assert_array_equal(matches, expected_matched)
+    np.testing.assert_array_equal(match_labels, expected_matched_labels)

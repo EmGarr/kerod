@@ -44,7 +44,7 @@ class DetrSimilarity(Similarity):
         pairwise  similarity scores defined in DeTr.
         """
         classification_logits = y_pred[BoxField.LABELS]
-        localization_pred = y_pred[BoxField.LABELS]
+        localization_pred = y_pred[BoxField.BOXES]
         out_prob = tf.nn.softmax(classification_logits, -1)
 
         # Extract the target classes to approximate the classification cost
@@ -65,7 +65,8 @@ class DetrSimilarity(Similarity):
 
         # Compute the giou cost betwen boxes
         # [batch_size, nb_target, num_detection]
-        cost_giou = compute_giou(gt_boxes, localization_pred)
+        # loss_giou= 1- giou but we approximate it with -giou
+        cost_giou = -compute_giou(gt_boxes, localization_pred)
 
         # Final cost matrix
         cost_matrix = cost_bbox + cost_class + cost_giou
