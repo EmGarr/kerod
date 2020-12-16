@@ -38,6 +38,28 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 - [ ] (checkout **detr*** branch)[End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers).
 - [ ] [Object Relation Network for object detection](https://arxiv.org/abs/1711.11575): aims to replace the fast-rcnn head multiclass nms. Will allow to make a better usage of the GPU (The NMS is used on CPU and block the serving efficiency).
 
+## Try Kerod 
+
+### Notebooks
+
+Training an algorithm on COCO or Pascal VOC has never been so easy. You just need to run the cells and everything will be done for you. 
+
+You can find examples in the [notebooks folder](./notebooks). There are no runners shipped with the library.
+
+| Algorithm | Dataset | Performance | MultiGPU | Mixed Precision | Notebook |
+| -------- | -------- | --- |----|---- | --|
+| [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | PascalVoc |             |          |                 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/pascal_voc_training_fpn50.ipynb) |
+| [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | PascalVoc |             |                    | :heavy_check_mark: | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb) |   |
+| [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | COCO      |             |                    |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb)                             |   |
+| [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | COCO      | 30 mAP      | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training_multi_gpu.ipynb)                   |   |
+### Requirements
+
+If you don't run the examples on Colab please install `tensorflow_datasets`:
+
+```bash
+pip install tensorflow_datasets
+```
+
 ### No configuration file
 
 The code is (I hope) as simple as possible. You won't find any configuration file. All the parameters have already been chosen for you. If you need to change something simply code it and create a new layer.
@@ -168,27 +190,6 @@ with mirrored_strategy.scope():
 
 model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
 ```
-
-### Notebooks
-
-#### Requirements
-
-If you don't run the examples on Colab please install `tensorflow_datasets`:
-
-```bash
-pip install tensorflow_datasets
-```
-
-#### Examples
-
-Training an algorithm on COCO or Pascal VOC has never been so easy. You just need to run the cells and everything will be done for you. 
-
-You can find examples in the [notebooks folder](./notebooks). There are no runners shipped with the library.
-
-- Pascal VOC training example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/pascal_voc_training_fpn50.ipynb).
-- Mixed precision Pascal VOC training (single GPU)[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb).
-- Coco example (single GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb).
-- Coco example (Multi-GPU) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training_multi_gpu.ipynb).
 
 ### Serving
 
