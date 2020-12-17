@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from kerod.core.standard_fields import BoxField, LossField
+from kerod.core.standard_fields import BoxField
 from kerod.model.detection.fast_rcnn import FastRCNN, compute_fast_rcnn_metrics
 
 
@@ -80,12 +80,12 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
     expected_weights_localization[1, 2] = 1
     expected_weights_localization[1, 3] = 1
 
-    np.testing.assert_array_equal(expected_y_true_classification, y_true[LossField.CLASSIFICATION])
+    np.testing.assert_array_equal(expected_y_true_classification, y_true[BoxField.LABELS])
     np.testing.assert_array_almost_equal(expected_y_true_localization,
-                                         y_true[LossField.LOCALIZATION], decimal=4)
-    np.testing.assert_array_equal(expected_weights_classification,
-                                  weights[LossField.CLASSIFICATION])
-    np.testing.assert_array_equal(expected_weights_localization, weights[LossField.LOCALIZATION])
+                                         y_true[BoxField.BOXES],
+                                         decimal=4)
+    np.testing.assert_array_equal(expected_weights_classification, weights[BoxField.LABELS])
+    np.testing.assert_array_equal(expected_weights_localization, weights[BoxField.BOXES])
 
     # In this batch [0, 0, 2, 2] isn't sampled because of the ground_truths weights
     # On the ground_truths [0, 0, 2, 2] the weights has been set to 0
@@ -128,18 +128,18 @@ def test_fast_rcnn_compute_loss(mock_add_loss, mock_add_metric):
     y_true_loc = tf.constant([[[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
                               [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]])
 
-    y_true = {LossField.CLASSIFICATION: y_true_cls, LossField.LOCALIZATION: y_true_loc}
+    y_true = {BoxField.LABELS: y_true_cls, BoxField.BOXES: y_true_loc}
     weights = {
-        LossField.CLASSIFICATION: tf.ones((2, 3), tf.float32),
-        LossField.LOCALIZATION: tf.constant([[1, 0, 0], [0, 1, 1]], tf.float32)
+        BoxField.LABELS: tf.ones((2, 3), tf.float32),
+        BoxField.BOXES: tf.constant([[1, 0, 0], [0, 1, 1]], tf.float32)
     }
     num_classes = 3
     fast_rcnn = FastRCNN(num_classes)
 
     losses = fast_rcnn.compute_loss(y_true, weights, classification_pred, localization_pred)
 
-    assert losses[LossField.CLASSIFICATION] == 400 / 3 / 2
-    assert losses[LossField.LOCALIZATION] == 0.5
+    assert losses[BoxField.LABELS] == 400 / 3 / 2
+    assert losses[BoxField.BOXES] == 0.5
     assert len(losses) == 2
 
 

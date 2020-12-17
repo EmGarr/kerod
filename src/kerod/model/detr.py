@@ -5,7 +5,7 @@ from kerod.model.layers.transformer import Transformer
 from kerod.core.matcher import hungarian_matching
 from kerod.utils.training import apply_kernel_regularization
 from kerod.model.backbone.resnet import ResNet50PytorchStyle
-from kerod.core.standard_fields import DatasetField, BoxField, LossField
+from kerod.core.standard_fields import BoxField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.core.similarity import DetrSimilarity
 from kerod.model.layers.positional_encoding import PositionEmbeddingLearned
@@ -125,16 +125,15 @@ class DeTr(tf.keras.Model):
                 ground_truths[BoxField.NUM_BOXES]
         }
         y_true, weights = self.target_assigner.assign(y_pred, ground_truths)
-        giou = self.giou(y_true[LossField.LOCALIZATION], y_pred[BoxField.BOXES],
-                         sample_weight=weights[LossField.LOCALIZATION])
-        mae = self.mae(y_true[LossField.LOCALIZATION],
+        giou = self.giou(y_true[BoxField.BOXES], y_pred[BoxField.BOXES],
+                         sample_weight=weights[BoxField.BOXES])
+        mae = self.mae(y_true[BoxField.BOXES],
                        y_pred[BoxField.BOXES],
-                       sample_weight=weights[LossField.LOCALIZATION])
+                       sample_weight=weights[BoxField.BOXES])
 
-        scc = self.scc(y_true[LossField.CLASSIFICATION],
+        scc = self.scc(y_true[BoxField.LABELS],
                        y_pred[BoxField.LABELS],
-                       sample_weight=weights[LossField.CLASSIFICATION])
-        import pdb; pdb.set_trace()
+                       sample_weight=weights[BoxField.LABELS])
         return tf.reduce_mean(tf.reduce_sum(giou * mae + scc, axis=1))
 
     def train_step(self, data):

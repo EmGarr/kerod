@@ -10,7 +10,7 @@ from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.similarity import IoUSimilarity
-from kerod.core.standard_fields import BoxField, LossField
+from kerod.core.standard_fields import BoxField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 from kerod.model.detection.pooling_ops import multilevel_roi_align
@@ -156,15 +156,15 @@ class FastRCNN(AbstractDetectionHead):
         Returns:
 
         - *y_true*: A dict with :
-            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
+            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,
             num_classes],
-            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors,
+            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,
             box_code_dimension]
 
         - *weights*: A dict with:
-            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors,
+            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,
             num_classes],
-            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors],
+            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],
 
         Raises:
 
@@ -185,16 +185,16 @@ class FastRCNN(AbstractDetectionHead):
         }
         y_true, weights = self.target_assigner.assign({BoxField.BOXES: anchors}, ground_truths)
 
-        labels = y_true[LossField.CLASSIFICATION] > 0
+        labels = y_true[BoxField.LABELS] > 0
         sample_idx = batch_sample_balanced_positive_negative(
-            weights[LossField.CLASSIFICATION],
+            weights[BoxField.LABELS],
             sampling_size,
             labels,
             positive_fraction=sampling_positive_ratio,
             dtype=self._compute_dtype)
 
-        weights[LossField.CLASSIFICATION] = sample_idx * weights[LossField.CLASSIFICATION]
-        weights[LossField.LOCALIZATION] = sample_idx * weights[LossField.LOCALIZATION]
+        weights[BoxField.LABELS] = sample_idx * weights[BoxField.LABELS]
+        weights[BoxField.BOXES] = sample_idx * weights[BoxField.BOXES]
 
         selected_boxes_idx = tf.where(sample_idx == 1)
 
@@ -204,11 +204,11 @@ class FastRCNN(AbstractDetectionHead):
         # tf.gather_nd collaps the batch_together so we reshape with the proper batch_size
         anchors = tf.reshape(tf.gather_nd(anchors, selected_boxes_idx), (batch_size, -1, 4))
 
-        y_true[LossField.LOCALIZATION] = tf.reshape(
-            tf.gather_nd(y_true[LossField.LOCALIZATION], selected_boxes_idx), (batch_size, -1, 4))
+        y_true[BoxField.BOXES] = tf.reshape(
+            tf.gather_nd(y_true[BoxField.BOXES], selected_boxes_idx), (batch_size, -1, 4))
 
-        y_true[LossField.CLASSIFICATION] = tf.reshape(
-            tf.gather_nd(y_true[LossField.CLASSIFICATION], selected_boxes_idx), (batch_size, -1))
+        y_true[BoxField.LABELS] = tf.reshape(
+            tf.gather_nd(y_true[BoxField.LABELS], selected_boxes_idx), (batch_size, -1))
 
         for key in y_true.keys():
             weights[key] = tf.reshape(tf.gather_nd(weights[key], selected_boxes_idx),
@@ -224,11 +224,11 @@ class FastRCNN(AbstractDetectionHead):
         Arguments:
 
         - *y_true*: A dict with :
-            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors, num_classes]
-            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors, 4]
+            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors, num_classes]
+            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors, 4]
         - *weights*: A dict with:
-            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors, num_classes]
-            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors]
+            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors, num_classes]
+            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors]
         - *classification_pred*: A tensor and shape
         [batch_size, num_anchors, num_classes]
         - *localization_pred*: A tensor and shape
@@ -239,14 +239,14 @@ class FastRCNN(AbstractDetectionHead):
         - *classification_loss*: A scalar
         - *localization_loss*: A scalar
         """
-        y_true_classification = tf.cast(y_true[LossField.CLASSIFICATION], tf.int32)
+        y_true_classification = tf.cast(y_true[BoxField.LABELS], tf.int32)
         accuracy, fg_accuracy, false_negative = compute_fast_rcnn_metrics(
             y_true_classification, classification_pred)
         self.add_metric(accuracy, name='accuracy', aggregation='mean')
         self.add_metric(fg_accuracy, name='fg_accuracy', aggregation='mean')
         self.add_metric(false_negative, name='false_negative', aggregation='mean')
 
-        # y_true[LossField.CLASSIFICATION] is just 1 and 0 we are using it as mask to extract
+        # y_true[BoxField.LABELS] is just 1 and 0 we are using it as mask to extract
         # the corresponding target anchors
         batch_size = tf.shape(classification_pred)[0]
         # We create a boolean mask to extract the desired localization prediction to compute
@@ -262,8 +262,8 @@ class FastRCNN(AbstractDetectionHead):
         extracted_localization_pred = tf.reshape(extracted_localization_pred, (batch_size, -1, 4))
 
         y_pred = {
-            LossField.CLASSIFICATION: classification_pred,
-            LossField.LOCALIZATION: extracted_localization_pred
+            BoxField.LABELS: classification_pred,
+            BoxField.BOXES: extracted_localization_pred
         }
 
         return self.compute_losses(y_true, y_pred, weights)

@@ -5,7 +5,6 @@ from kerod.core.standard_fields import BoxField
 from kerod.core import target_assigner as targetassigner
 from kerod.core.similarity import IoUSimilarity
 from kerod.core.matcher import Matcher
-from kerod.core.standard_fields import LossField
 
 
 def encode_mean_stddev(boxes, anchors, stddev=0.1):
@@ -41,10 +40,10 @@ def test_assign_multiclass_with_groundtruth_weights():
     }
 
     targets, weights = target_assigner.assign({BoxField.BOXES: anchor_means}, gt_box_batch)
-    cls_targets = targets[LossField.CLASSIFICATION]
-    cls_weights = weights[LossField.CLASSIFICATION]
-    reg_targets = targets[LossField.LOCALIZATION]
-    reg_weights = weights[LossField.LOCALIZATION]
+    cls_targets = targets[BoxField.LABELS]
+    cls_weights = weights[BoxField.LABELS]
+    reg_targets = targets[BoxField.BOXES]
+    reg_weights = weights[BoxField.BOXES]
 
     np.testing.assert_array_almost_equal(cls_weights, exp_cls_weights)
     np.testing.assert_array_almost_equal(reg_weights, exp_reg_weights)
@@ -85,10 +84,10 @@ def test_batch_assign_multiclass_targets_with_padded_groundtruth():
     }
 
     targets, weights = target_assigner.assign({BoxField.BOXES: anchor_means}, gt_box_batch)
-    cls_targets = targets[LossField.CLASSIFICATION]
-    cls_weights = weights[LossField.CLASSIFICATION]
-    reg_targets = targets[LossField.LOCALIZATION]
-    reg_weights = weights[LossField.LOCALIZATION]
+    cls_targets = targets[BoxField.LABELS]
+    cls_weights = weights[BoxField.LABELS]
+    reg_targets = targets[BoxField.BOXES]
+    reg_weights = weights[BoxField.BOXES]
 
     np.testing.assert_array_almost_equal(cls_targets, exp_cls_targets)
     np.testing.assert_array_almost_equal(cls_weights, exp_cls_weights)
@@ -123,10 +122,10 @@ def test_target_assigner_with_padded_ground_truths():
     }
 
     targets, weights = target_assigner.assign({BoxField.BOXES: anchor_means}, gt_box_batch)
-    cls_targets = targets[LossField.CLASSIFICATION]
-    cls_weights = weights[LossField.CLASSIFICATION]
-    reg_targets = targets[LossField.LOCALIZATION]
-    reg_weights = weights[LossField.LOCALIZATION]
+    cls_targets = targets[BoxField.LABELS]
+    cls_weights = weights[BoxField.LABELS]
+    reg_targets = targets[BoxField.BOXES]
+    reg_weights = weights[BoxField.BOXES]
 
     exp_cls_targets = np.array([[1, 0, 0, 0], [0, 3, 2, 0]])
     exp_cls_weights = [[1, 1, 1, 1], [1, 1, 1, 1]]
@@ -139,6 +138,7 @@ def test_target_assigner_with_padded_ground_truths():
     np.testing.assert_array_almost_equal(cls_weights, exp_cls_weights)
     np.testing.assert_array_almost_equal(reg_targets, exp_reg_targets)
     np.testing.assert_array_almost_equal(reg_weights, exp_reg_weights)
+
 
 # NOTE is handling empty ground_truths useful?
 # def test_batch_assign_empty_groundtruth(self):
@@ -156,10 +156,10 @@ def test_target_assigner_with_padded_ground_truths():
 #             unmatched_class_label = tf.constant([1] + num_classes * [0], tf.float32)
 #             targets, weights, _ = targetassigner.batch_assign_targets(
 #                 multiclass_target_assigner, anchors_boxlist, gt_box_batch, unmatched_class_label)
-#             cls_targets = targets[LossField.CLASSIFICATION]
-#             cls_weights = weights[LossField.CLASSIFICATION]
-#             reg_targets = targets[LossField.LOCALIZATION]
-#             reg_weights = weights[LossField.LOCALIZATION]
+#             cls_targets = targets[BoxField.LABELS]
+#             cls_weights = weights[BoxField.LABELS]
+#             reg_targets = targets[BoxField.BOXES]
+#             reg_weights = weights[BoxField.BOXES]
 #             return (cls_targets, cls_weights, reg_targets, reg_weights)
 
 #         groundtruth_box_corners = np.zeros((0, 4), dtype=np.float32)

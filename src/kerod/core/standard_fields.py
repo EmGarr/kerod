@@ -8,11 +8,6 @@ class BoxField:
     WEIGHTS = 'weights'
 
 
-class LossField:
-    CLASSIFICATION = 'classification'
-    INSTANCE_SEGMENTATION = 'instance_segmentation'
-    LOCALIZATION = 'localization'
-
 
 class DatasetField:
     IMAGES = 'images'

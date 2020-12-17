@@ -9,8 +9,8 @@ def test_build_fpn_resnet50_faster_rcnn():
     model = DeTrResnet50Pytorch(num_classes, num_queries=20)
 
     classification, bbox = model(tf.zeros((2, 200, 200, 3)))
-    import pdb
-    pdb.set_trace()
+    # import pdb
+    # pdb.set_trace()
     # x['ground_truths'] = y
     # model(x, training=True)
 
@@ -50,5 +50,5 @@ def test_compute_loss_detr():
     exp_giou = 1 - (exp_iou - exp_term2)
     # (1 - 0.75, 1.947, 1- 0.0125), [1-0.75, 1-0.995555555, 1-0.015]
 
-    import pdb
-    pdb.set_trace()
+    # import pdb
+    # pdb.set_trace()

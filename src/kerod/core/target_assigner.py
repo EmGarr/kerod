@@ -22,7 +22,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 
 from kerod.core.matcher import Matcher
-from kerod.core.standard_fields import BoxField, LossField
+from kerod.core.standard_fields import BoxField
 from kerod.utils import item_assignment, get_full_indices
 
 
@@ -82,13 +82,13 @@ class TargetAssigner:
         Returns:
 
         - *y_true*: A dict with :
-            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors]
-            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors,
+            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors]
+            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,
             box_code_dimension]
 
         - *weights*: A dict with:
-            - *LossField.CLASSIFICATION*: a tensor with shape [batch_size, num_anchors],
-            - *LossField.LOCALIZATION*: a tensor with shape [batch_size, num_anchors],
+            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors],
+            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],
         """
         shape = tf.shape(groundtruth[BoxField.BOXES])
         batch_size = shape[0]
@@ -112,12 +112,12 @@ class TargetAssigner:
         cls_weights = self._create_classification_weights(groundtruth_weights, matched_labels)
 
         y_true = {
-            LossField.CLASSIFICATION: tf.cast(cls_targets, self.dtype),
-            LossField.LOCALIZATION: tf.cast(reg_targets, self.dtype)
+            BoxField.LABELS: tf.cast(cls_targets, self.dtype),
+            BoxField.BOXES: tf.cast(reg_targets, self.dtype)
         }
         weights = {
-            LossField.CLASSIFICATION: tf.cast(cls_weights, self.dtype),
-            LossField.LOCALIZATION: tf.cast(reg_weights, self.dtype)
+            BoxField.LABELS: tf.cast(cls_weights, self.dtype),
+            BoxField.BOXES: tf.cast(reg_weights, self.dtype)
         }
 
         return y_true, weights

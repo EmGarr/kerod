@@ -4,7 +4,7 @@ import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 
-from kerod.core.standard_fields import LossField
+from kerod.core.standard_fields import BoxField
 
 
 class AbstractDetectionHead(KL.Layer):
@@ -164,19 +164,18 @@ class AbstractDetectionHead(KL.Layer):
                           sample_weight=tf.cast(weights[target], tf.float32))
             return loss_weight * tf.reduce_mean(tf.reduce_sum(losses, axis=1) / normalizer)
 
-        normalizer = tf.maximum(tf.reduce_sum(weights[LossField.CLASSIFICATION], axis=1), 1.0)
+        normalizer = tf.maximum(tf.reduce_sum(weights[BoxField.LABELS], axis=1), 1.0)
         normalizer = tf.cast(normalizer, tf.float32)
 
         classification_loss = _compute_loss(self._classification_loss,
-                                            self._classification_loss_weight,
-                                            LossField.CLASSIFICATION)
+                                            self._classification_loss_weight, BoxField.LABELS)
 
         self.add_metric(classification_loss,
                         name=f'{self.name}_classification_loss',
                         aggregation='mean')
 
         localization_loss = _compute_loss(self._localization_loss, self._localization_loss_weight,
-                                          LossField.LOCALIZATION)
+                                          BoxField.BOXES)
 
         self.add_metric(localization_loss,
                         name=f'{self.name}_localization_loss',
@@ -186,23 +185,19 @@ class AbstractDetectionHead(KL.Layer):
 
         if self._use_mask:
             segmentation_loss = _compute_loss(self._segmentation_loss,
-                                              self._segmentation_loss_weight,
-                                              LossField.INSTANCE_SEGMENTATION)
+                                              self._segmentation_loss_weight, BoxField.MASKS)
 
             self.add_metric(segmentation_loss,
                             name=f'{self.name}_segmentation_loss',
                             aggregation='mean')
             self.add_loss(segmentation_loss)
             return {
-                LossField.CLASSIFICATION: classification_loss,
-                LossField.LOCALIZATION: localization_loss,
-                LossField.INSTANCE_SEGMENTATION: segmentation_loss
+                BoxField.LABELS: classification_loss,
+                BoxField.BOXES: localization_loss,
+                BoxField.MASKS: segmentation_loss
             }
 
-        return {
-            LossField.CLASSIFICATION: classification_loss,
-            LossField.LOCALIZATION: localization_loss
-        }
+        return {BoxField.LABELS: classification_loss, BoxField.BOXES: localization_loss}
 
     def get_config(self):
         base_config = super().get_config()

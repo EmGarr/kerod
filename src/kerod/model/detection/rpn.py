@@ -10,7 +10,7 @@ from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.similarity import IoUSimilarity
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
-from kerod.core.standard_fields import BoxField, LossField
+from kerod.core.standard_fields import BoxField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 
@@ -152,28 +152,28 @@ class RegionProposalNetwork(AbstractDetectionHead):
         # anchors are deterministic duplicate them to create a batch
         anchors = tf.tile(anchors[None], (tf.shape(ground_truths[BoxField.BOXES])[0], 1, 1))
         y_true, weights = self.target_assigner.assign({BoxField.BOXES: anchors}, ground_truths)
-        y_true[LossField.CLASSIFICATION] = tf.minimum(y_true[LossField.CLASSIFICATION], 1)
+        y_true[BoxField.LABELS] = tf.minimum(y_true[BoxField.LABELS], 1)
 
         ## Compute metrics
-        recall = compute_rpn_metrics(y_true[LossField.CLASSIFICATION], classification_pred,
-                                     weights[LossField.CLASSIFICATION])
+        recall = compute_rpn_metrics(y_true[BoxField.LABELS], classification_pred,
+                                     weights[BoxField.LABELS])
         self.add_metric(recall, name='rpn_recall', aggregation='mean')
 
         # All the boxes which are not -1 can be sampled
-        labels = y_true[LossField.CLASSIFICATION] > 0
+        labels = y_true[BoxField.LABELS] > 0
         sample_idx = batch_sample_balanced_positive_negative(
-            weights[LossField.CLASSIFICATION],
+            weights[BoxField.LABELS],
             SAMPLING_SIZE,
             labels,
             positive_fraction=SAMPLING_POSITIVE_RATIO,
             dtype=self._compute_dtype)
 
-        weights[LossField.CLASSIFICATION] = sample_idx * weights[LossField.CLASSIFICATION]
-        weights[LossField.LOCALIZATION] = sample_idx * weights[LossField.LOCALIZATION]
+        weights[BoxField.LABELS] = sample_idx * weights[BoxField.LABELS]
+        weights[BoxField.BOXES] = sample_idx * weights[BoxField.BOXES]
 
         y_pred = {
-            LossField.CLASSIFICATION: classification_pred,
-            LossField.LOCALIZATION: localization_pred
+            BoxField.LABELS: classification_pred,
+            BoxField.BOXES: localization_pred
         }
 
         return self.compute_losses(y_true, y_pred, weights)

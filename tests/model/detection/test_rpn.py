@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 import tensorflow as tf
 
-from kerod.core.standard_fields import BoxField, LossField
+from kerod.core.standard_fields import BoxField
 from kerod.model.detection.rpn import RegionProposalNetwork, compute_rpn_metrics
 
 
@@ -70,8 +70,8 @@ def test_compute_loss_rpn(mock_add_metric, mock_add_loss, mock_shuffle):
     rpn = RegionProposalNetwork(classification_loss_weight=1.0)
     losses = rpn.compute_loss([localization_pred], [classification_pred], [anchors], ground_truths)
 
-    assert losses[LossField.CLASSIFICATION] == 100
-    assert losses[LossField.LOCALIZATION] == 0
+    assert losses[BoxField.LABELS] == 100
+    assert losses[BoxField.BOXES] == 0
     assert len(losses) == 2
 
 
