@@ -42,7 +42,8 @@ def test_detr_similarity():
 
     exp_cost_class = np.array([[[-1., -1., -1.], [0., 0., 0.]], [[0., 0., -0.], [-1., -0.5, -0.5]]])
 
-    exp_cost_bbox = np.array([[[6., 39., 35.], [9., 30., 34.]], [[6., 39., 35.], [21., 58., 40.]]])
+    exp_cost_bbox = np.array([[[5., 22.5, 45.5], [8.5, 19., 40.]],
+                              [[5., 22.5, 45.5], [17.5, 31., 60.]]])
 
     exp_similarity = -(exp_giou + exp_cost_class + exp_cost_bbox)
 
