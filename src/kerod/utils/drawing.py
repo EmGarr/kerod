@@ -1,4 +1,3 @@
-from random import sample
 from typing import List, Union
 
 import matplotlib.colors as pltc
@@ -23,16 +22,17 @@ class BoxDrawer:
 
     def __init__(self, classes: List[str]):
         self._classes = classes
-        # TODO handle if the classes are above 148
         all_colors = [color for color in pltc.cnames.keys()]
-        self._colors = sample(all_colors, len(classes))
+        self._colors = [
+            all_colors[i] for i in np.random.randint(0, len(all_colors), size=len(classes))
+        ]
 
     def __call__(self,
                  images,
                  boxes,
-                 labels: Union[np.array, List[int], tf.Tensor],
-                 scores: Union[np.array, List[float], tf.Tensor],
-                 num_valid_detections: int,
+                 labels: Union[np.array, List[List[int]], tf.Tensor],
+                 scores: Union[np.array, List[List[float]], tf.Tensor],
+                 num_valid_detections: Union[np.array, List[int], tf.Tensor],
                  resize=True):
         """Outputs a copy of images but draws on top of the pixels zero or more bounding boxes specified
         by the locations in boxes. The coordinates of the each bounding box in boxes are encoded as
@@ -43,11 +43,11 @@ class BoxDrawer:
 
         Arguments:
 
-        - *image*: An image (tf.Tensor or numpy array)with shape [height, width, 3]
-        - *boxes*: An array (tf.Tensor, or Numpy array) of boxes with the following shape [num_boxes, (y_min, x_min, y_max, x_max)]
+        - *images*: An image (tf.Tensor or numpy array) with shape [batch, height, width, 3]
+        - *boxes*: An array (tf.Tensor, or Numpy array) of boxes with the following shape [batch, num_boxes, (y_min, x_min, y_max, x_max)]
         are as described by `1`. If set to false the boxes won't be resized.
-        - *labels*: A list of string corresponding to the predicted label.
-        - *scores*: A list of scores predicted
+        - *labels*: Label of the predicted boxes.
+        - *scores*: Score of the predicted boxes.
         - *num_valid_detections*: Number of boxes that we need to display. By default it will display all
         the boxes. This argument is useful whenever we are inference mode. The network perform padding
         operation and num_valid_detections is the value which allow to know which boxes were padded.
@@ -55,12 +55,16 @@ class BoxDrawer:
         """
         if isinstance(labels, np.ndarray):
             labels = labels.tolist()
-        elif isinstance(labels, tf.Tensor):
+        elif tf.is_tensor(labels):
             labels = labels.numpy().tolist()
         if isinstance(scores, np.ndarray):
             scores = scores.tolist()
-        elif isinstance(scores, tf.Tensor):
+        elif tf.is_tensor(scores):
             scores = scores.numpy().tolist()
+        if isinstance(num_valid_detections, np.ndarray):
+            num_valid_detections = num_valid_detections.tolist()
+        elif tf.is_tensor(num_valid_detections):
+            num_valid_detections = num_valid_detections.numpy().tolist()
 
         for im, bb, cls, scr, nvd in zip(images, boxes, labels, scores, num_valid_detections):
             labels = [self._classes[int(ind)] for ind in cls]
