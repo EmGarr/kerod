@@ -112,7 +112,7 @@ class TargetAssigner:
         cls_weights = self._create_classification_weights(groundtruth_weights, matched_labels)
 
         y_true = {
-            BoxField.LABELS: tf.cast(cls_targets, self.dtype),
+            BoxField.LABELS: tf.cast(cls_targets, tf.int32),
             BoxField.BOXES: tf.cast(reg_targets, self.dtype)
         }
         weights = {

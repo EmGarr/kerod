@@ -1,18 +1,42 @@
+import pytest
 import tensorflow as tf
-import numpy as np
-from kerod.model.detr import DeTr, DeTrResnet50Pytorch
-from kerod.core.standard_fields import BoxField
+from kerod.core.standard_fields import BoxField, DatasetField
+from kerod.model.detr import DeTr, DeTrResnet50Pytorch, compute_detr_metrics
 
 
-def test_build_fpn_resnet50_faster_rcnn():
+def test_build_detr():
     num_classes = 2
     model = DeTrResnet50Pytorch(num_classes, num_queries=20)
 
-    classification, bbox = model(tf.zeros((2, 200, 200, 3)))
-    # import pdb
-    # pdb.set_trace()
-    # x['ground_truths'] = y
-    # model(x, training=True)
+    # classification, bbox = model(tf.zeros((2, 200, 200, 3)))
+
+    ground_truths = {
+        BoxField.BOXES:
+            tf.constant([[[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]],
+                         [[4.0, 3.0, 7.0, 5.0], [0, 0, 0, 0]]]),
+        BoxField.LABELS:
+            tf.constant([[1, 0], [1, 0]], tf.int32),
+        BoxField.WEIGHTS:
+            tf.constant([[1, 0], [1, 1]], tf.float32),
+        BoxField.NUM_BOXES:
+            tf.constant([[2], [1]], tf.int32)
+    }
+
+    base_lr = 0.02
+    optimizer = tf.keras.optimizers.SGD(learning_rate=base_lr)
+    model.compile(optimizer=optimizer, loss=None)
+    model.train_step(({DatasetField.IMAGES: tf.zeros((2, 200, 200, 3))}, ground_truths))
+    ground_truths = {
+        'bbox': tf.constant([[[0., 0., 199, 199]]], dtype=tf.float32),
+        'label': tf.constant([[1]], dtype=tf.int32),
+        'num_boxes': tf.constant([[1]], dtype=tf.int32),
+        'weights': tf.constant([[1.]], dtype=tf.float32)
+    }
+
+    # Bug in the implementation of GIoU from tensorflow addons
+    # If batch_size is 1 and sample_weight is provided bad shapping
+    with pytest.raises(Exception):
+        model.train_step(({DatasetField.IMAGES: tf.zeros((1, 200, 200, 3))}, ground_truths))
 
 
 def test_compute_loss_detr():
@@ -40,15 +64,24 @@ def test_compute_loss_detr():
     y_pred = {BoxField.BOXES: boxes_inf, BoxField.LABELS: classification_logits}
 
     detr = DeTr(num_classes, None)
-    detr.compute_loss(ground_truths, y_pred)
+    giou, l1, scc = detr.compute_loss(ground_truths, y_pred, tf.constant([2., 2.]))
 
-    # Taken from test_box_ops.py::test_compute_giou_3d_tensor
-    exp_iou = np.array([[[2.0 / 16.0, 0, 6.0 / 400.0], [1.0 / 16.0, 0.0, 5.0 / 400.0]],
-                        [[2.0 / 16.0, 0, 6.0 / 400.0], [0, 0, 0]]])
-    exp_term2 = np.array([[[4. / 20, 125 / 132, 0.], [12 / 28., 84 / 90., 0.]],
-                          [[4. / 20, 125. / 132, 0.], [36. / 48, 224. / 225, 0.]]])
-    exp_giou = 1 - (exp_iou - exp_term2)
-    # (1 - 0.75, 1.947, 1- 0.0125), [1-0.75, 1-0.995555555, 1-0.015]
+    assert giou == 0.9940016
+    assert l1 == 6.4583335
+    assert scc == 33.448856
 
-    # import pdb
-    # pdb.set_trace()
+
+def test_compute_detr_metrics():
+    y_pred = tf.constant(
+        [
+            # TP foreground   - TP background    -  TP background
+            [[-100, 100, -100], [100, -100, -100], [100, -100, -100]],
+            # FP background & FN predicted - TP foreground   - FP
+            [[100, -100, -100], [-100, -100, 100], [-100, -100, 100]]
+        ],
+        tf.float32)
+
+    y_true = tf.constant([[1, 0, 0], [2, 2, 1]])
+
+    recall = compute_detr_metrics(y_true, y_pred)
+    assert recall == 0.5

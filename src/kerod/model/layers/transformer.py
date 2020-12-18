@@ -40,9 +40,9 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     def call(self, inputs, training=None):
         """Arguments (inputs):
 
-        - *value*: A 3-D tensor of shape [batch_size, seq_len, dim]
-        - *key*: A 3-D tensor of shape [batch_size, seq_len, dim]
-        - *query*: A 3-D tensor of shape [batch_size, seq_len_q, dim]
+        - *value*: A 3-D tensor of shape [batch_size, seq_len, depth_v]
+        - *key*: A 3-D tensor of shape [batch_size, seq_len, depth]
+        - *query*: A 3-D tensor of shape [batch_size, seq_len_q, depth]
 
         Return:
 
@@ -62,8 +62,11 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         # scaled dot product attention
         # (..., seq_len_q, seq_len_k)
         matmul_qk = tf.matmul(q, k, transpose_b=True)
-        dk = tf.cast(tf.shape(k)[-1], self.compute_dtype)
-        scaled_attention_logits = matmul_qk / tf.math.sqrt(dk)
+        # Here we normalize by depth_k suppose K and Q are two matrices
+        # with mean=0 and var=1. After QK^T will have a matrix with
+        # mean=0 and var= 1 * depth_k. QK^T/sqrt(depth_k) => mean=0 and var=1
+        depth_k = tf.cast(tf.shape(k)[-1], self.compute_dtype)
+        scaled_attention_logits = matmul_qk / tf.math.sqrt(depth_k)
 
         # add the mask to the scaled tensor.
         if mask is not None:
@@ -313,6 +316,9 @@ class Decoder(tf.keras.layers.Layer):
         """
         memory, pos_embed, object_queries, memory_padding_mask = inputs
 
+        # At the beginning we set target to 0
+        # In the first decoder layer Q and K will be equal
+        # to tgt + object_queries=object_queries
         tgt = tf.zeros_like(object_queries)
         for layer in self.dec_layers:
             tgt = layer((tgt, memory, pos_embed, object_queries, memory_padding_mask),

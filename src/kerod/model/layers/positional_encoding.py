@@ -9,8 +9,8 @@ class PositionEmbeddingLearned(tf.keras.layers.Layer):
     - *output_dim*: Dimension of the dense embedding.
     """
 
-    def __init__(self, output_dim=512):
-        super().__init__()
+    def __init__(self, output_dim=512, **kwargs):
+        super().__init__(**kwargs)
         if output_dim % 2 != 0:
             raise ValueError("x an y embedding will be concatened to form a single vector "
                              f"of shape output_dim. Please use a multiple of 2 (e.g {output_dim})")
@@ -29,7 +29,7 @@ class PositionEmbeddingLearned(tf.keras.layers.Layer):
 
         The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]
         """
-        batch_size, h, w, _ = tf.shape(inputs)
+        batch_size, h, w = tf.shape(inputs)[0], tf.shape(inputs)[1], tf.shape(inputs)[2]
         i = tf.range(w)
         j = tf.range(h)
         x_emb = self.col_embed(i)
