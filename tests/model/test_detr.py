@@ -68,7 +68,7 @@ def test_compute_loss_detr():
 
     assert giou == 0.9940016
     assert l1 == 6.4583335
-    assert scc == 33.448856
+    assert scc == 18.448858
 
 
 def test_compute_detr_metrics():

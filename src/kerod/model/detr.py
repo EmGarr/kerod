@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 from tensorflow.python.keras.engine import data_adapter
 from kerod.model.layers.transformer import Transformer
@@ -67,9 +68,19 @@ class DeTr(tf.keras.Model):
         self.target_assigner = TargetAssigner(DetrSimilarity(), hungarian_matching,
                                               lambda gt, pred: gt)
 
+        # Relative classification weight applied to the no-object category
+        # It down-weight the log-probability term of a no-object
+        # by a factor 10 to account for class imbalance
+        self.eos_coef = 0.1
+        self.eos_vector = np.ones((self.num_classes + 1))
+        self.eos_vector[0] = self.eos_coef
+        self.eos_vector = tf.constant(self.eos_vector, dtype=tf.float32)
+
+        # Losses
         self.giou = GIoULoss(reduction=tf.keras.losses.Reduction.NONE)
         self.mae = MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE)
         self.scc = SparseCategoricalCrossentropy(from_logits=True)
+
         # Metrics
         self.giou_metric = tf.keras.metrics.Mean(name="giou")
         self.mae_metric = tf.keras.metrics.Mean(name="mae")
@@ -148,7 +159,9 @@ class DeTr(tf.keras.Model):
         y_true, weights = self.target_assigner.assign(y_pred, ground_truths)
 
         num_boxes = tf.cast(tf.reduce_sum(ground_truths[BoxField.NUM_BOXES]), tf.float32)
-
+        # Reduce the class imbalanced by applying dividing the weights
+        # by self.eos for the non object (pos 0)
+        weights[BoxField.LABELS] = weights[BoxField.LABELS] * self.eos_vector
         # Caveats GIoU is buggy and if the batch_size is 1 and the sample_weight
         # is provided will raise an error
         giou = self.giou(y_true[BoxField.BOXES],
