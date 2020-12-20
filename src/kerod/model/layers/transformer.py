@@ -114,8 +114,8 @@ class EncoderLayer(tf.keras.layers.Layer):
             tf.keras.layers.Dense(d_model)
         ])
 
-        self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
-        self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
+        self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-5)
+        self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-5)
 
         self.dropout1 = tf.keras.layers.Dropout(dropout_rate)
         self.dropout2 = tf.keras.layers.Dropout(dropout_rate)
@@ -177,9 +177,9 @@ class DecoderLayer(tf.keras.layers.Layer):
             tf.keras.layers.Dense(d_model)
         ])
 
-        self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
-        self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
-        self.layernorm3 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
+        self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-5)
+        self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-5)
+        self.layernorm3 = tf.keras.layers.LayerNormalization(epsilon=1e-5)
 
         self.dropout1 = tf.keras.layers.Dropout(dropout_rate)
         self.dropout2 = tf.keras.layers.Dropout(dropout_rate)
