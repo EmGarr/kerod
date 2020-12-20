@@ -1,18 +1,19 @@
-import tensorflow as tf
 import numpy as np
-
-from tensorflow.python.keras.engine import data_adapter
-from kerod.model.layers.transformer import Transformer
+import tensorflow as tf
+from kerod.core.box_ops import convert_to_center_coordinates
 from kerod.core.matcher import hungarian_matching
-from kerod.utils.training import apply_kernel_regularization
-from kerod.model.backbone.resnet import ResNet50PytorchStyle
+from kerod.core.similarity import DetrSimilarity
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.core.target_assigner import TargetAssigner
-from kerod.core.similarity import DetrSimilarity
-from kerod.core.box_ops import convert_to_center_coordinates
+from kerod.model.backbone.resnet import ResNet50PytorchStyle
 from kerod.model.layers.positional_encoding import PositionEmbeddingLearned
+from kerod.model.layers.transformer import Transformer
+from kerod.model.post_processing.post_processing_detr import \
+    post_processing as detr_postprocessing
+from kerod.utils.training import apply_kernel_regularization
+from tensorflow.keras.losses import (MeanAbsoluteError, SparseCategoricalCrossentropy)
+from tensorflow.python.keras.engine import data_adapter
 from tensorflow_addons.losses.giou_loss import GIoULoss
-from tensorflow.keras.losses import MeanAbsoluteError, SparseCategoricalCrossentropy
 
 
 class DeTr(tf.keras.Model):
@@ -107,9 +108,8 @@ class DeTr(tf.keras.Model):
 
         Returns:
 
-        - *classification_pred*: A Tensor of shape [batch_size, num_queries, num_classes + 1] representig
-        the class probability.
-        - *localization_pred*: A Tensor of shape [batch_size, num_queries, 4]
+        - *logits*: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
+        - *boxes*: A Tensor of shape [batch_size, num_queries, 4]
         """
         batch_size = tf.shape(images)[0]
         # The preprocessing dedicated to the backbone is done inside the model.
@@ -133,12 +133,12 @@ class DeTr(tf.keras.Model):
         pos_embed = tf.reshape(pos_embed, (batch_size, -1, self.hidden_dim))
 
         decoder_out, _ = self.transformer((x, None, pos_embed, query_embed))
-        localization_pred = self.bbox_embed(decoder_out)
-        classification_pred = self.class_embed(decoder_out)
+        boxes = self.bbox_embed(decoder_out)
+        logits = self.class_embed(decoder_out)
 
         return {
-            BoxField.LABELS: classification_pred,
-            BoxField.BOXES: localization_pred,
+            BoxField.LABELS: logits,  # TODO Do not use labels but scores
+            BoxField.BOXES: boxes,
         }
 
     def compute_loss(self, ground_truths, y_pred, input_shape):
@@ -228,9 +228,38 @@ class DeTr(tf.keras.Model):
         return {m.name: m.result() for m in self.metrics}
 
     def predict_step(self, data):
+        """Perform an inference and returns the boxes, scores and labels associated.
+        Background is discarded the max and argmax operation are performed.
+        It means that if background was predicted the second maximum score would
+        be outputed.
+
+        Example: background + 3 classes
+        [0.54, 0.40, 0.03, 0.03] => score = 0.40, label = 0 (1 - 1)
+
+
+        "To optimize for AP, we override the prediction of these slots
+        with the second highest scoring class, using the corresponding confidence"
+        Part 4. Experiments of Object Detection with Transformers
+
+        Returns:
+
+        - *boxes*: A Tensor of shape [batch_size, self.num_queries, (y1,x1,y2,x2)]
+        containing the boxes with the coordinates between 0 and 1.
+        - *scores*: A Tensor of shape [batch_size, self.num_queries] containing
+        the score of the boxes.
+        - *classes*: A Tensor of shape [batch_size, self.num_queries]
+        containing the class of the boxes [0, num_classes).
+        """
         data = data_adapter.expand_1d(data)
         x, _, _ = data_adapter.unpack_x_y_sample_weight(data)
-        return self(x[DatasetField.IMAGES], training=False)
+        y_pred = self(x[DatasetField.IMAGES], training=False)
+        boxes_without_padding, scores, labels = detr_postprocessing(
+            y_pred[BoxField.BOXES],
+            y_pred[BoxField.LABELS],
+            x[DatasetField.IMAGES_INFO],
+            tf.shape(x[DatasetField.IMAGES])[1:3],
+        )
+        return boxes_without_padding, scores, labels
 
 
 class DeTrResnet50Pytorch(DeTr):

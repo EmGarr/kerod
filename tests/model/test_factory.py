@@ -100,7 +100,6 @@ def test_detr(tmpdir):
     data = data.map(preprocess)
     data = data.padded_batch(batch_size, padded_shape)
 
-
     base_lr = 0.02
     optimizer = tf.keras.optimizers.SGD(learning_rate=base_lr)
     model.compile(optimizer=optimizer, loss=None)
@@ -108,3 +107,10 @@ def test_detr(tmpdir):
               validation_data=data,
               epochs=2,
               callbacks=[ModelCheckpoint(os.path.join(tmpdir, 'checkpoints'))])
+
+    model.predict(data, batch_size=2)
+
+    serving_path = os.path.join(tmpdir, 'serving')
+    model.save(serving_path)
+    model = tf.keras.models.load_model(serving_path)
+    model.predict(data, batch_size=2)
