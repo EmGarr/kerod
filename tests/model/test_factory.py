@@ -112,5 +112,5 @@ def test_detr(tmpdir):
 
     serving_path = os.path.join(tmpdir, 'serving')
     model.save(serving_path)
-    model = tf.keras.models.load_model(serving_path)
-    model.predict(data, batch_size=2)
+    # model = tf.keras.models.load_model(serving_path)
+    # model.predict(data, batch_size=2)

@@ -114,8 +114,6 @@ class DeTr(tf.keras.Model):
         batch_size = tf.shape(images)[0]
         # The preprocessing dedicated to the backbone is done inside the model.
         x = self.backbone(images)[-1]
-        if training:
-            apply_kernel_regularization(self.l2, self.backbone)
 
         # Add positional_encoding to backbon
         pos_embed = self.pos_embed(x)
@@ -132,18 +130,17 @@ class DeTr(tf.keras.Model):
         x = tf.reshape(x, (batch_size, -1, self.hidden_dim))
         pos_embed = tf.reshape(pos_embed, (batch_size, -1, self.hidden_dim))
 
-        decoder_out, _ = self.transformer((x, None, pos_embed, query_embed))
+        decoder_out, _ = self.transformer((x, None, pos_embed, query_embed), training=training)
         boxes = self.bbox_embed(decoder_out)
         logits = self.class_embed(decoder_out)
 
         return {
-            BoxField.LABELS: logits,  # TODO Do not use labels but scores
+            BoxField.SCORES: logits,
             BoxField.BOXES: boxes,
         }
 
     def compute_loss(self, ground_truths, y_pred, input_shape):
-        normalized_boxes = ground_truths[BoxField.BOXES] / tf.tile(
-            tf.expand_dims(input_shape, axis=0), [1, 2])
+        normalized_boxes = ground_truths[BoxField.BOXES] / tf.tile(input_shape[None], [1, 2])
 
         ground_truths = {
             # We add one because the background is not counted in ground_truths [BoxField.LABELS]
@@ -259,7 +256,7 @@ class DeTr(tf.keras.Model):
         y_pred = self(x[DatasetField.IMAGES], training=False)
         boxes_without_padding, scores, labels = detr_postprocessing(
             y_pred[BoxField.BOXES],
-            y_pred[BoxField.LABELS],
+            y_pred[BoxField.SCORES],
             x[DatasetField.IMAGES_INFO],
             tf.shape(x[DatasetField.IMAGES])[1:3],
         )

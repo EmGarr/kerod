@@ -61,7 +61,7 @@ def test_compute_loss_detr():
         [[[0, 100, 0], [0, 100, 0], [0, 100, 0]], [[100, 0, 0], [0, -100, 0], [0, -100, 0]]],
         tf.float32)
 
-    y_pred = {BoxField.BOXES: boxes_inf, BoxField.LABELS: classification_logits}
+    y_pred = {BoxField.BOXES: boxes_inf, BoxField.SCORES: classification_logits}
 
     detr = DeTr(num_classes, None)
     giou, l1, scc = detr.compute_loss(ground_truths, y_pred, tf.constant([2., 2.]))

@@ -30,7 +30,7 @@ def test_detr_similarity():
         [[[0, 100, 0], [0, 100, 0], [0, 100, 0]], [[100, 0, 0], [0, -100, 0], [0, -100, 0]]],
         tf.float32)
 
-    inputs2 = {BoxField.BOXES: boxes2, BoxField.LABELS: classification_logits}
+    inputs2 = {BoxField.BOXES: boxes2, BoxField.SCORES: classification_logits}
 
     similarity = DetrSimilarity()(ground_truths, inputs2)
     # Taken from test_box_ops.py::test_compute_giou_3d_tensor
