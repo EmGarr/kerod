@@ -1,4 +1,3 @@
-import numpy as np
 import tensorflow as tf
 from kerod.core.box_ops import convert_to_center_coordinates
 from kerod.core.matcher import hungarian_matching
@@ -10,6 +9,7 @@ from kerod.model.layers.positional_encoding import PositionEmbeddingLearned
 from kerod.model.layers.transformer import Transformer
 from kerod.model.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
+from kerod.utils import item_assignment
 from kerod.utils.training import apply_kernel_regularization
 from tensorflow.keras.losses import (MeanAbsoluteError, SparseCategoricalCrossentropy)
 from tensorflow.python.keras.engine import data_adapter
@@ -72,10 +72,7 @@ class DeTr(tf.keras.Model):
         # Relative classification weight applied to the no-object category
         # It down-weight the log-probability term of a no-object
         # by a factor 10 to account for class imbalance
-        self.eos_coef = 0.1
-        self.eos_vector = np.ones((self.num_classes + 1))
-        self.eos_vector[0] = self.eos_coef
-        self.eos_vector = tf.constant(self.eos_vector, dtype=tf.float32)
+        self.non_object_weight = tf.constant(0.1, dtype=self.compute_dtype)
 
         # Losses
         self.giou = GIoULoss(reduction=tf.keras.losses.Reduction.NONE)
@@ -159,9 +156,11 @@ class DeTr(tf.keras.Model):
         y_true, weights = self.target_assigner.assign(y_pred, ground_truths)
 
         num_boxes = tf.cast(tf.reduce_sum(ground_truths[BoxField.NUM_BOXES]), tf.float32)
-        # Reduce the class imbalanced by applying dividing the weights
-        # by self.eos for the non object (pos 0)
-        weights[BoxField.LABELS] = weights[BoxField.LABELS] * self.eos_vector
+        # Reduce the class imbalanced by applying to the weights
+        # self.non_object_weight for the non object (pos 0)
+        weights[BoxField.LABELS] = item_assignment(weights[BoxField.LABELS],
+                                                   y_true[BoxField.LABELS] == 0,
+                                                   self.non_object_weight)
         # Caveats GIoU is buggy and if the batch_size is 1 and the sample_weight
         # is provided will raise an error
         giou = self.giou(y_true[BoxField.BOXES],
