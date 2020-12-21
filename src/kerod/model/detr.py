@@ -85,7 +85,8 @@ class DeTr(tf.keras.Model):
         self.scc_metric = tf.keras.metrics.Mean(name="scc")
         self.loss_metric = tf.keras.metrics.Mean(name="loss")
         self.precision_metric = tf.keras.metrics.SparseCategoricalAccuracy()
-        self.recall_metric = tf.keras.metrics.Mean(name="recall")
+        # Object recall = foreground
+        self.recall_metric = tf.keras.metrics.Mean(name="object_recall")
 
     @property
     def metrics(self):
