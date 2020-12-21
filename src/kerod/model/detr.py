@@ -66,7 +66,9 @@ class DeTr(tf.keras.Model):
         self.all_the_queries = tf.range(num_queries)
 
         # Loss computation
-        self.target_assigner = TargetAssigner(DetrSimilarity(), hungarian_matching,
+        self.weight_class, self.weight_l1, self.weight_giou = 1, 5, 2
+        similarity_func = DetrSimilarity(self.weight_class, self.weight_l1, self.weight_giou)
+        self.target_assigner = TargetAssigner(similarity_func, hungarian_matching,
                                               lambda gt, pred: gt)
 
         # Relative classification weight applied to the no-object category
@@ -174,22 +176,24 @@ class DeTr(tf.keras.Model):
                        sample_weight=weights[BoxField.BOXES])
 
         # SparseCategoricalCrossentropy
-        scc = self.scc(y_true[BoxField.LABELS],
-                       y_pred[BoxField.LABELS],
-                       sample_weight=weights[BoxField.LABELS])
+        scc = self.weight_class * self.scc(y_true[BoxField.LABELS],
+                                           y_pred[BoxField.SCORES],
+                                           sample_weight=weights[BoxField.LABELS])
         self.scc_metric.update_state(scc)
 
-        giou = tf.reduce_sum(giou) / num_boxes
+        # coeff giou equal 2 according to the paper Appendix A.4 losses
+        giou = self.weight_giou * tf.reduce_sum(giou) / num_boxes
         self.giou_metric.update_state(giou)
 
-        mae = tf.reduce_sum(mae) / num_boxes
+        # coeff giou equal 5 according to the paper Appendix A.4 losses
+        mae = self.weight_l1 * tf.reduce_sum(mae) / num_boxes
         self.mae_metric.update_state(mae)
 
-        recall = compute_detr_metrics(y_true[BoxField.LABELS], y_pred[BoxField.LABELS])
+        recall = compute_detr_metrics(y_true[BoxField.LABELS], y_pred[BoxField.SCORES])
         self.recall_metric.update_state(recall)
 
         self.precision_metric.update_state(y_true[BoxField.LABELS],
-                                           y_pred[BoxField.LABELS],
+                                           y_pred[BoxField.SCORES],
                                            sample_weight=weights[BoxField.LABELS])
 
         return giou, mae, scc

@@ -34,6 +34,20 @@ class IoUSimilarity(Similarity):
 
 class DetrSimilarity(Similarity):
 
+    def __init__(self, weight_class=1, weight_l1=5, weight_giou=2):
+        """Instantiate a callable object which will compute the similarity
+        according to the default parameters: [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers).
+
+        Arguments:
+
+        - *weight_class*: Weight which ponderates the cost of the class similarity.
+        - *weight_l1*: Weight which ponderates the cost of the l1 similarity between boxes.
+        - *weight_giou*: Weight which ponderates the cost of the giou similarity between boxes.
+        """
+        self.weight_class = weight_class
+        self.weight_l1 = weight_l1
+        self.weight_giou = weight_giou
+
     def call(self, y_true: Dict[str, tf.Tensor], y_pred: Dict[str, tf.Tensor]) -> tf.Tensor:
         """ Compute the cost matrix according to the paper
         [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers).
@@ -43,7 +57,7 @@ class DetrSimilarity(Similarity):
         A 3-D tensor of float32 with shape [batch_size, N, M] representing
         pairwise  similarity scores defined in DeTr.
         """
-        classification_logits = y_pred[BoxField.LABELS]
+        classification_logits = y_pred[BoxField.SCORES]
         localization_pred = y_pred[BoxField.BOXES]
         out_prob = tf.nn.softmax(classification_logits, -1)
 
@@ -70,12 +84,9 @@ class DetrSimilarity(Similarity):
 
         # Compute the giou cost betwen boxes
         # [batch_size, nb_target, num_detection]
-        # loss_giou= 1- giou but we approximate it with -giou
+        # loss_giou= 1 - giou but we approximate it with -giou
         cost_giou = -compute_giou(gt_boxes, localization_pred)
 
         # Final cost matrix
-        cost_matrix = cost_bbox + cost_class + cost_giou
-        # Linear sum assignment or the hungarian_assignment will look for the
-        # minimum weight matching in bipartite graphs. In our case, we are
-        # looking for the highest values of the cost matrix.
-        return -cost_matrix
+        cost_matrix = self.weight_l1 * cost_bbox + self.weight_class * cost_class + self.weight_giou * cost_giou
+        return cost_matrix
