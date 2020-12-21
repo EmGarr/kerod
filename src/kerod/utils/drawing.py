@@ -29,6 +29,7 @@ class BoxDrawer:
 
     def __call__(self,
                  images,
+                 images_information,
                  boxes,
                  labels: Union[np.array, List[List[int]], tf.Tensor],
                  scores: Union[np.array, List[List[float]], tf.Tensor],
@@ -44,6 +45,8 @@ class BoxDrawer:
         Arguments:
 
         - *images*: An image (tf.Tensor or numpy array) with shape [batch, height, width, 3]
+        - *images_information*: A 2D (tf.Tensor or numpy array) and shape [batch, (height, width)]. It contains the shape
+        of the image without any padding. It allows to remove padding of the image
         - *boxes*: An array (tf.Tensor, or Numpy array) of boxes with the following shape [batch, num_boxes, (y_min, x_min, y_max, x_max)]
         are as described by `1`. If set to false the boxes won't be resized.
         - *labels*: Label of the predicted boxes.
@@ -53,6 +56,10 @@ class BoxDrawer:
         operation and num_valid_detections is the value which allow to know which boxes were padded.
         - *resize*: Allow to resize the bounding boxes to the proper size. If set to true the inputs
         """
+        if isinstance(images_information, np.ndarray):
+            images_information = images_information.astype(np.int32)
+        elif tf.is_tensor(images_information):
+            images_information = tf.cast(images_information, tf.int32)
         if isinstance(labels, np.ndarray):
             labels = labels.tolist()
         elif tf.is_tensor(labels):
@@ -66,9 +73,12 @@ class BoxDrawer:
         elif tf.is_tensor(num_valid_detections):
             num_valid_detections = num_valid_detections.numpy().tolist()
 
-        for im, bb, cls, scr, nvd in zip(images, boxes, labels, scores, num_valid_detections):
+        for im, im_info, bb, cls, scr, nvd in zip(images, images_information, boxes, labels, scores,
+                                                  num_valid_detections):
             labels = [self._classes[int(ind)] for ind in cls]
             colors = [self._colors[int(ind)] for ind in cls]
+
+            im = im[:im_info[0], :im_info[1]]
             draw_bounding_boxes(im,
                                 bb,
                                 scores=scr,
@@ -144,3 +154,4 @@ def draw_bounding_boxes(image,
                           fontsize=10,
                           ha='center',
                           va='center')
+    plt.show()
