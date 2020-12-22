@@ -62,10 +62,11 @@ def test_preprocess_coco_example(mock):
                 np.array([False, True, False, False])
         }
     }
-    x, y = preprocess_coco_example(inputs)
+    x, y = preprocess_coco_example(inputs, padded_mask=True)
 
     np.testing.assert_array_equal(np.zeros((1333, 666, 3)), x[DatasetField.IMAGES])
     np.testing.assert_array_equal(np.array([1333, 666]), x[DatasetField.IMAGES_INFO])
+    np.testing.assert_array_equal(np.ones([1333, 666], np.int8), x[DatasetField.IMAGES_PMASK])
     np.testing.assert_allclose(np.array([[0, 133.2, 1333, 599.39996]]), y[BoxField.BOXES], 1e-5)
     np.testing.assert_array_equal(np.array([4]), y[BoxField.LABELS])
     np.testing.assert_array_equal(np.array([1.]), y[BoxField.WEIGHTS])

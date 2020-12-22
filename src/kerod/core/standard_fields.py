@@ -12,3 +12,4 @@ class BoxField:
 class DatasetField:
     IMAGES = 'images'
     IMAGES_INFO = 'images_information'
+    IMAGES_PMASK = 'images_padding_mask'

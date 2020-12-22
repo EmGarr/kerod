@@ -46,7 +46,7 @@ def resize_to_min_dim(image, short_edge_length, max_dimension):
                            method=tf.image.ResizeMethod.BILINEAR)[0]
 
 
-def preprocess(inputs, bgr=True):
+def preprocess(inputs, bgr=True, padded_mask=False):
     """This operations performs a classical preprocessing operations for localization datasets:
 
     - COCO
@@ -54,7 +54,7 @@ def preprocess(inputs, bgr=True):
 
     You can download easily those dataset using [tensorflow dataset](https://www.tensorflow.org/datasets/catalog/overview).
 
-    Argument:
+    Arguments:
 
     - *inputs*: It can be either a [FeaturesDict](https://www.tensorflow.org/datasets/api_docs/python/tfds/features/FeaturesDict) or a dict.
     but it should have the following structures.
@@ -74,16 +74,23 @@ def preprocess(inputs, bgr=True):
     If you have open your image with `tf.image.decode_image` will open an image in RGB. However,
     OpenCV will open it in BGR by default.
 
+    - *padded_mask*: If set to true return a mask of 1 of the image. When padded
+    we will know which parts is from the original image.
+
+
     Returns:
 
     - *inputs*:
-        1. image: A 3D tensor of float32 and shape [None, None, 3] with BGR order
-        2. image_information: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
+        1. images: A 3D tensor of float32 and shape [None, None, 3]
+        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
         of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.
         The models needs those information in order to clip the boxes to the proper dimension.
-        3. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
-        4. BoxField.LABELS: A tensor of shape [num_boxes, ]
-        5. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
+        3. images_padding_mask: If padded_mask set to true return a 2D tensor of int8 and shape [None, None, 3].
+        Mask of the image if a padding is performed we will know where the original image was.
+    - *ground_truths*:
+        1. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
+        2. BoxField.LABELS: A tensor of shape [num_boxes, ]
+        3. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
     """
     if bgr:
         images = inputs['image'][:, :, ::-1]
@@ -94,6 +101,10 @@ def preprocess(inputs, bgr=True):
     boxes = inputs['objects'][BoxField.BOXES] * tf.tile(tf.expand_dims(image_information, axis=0),
                                                         [1, 2])
     x = {DatasetField.IMAGES: image, DatasetField.IMAGES_INFO: image_information}
+    if padded_mask:
+        x[DatasetField.IMAGES_PMASK] = tf.ones((tf.shape(image)[0], tf.shape(image)[1]),
+                                               dtype=tf.int8)
+
     ground_truths = {
         BoxField.BOXES: boxes,
         BoxField.LABELS: tf.cast(inputs['objects'][BoxField.LABELS], tf.int32),
@@ -141,7 +152,7 @@ def filter_bad_area(boxes: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
     return tf.gather_nd(boxes, tf.where(area > 0)), tf.gather_nd(labels, tf.where(area > 0))
 
 
-def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True):
+def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True, padded_mask=False):
     """This operations performs a classical preprocessing operations for localization datasets:
 
     - COCO
@@ -149,7 +160,7 @@ def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True):
 
     You can download easily those dataset using [tensorflow dataset](https://www.tensorflow.org/datasets/catalog/overview).
 
-    Argument:
+    Arguments:
 
     - *inputs*: It can be either a [FeaturesDict](https://www.tensorflow.org/datasets/api_docs/python/tfds/features/FeaturesDict) or a dict.
     but it should have the following structures.
@@ -168,15 +179,19 @@ def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True):
     If you have open your image with `tf.image.decode_image` will open an image in RGB. However,
     OpenCV will open it in BGR by default.
 
-    -*horizontal_flip*: Activate the random horizontal flip.
+    - *horizontal_flip*: Activate the random horizontal flip.
+    - *padded_mask*: If set to true return a mask of 1 of the image. When padded
+    we will know which parts is from the original image.
 
     Returns:
 
     - *inputs*:
-        1. image: A 3D tensor of float32 and shape [None, None, 3]
-        2. image_information: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
+        1. images: A 3D tensor of float32 and shape [None, None, 3]
+        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
         of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.
         The models needs those information in order to clip the boxes to the proper dimension.
+        3. images_padding_mask: If padded_mask set to true return a 2D tensor of int8 and shape [None, None, 3].
+        Mask of the image if a padding is performed we will know where the original image was.
     - *ground_truths*:
         1. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
         2. BoxField.LABELS: A tensor of shape [num_boxes, ]
@@ -198,6 +213,9 @@ def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True):
     boxes *= tf.tile(tf.expand_dims(image_information, axis=0), [1, 2])
 
     inputs = {DatasetField.IMAGES: image, DatasetField.IMAGES_INFO: image_information}
+    if padded_mask:
+        inputs[DatasetField.IMAGES_PMASK] = tf.ones((tf.shape(image)[0], tf.shape(image)[1]),
+                                                    dtype=tf.int8)
     ground_truths = {
         BoxField.BOXES: boxes,
         BoxField.LABELS: tf.cast(labels, tf.int32),

@@ -43,13 +43,16 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         - *value*: A 3-D tensor of shape [batch_size, seq_len, depth_v]
         - *key*: A 3-D tensor of shape [batch_size, seq_len, depth]
         - *query*: A 3-D tensor of shape [batch_size, seq_len_q, depth]
+        - *key_padding_mask*: A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
+        False means padding and True means pixel from the original image.
 
         Return:
 
         A 3-D tensor of shape [batch_size, seq_len_q, d_model]
         """
 
-        v, k, q, mask = inputs
+        v, k, q, key_padding_mask = inputs
+        seq_len_q = tf.shape(q)[1]
         batch_size = tf.shape(q)[0]
 
         # (batch_size, num_heads, seq_len_q, depth)
@@ -68,9 +71,16 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         depth_k = tf.cast(tf.shape(k)[-1], self.compute_dtype)
         scaled_attention_logits = matmul_qk / tf.math.sqrt(depth_k)
 
-        # add the mask to the scaled tensor.
-        if mask is not None:
-            scaled_attention_logits += (mask * tf.cast(-1e9, self.compute_dtype))
+        if key_padding_mask is not None:
+            # Tile the tensor from [batch_size, seq_len] to [batch_size, num_heads, seq_len_q, seq_len]
+            key_padding_mask = tf.tile(key_padding_mask[:, None, None],
+                                       [1, self.num_heads, seq_len_q, 1])
+
+            # Apply -inf if the pixels is a padding
+            # False means padded so we take: not key_padding_mask
+            scaled_attention_logits = tf.where(
+                ~key_padding_mask,
+                tf.zeros_like(scaled_attention_logits) + float('-inf'), scaled_attention_logits)
 
         # softmax is normalized on the last axis (seq_len_k) so that the scores
         # add up to 1.
@@ -125,10 +135,12 @@ class EncoderLayer(tf.keras.layers.Layer):
 
         Arguments (inputs):
 
-        - *src*: A 3-D Tensor of float32 and shape [batch_size, M, dim] the sequence to the encoder layer
-        - *pos_embed*: A 3-D Tensor of float32 and shape [batch_size, N, dim] positional encoding
-        of the encoder
-        - *mask*: TODO ?
+        - *src*: A 3-D Tensor of float32 and shape [batch_size, M, dim]
+        the sequence to the encoder layer
+        - *pos_embed*: A 3-D Tensor of float32 and shape [batch_size, N, dim]
+        positional encoding of the encoder
+        - *mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
+        False means padding and True means pixel from the original image.
 
         Return:
         A 3-D Tensor of float32 and shape [batch_size, M, d_model]
@@ -256,10 +268,12 @@ class Encoder(tf.keras.layers.Layer):
         """
         Arguments (inputs):
 
-        - *src*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model] 
+        - *src*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model]
         the sequence to the encoder.
-        - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model]. Positional spatial positional encoding matching the flatten_tensor.
-        - *mask*: # TODO usefull ?
+        - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model].
+        Positional spatial positional encoding matching the flatten_tensor.
+        - *mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
+        False means padding and True means pixel from the original image.
 
         Return:
 
@@ -308,7 +322,7 @@ class Decoder(tf.keras.layers.Layer):
         the sequence from the last layer of the encoder.
         - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model]. Positional spatial positional encoding matching the flatten_tensor.
         - *object_queries*: A 3-D float32 Tensor of shape [batch_size, num_queries, d_model] small fixed number of learned positional embeddings input of the decoder.
-        - *memory_padding_mask*: # TODO usefull ?
+        - *memory_padding_mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where False means padding and True means pixel from the original image.
 
         Return:
 
@@ -360,7 +374,7 @@ class Transformer(tf.keras.Model):
 
         - *flatten_tensor*: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].
         It represents the flatten output tensor of the backbone.
-        - *mask*: # TODO usefull ?
+        - *mask*:  A 2-D bool Tensor of shape [batch_size, H * W] where False means padding and True means pixel from the original image.
         - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, H * W, d_model]. Positional spatial positional encoding matching the flatten_tensor.
         - *object_queries*: A 3-D float32 Tensor of shape [batch_size, num_object_queries, d_model]
         small fixed number of learned positional embeddings input of the decoder.

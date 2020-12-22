@@ -1,5 +1,5 @@
 <h3 align="center">
-<p>KEROD - Object Detection for TensorFlow 2.X
+<p>KEROD - Object Detection for TensorFlow 2.X (FasterRCNN, DeTr)
 </h3>
 
 [![Build Status](https://travis-ci.com/EmGarr/kerod.svg?branch=master)](https://travis-ci.com/EmGarr/kerod)
@@ -30,9 +30,7 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 ### Algorithms
 
 - [x] [Feature Pyramidal Network](https://arxiv.org/abs/1612.03144) 
-- [x] [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers). We have two main differences compared to the original implementation (WIP will be supported soon):
-     - We do not mask the padding in the transformers. When you batch your input images you preserved the aspect ratio. The author chose to mask those pixels but do not speak of it in the paper.
-     - We use a learned position encoding instead of a fix one (it is an option in the paper and do not affect the performances)
+- [x] DeTr from: [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers). 
 - [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (Much of the pieces are already here just need to put everything together. It will arrive soon.)
 - [ ] [Object Relation Network for object detection](https://arxiv.org/abs/1711.11575): aims to replace the fast-rcnn head multiclass nms. Will allow to make a better usage of the GPU (The NMS is used on CPU and block the serving efficiency).
 
@@ -52,6 +50,7 @@ You can find examples in the [notebooks folder](./notebooks). There are no runne
 | [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | COCO      | 30 mAP      | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training_multi_gpu.ipynb)                   |   |
 | [DetrResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/detr.py) | COCO      | (WIP)  | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/detr_coco_training_multi_gpu.ipynb)              |   |
 
+Pytorch: means resnet implementation Pytorch style. In the residual block we have: conv (1x1) stride 1 -> conv (3x3) stride 2 instead of conv (1x1) stride 2 -> conv (3x3) stride 1 (Caffe, Keras implementations)
 
 If you want to perform an overfit you have an example with the detr architecture:
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/overfit-detr.ipynb)

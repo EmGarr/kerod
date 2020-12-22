@@ -1,5 +1,6 @@
 import os
 
+from functools import partial
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -88,7 +89,8 @@ def test_detr(tmpdir):
     }
     padded_shape = ({
         DatasetField.IMAGES: [None, None, 3],
-        DatasetField.IMAGES_INFO: [2]
+        DatasetField.IMAGES_INFO: [2],
+        DatasetField.IMAGES_PMASK: [None, None]
     }, {
         BoxField.BOXES: [None, 4],
         BoxField.LABELS: [None],
@@ -97,7 +99,7 @@ def test_detr(tmpdir):
     })
     batch_size = 2
     data = tf.data.Dataset.from_tensor_slices(inputs)
-    data = data.map(preprocess)
+    data = data.map(partial(preprocess, padded_mask=True))
     data = data.padded_batch(batch_size, padded_shape)
 
     base_lr = 0.02

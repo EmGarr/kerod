@@ -25,7 +25,10 @@ def test_build_detr():
     base_lr = 0.02
     optimizer = tf.keras.optimizers.SGD(learning_rate=base_lr)
     model.compile(optimizer=optimizer, loss=None)
-    model.train_step(({DatasetField.IMAGES: tf.zeros((2, 200, 200, 3))}, ground_truths))
+    model.train_step(({
+        DatasetField.IMAGES: tf.zeros((2, 200, 200, 3)),
+        DatasetField.IMAGES_PMASK: tf.ones((2, 200, 200))
+    }, ground_truths))
     ground_truths = {
         'bbox': tf.constant([[[0., 0., 199, 199]]], dtype=tf.float32),
         'label': tf.constant([[1]], dtype=tf.int32),

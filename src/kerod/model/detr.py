@@ -5,7 +5,7 @@ from kerod.core.similarity import DetrSimilarity
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.backbone.resnet import ResNet50PytorchStyle
-from kerod.model.layers.positional_encoding import PositionEmbeddingLearned
+from kerod.model.layers.positional_encoding import PositionEmbeddingSine
 from kerod.model.layers.transformer import Transformer
 from kerod.model.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
@@ -49,7 +49,7 @@ class DeTr(tf.keras.Model):
         self.l2 = tf.keras.regularizers.l2(1e-4)
         self.backbone = backbone
         self.input_proj = tf.keras.layers.Conv2D(self.hidden_dim, 1)
-        self.pos_embed = PositionEmbeddingLearned(output_dim=256)
+        self.pos_embed = PositionEmbeddingSine(output_dim=self.hidden_dim)
         self.transformer = Transformer(d_model=self.hidden_dim)
 
         self.bbox_embed = tf.keras.models.Sequential([
@@ -97,12 +97,17 @@ class DeTr(tf.keras.Model):
             self.precision_metric, self.recall_metric
         ]
 
-    def call(self, images, training=None):
+    def call(self, inputs, training=None):
         """Perform an inference in training.
 
         Arguments:
 
-        - *images*: A Tensor of shape [batch_size, height, width, 3]
+        - *inputs*:
+            1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
+            2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
+            of the image without any padding.
+            3. images_padding_mask: A 3D tensor of int8 and shape [batch_size, None, None] composed of 0 and 1 which allows to know where a padding has been applied.
+
 
         - *training*: Is automatically set to `True` in train mode
 
@@ -111,12 +116,17 @@ class DeTr(tf.keras.Model):
         - *logits*: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
         - *boxes*: A Tensor of shape [batch_size, num_queries, 4]
         """
+        images = inputs[DatasetField.IMAGES]
+        images_padding_masks = inputs[DatasetField.IMAGES_PMASK]
         batch_size = tf.shape(images)[0]
         # The preprocessing dedicated to the backbone is done inside the model.
         x = self.backbone(images)[-1]
-
-        # Add positional_encoding to backbon
-        pos_embed = self.pos_embed(x)
+        features_mask = tf.image.resize(tf.cast(images_padding_masks[..., None], tf.float32),
+                                        tf.shape(x)[1:3],
+                                        method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+        features_mask = tf.cast(features_mask, tf.bool)
+        # Positional_encoding for the backbone
+        pos_embed = self.pos_embed(features_mask)
         # [batch_size, num_queries, self.hidden_dim]
         all_the_queries = tf.tile(self.all_the_queries[None], (batch_size, 1))
         # [batch_size, num_queries, self.hidden_dim]
@@ -129,8 +139,11 @@ class DeTr(tf.keras.Model):
         # [batch_size, h * w,  self.hidden_dim]
         x = tf.reshape(x, (batch_size, -1, self.hidden_dim))
         pos_embed = tf.reshape(pos_embed, (batch_size, -1, self.hidden_dim))
+        # Flatten the padding masks
+        features_mask = tf.reshape(features_mask, (batch_size, -1))
 
-        decoder_out, _ = self.transformer((x, None, pos_embed, query_embed), training=training)
+        decoder_out, _ = self.transformer((x, features_mask, pos_embed, query_embed),
+                                          training=training)
         boxes = self.bbox_embed(decoder_out)
         logits = self.class_embed(decoder_out)
 
@@ -200,9 +213,7 @@ class DeTr(tf.keras.Model):
         x, ground_truths, _ = data_adapter.unpack_x_y_sample_weight(data)
 
         with tf.GradientTape() as tape:
-            y_pred = self(x[DatasetField.IMAGES], training=True)
-            # They are added automatically to self.losses
-            # Normalize the boxes between 0 and 1
+            y_pred = self(x, training=True)
             input_shape = tf.cast(tf.shape(x[DatasetField.IMAGES])[1:3], self.compute_dtype)
             giou, mae, scc = self.compute_loss(ground_truths, y_pred, input_shape)
 
@@ -217,9 +228,7 @@ class DeTr(tf.keras.Model):
         data = data_adapter.expand_1d(data)
         x, ground_truths, _ = data_adapter.unpack_x_y_sample_weight(data)
 
-        y_pred = self(x[DatasetField.IMAGES], training=False)
-        # They are added automatically to self.losses
-        # Normalize the boxes between 0 and 1
+        y_pred = self(x, training=False)
         input_shape = tf.cast(tf.shape(x[DatasetField.IMAGES])[1:3], self.compute_dtype)
         giou, mae, scc = self.compute_loss(ground_truths, y_pred, input_shape)
 
@@ -253,7 +262,7 @@ class DeTr(tf.keras.Model):
         """
         data = data_adapter.expand_1d(data)
         x, _, _ = data_adapter.unpack_x_y_sample_weight(data)
-        y_pred = self(x[DatasetField.IMAGES], training=False)
+        y_pred = self(x, training=False)
         boxes_without_padding, scores, labels = detr_postprocessing(
             y_pred[BoxField.BOXES],
             y_pred[BoxField.SCORES],
