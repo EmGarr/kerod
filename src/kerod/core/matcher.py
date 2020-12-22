@@ -183,6 +183,17 @@ def hungarian_matching(match_quality_matrix: tf.Tensor, num_valid_boxes: tf.Tens
         return tf.py_function(lambda c: linear_sum_assignment(c), [cost_matrix],
                               Tout=(tf.int32, tf.int32))
 
+    # We do not want to match our padded ground_truth during the hungarian
+    # assignment so we create a mask to increase the cost of fake ground_truth
+    # [batch_size, M]
+    mask = ~tf.sequence_mask(tf.squeeze(num_valid_boxes, 1), tf.shape(match_quality_matrix)[1])
+    # [batch_size, M, N]
+    mask = tf.tile(mask[..., None], [1, 1, tf.shape(match_quality_matrix)[-1]])
+
+    # We set to inf all cost which corresponds to padding.
+    # They won't interfere during the linear assignment
+    match_quality_matrix = item_assignment(match_quality_matrix, mask, 10e5)
+
     # [batch_size, num_gt_boxes]
     indices = tf.vectorized_map(hungarian_assignment, match_quality_matrix)
 
