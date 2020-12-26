@@ -69,8 +69,10 @@ class DeTr(tf.keras.Model):
         # Loss computation
         self.weight_class, self.weight_l1, self.weight_giou = 1, 5, 2
         similarity_func = DetrSimilarity(self.weight_class, self.weight_l1, self.weight_giou)
-        self.target_assigner = TargetAssigner(similarity_func, hungarian_matching,
-                                              lambda gt, pred: gt)
+        self.target_assigner = TargetAssigner(similarity_func,
+                                              hungarian_matching,
+                                              lambda gt, pred: gt,
+                                              negative_class_weight=1.0)
 
         # Relative classification weight applied to the no-object category
         # It down-weight the log-probability term of a no-object

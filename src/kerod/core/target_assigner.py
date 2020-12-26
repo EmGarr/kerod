@@ -33,17 +33,21 @@ class TargetAssigner:
                  similarity_calc: Callable,
                  matcher: Matcher,
                  box_encoder: Callable,
+                 negative_class_weight=0.,
+                 positive_class_weight=1.,
                  dtype=None):
         """Construct Object Detection Target Assigner.
 
         Arguments:
 
         - *similarity_calc*: a method wich allow to compute a similarity between two batch of boxes
-
         - *matcher*: an od.core.Matcher used to match groundtruth to anchors.
-
         - *box_encoder*: a method which allow to encode matching
             groundtruth boxes with respect to anchors.
+        - *negative_class_weight*: A negative_class can be an unmatched anchors or a padded boxes.
+            All negative classes will have a associated set to this corresponding value
+            for the classification target.
+        - *positive_class_weight*: A positive_class is a matched foreground object
         """
         self._similarity_calc = similarity_calc
         self._matcher = matcher
@@ -51,6 +55,8 @@ class TargetAssigner:
         if dtype is None:
             dtype = K.floatx()
         self.dtype = dtype
+        self.negative_class_weight = tf.constant(negative_class_weight, dtype=dtype)
+        self.positive_class_weight = tf.constant(positive_class_weight, dtype=dtype)
 
     @property
     def box_encoder(self):
@@ -244,7 +250,7 @@ class TargetAssigner:
         A tensor of shape [batch_size, num_anchors] representing classification weights.
         """
         indicator = matched_labels < 0
-        weights = tf.where(indicator, tf.constant(0., dtype=self.dtype), groundtruth_weights)
+        weights = tf.where(indicator, self.negative_class_weight, groundtruth_weights)
         indicator = matched_labels == 0
-        weights = tf.where(indicator, tf.constant(1, dtype=self.dtype), weights)
+        weights = tf.where(indicator, self.positive_class_weight, weights)
         return weights
