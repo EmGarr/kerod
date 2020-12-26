@@ -69,9 +69,9 @@ def test_compute_loss_detr():
     detr = DeTr(num_classes, None)
     giou, l1, scc = detr.compute_loss(ground_truths, y_pred, tf.constant([2., 2.]))
 
-    assert giou == 2.311016
-    assert l1 == 14.583333
-    assert scc == 35.023106
+    assert giou == 1.31
+    assert l1 == 93.333336
+    assert scc == 91.36464
 
 
 def test_compute_detr_metrics():
