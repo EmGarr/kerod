@@ -49,6 +49,24 @@ class PositionEmbeddingSine(tf.keras.layers.Layer):
     """
     This is a more standard version of the position embedding, very similar to the one
     used by the Attention is all you need paper, generalized to work on images.
+
+    ```python
+    import matplotlib.pyplot as plt
+    from kerod.model.layers.positional_encoding import PositionEmbeddingSine
+
+    dim = 128
+    embedding =  PositionEmbeddingSine(dim)
+    pos_encoding = embedding(tf.ones((1, 10, 10)))
+
+    plt.pcolormesh(tf.reshape(pos_encoding, (1, -1, dim))[0], cmap='RdBu')
+    plt.xlabel('Depth')
+    plt.xlim((0, dim))
+    plt.ylabel('Position')
+    plt.colorbar()
+    plt.show()
+    ```
+
+    ![Visualization Positional Encoding](https://raw.githubusercontent.com/EmGarr/cv/master/ressources/2d_pos_encoding.png)
     """
 
     def __init__(self, output_dim=64, temperature=10000):
