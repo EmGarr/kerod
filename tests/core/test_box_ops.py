@@ -27,6 +27,8 @@ def test_convert_to_center_coordinates():
     centers_sizes = box_ops.convert_to_center_coordinates(boxes)
     expected_centers_sizes = np.array([[15, 12.5, 10, 5], [0.35, 0.25, 0.3, 0.3]])
     np.testing.assert_allclose(centers_sizes, expected_centers_sizes)
+    boxes_out = box_ops.convert_to_xyxy_coordinates(centers_sizes)
+    np.testing.assert_allclose(boxes_out, boxes)
 
 
 def test_compute_area():

@@ -67,6 +67,27 @@ def convert_to_center_coordinates(boxes: tf.Tensor) -> tf.Tensor:
     return tf.concat([ycenter, xcenter, height, width], axis=-1)
 
 
+def convert_to_xyxy_coordinates(boxes: tf.Tensor) -> tf.Tensor:
+    """Convert boxes to their center coordinates
+
+    y_cent, x_cent, h, w -> y_min, x_min, y_max, x_max
+
+    Arguments:
+
+    - *boxes*: A Tensor of shape [N, ..., (y_cent, x_cent, h, w)]
+
+    Returns:
+
+    A tensor of shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]
+    """
+    y_cent, x_cent, h, w = tf.split(value=boxes, num_or_size_splits=4, axis=-1)
+    y_min = y_cent - 0.5 * h
+    x_min = x_cent - 0.5 * w
+    y_max = y_cent + 0.5 * h
+    x_max = x_cent + 0.5 * w
+    return tf.concat([y_min, x_min, y_max, x_max], axis=-1)
+
+
 def compute_area(boxes: tf.Tensor) -> tf.Tensor:
     """Compute the area of boxes.
 

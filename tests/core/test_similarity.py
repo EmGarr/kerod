@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from kerod.core.box_ops import convert_to_center_coordinates
 from kerod.core.similarity import DetrSimilarity, IoUSimilarity
 from kerod.core.standard_fields import BoxField
 
@@ -18,8 +19,11 @@ def test_iou_similarity():
 def test_detr_similarity():
     boxes1 = tf.constant([[[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]],
                           [[4.0, 3.0, 7.0, 5.0], [0, 0, 0, 0]]])
+    boxes1 = convert_to_center_coordinates(boxes1)
+
     boxes2 = tf.constant([[[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]],
                           [[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0], [0.0, 0.0, 20.0, 20.0]]])
+    boxes2 = convert_to_center_coordinates(boxes2)
     ground_truths = {
         BoxField.BOXES: boxes1,
         BoxField.LABELS: tf.constant([[1, 0], [1, 0]], tf.int32),

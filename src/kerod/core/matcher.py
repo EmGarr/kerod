@@ -1,8 +1,6 @@
 from typing import List
 import tensorflow as tf
-from kerod.utils import item_assignment, get_full_indices
-from kerod.core.standard_fields import BoxField
-from kerod.core.box_ops import compute_giou
+from kerod.utils import item_assignment
 from scipy.optimize import linear_sum_assignment
 
 

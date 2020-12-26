@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-
+from kerod.core.box_ops import convert_to_center_coordinates
 from kerod.model.post_processing.post_processing_detr import post_processing
 
 
@@ -13,7 +13,7 @@ def test_post_processing_batch_size2():
         [[0, 0, 1, 1], [0, 0, 0.5, 0.5]],
         [[0, 0, 0.3, 0.3], [0, 0, 0.5, 0.5]],
     ])
-
+    boxes = convert_to_center_coordinates(boxes)
     image_information = tf.constant([[200, 400], [400, 200]])
     image_padded_information = tf.constant([400, 400])
     boxes, scores, labels = post_processing(boxes, logits, image_information,
@@ -37,6 +37,7 @@ def test_post_processing_singled_element():
     probs = tf.nn.softmax(logits, axis=-1)
 
     boxes = tf.constant([[[0, 0, 0.3, 0.3], [0, 0, 0.5, 0.5]]])
+    boxes = convert_to_center_coordinates(boxes)
 
     image_information = tf.constant([[400, 200]])
     image_padded_information = tf.constant([400, 400])

@@ -2,10 +2,9 @@ from abc import abstractmethod
 from typing import Dict
 
 import tensorflow as tf
-from kerod.core.box_ops import compute_giou, compute_iou, convert_to_center_coordinates
+from kerod.core.box_ops import compute_giou, compute_iou, convert_to_xyxy_coordinates
 from kerod.core.standard_fields import BoxField
-from kerod.utils import get_full_indices, item_assignment
-from scipy.optimize import linear_sum_assignment
+from kerod.utils import get_full_indices
 
 
 class Similarity:
@@ -76,8 +75,7 @@ class DetrSimilarity(Similarity):
         # Compute the L1 cost between boxes
         # [batch_size, nb_target, num_detection]
         cost_bbox = tf.norm(
-            convert_to_center_coordinates(localization_pred)[:, None] -
-            convert_to_center_coordinates(gt_boxes)[:, :, None],
+            localization_pred[:, None] - gt_boxes[:, :, None],
             ord=1,
             axis=-1,
         )
@@ -85,7 +83,8 @@ class DetrSimilarity(Similarity):
         # Compute the giou cost betwen boxes
         # [batch_size, nb_target, num_detection]
         # loss_giou= 1 - giou but we approximate it with -giou
-        cost_giou = -compute_giou(gt_boxes, localization_pred)
+        cost_giou = -compute_giou(convert_to_xyxy_coordinates(gt_boxes),
+                                  convert_to_xyxy_coordinates(localization_pred))
 
         # Final cost matrix
         cost_matrix = self.weight_l1 * cost_bbox + self.weight_class * cost_class + self.weight_giou * cost_giou

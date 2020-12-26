@@ -1,5 +1,5 @@
 import tensorflow as tf
-from kerod.core.box_ops import convert_to_center_coordinates
+from kerod.core.box_ops import convert_to_center_coordinates, convert_to_xyxy_coordinates
 from kerod.core.matcher import hungarian_matching
 from kerod.core.similarity import DetrSimilarity
 from kerod.core.standard_fields import BoxField, DatasetField
@@ -154,13 +154,13 @@ class DeTr(tf.keras.Model):
 
     def compute_loss(self, ground_truths, y_pred, input_shape):
         normalized_boxes = ground_truths[BoxField.BOXES] / tf.tile(input_shape[None], [1, 2])
-
+        centered_normalized_boxes = convert_to_center_coordinates(normalized_boxes)
         ground_truths = {
             # We add one because the background is not counted in ground_truths [BoxField.LABELS]
             BoxField.LABELS:
                 ground_truths[BoxField.LABELS] + 1,
             BoxField.BOXES:
-                normalized_boxes,
+                centered_normalized_boxes,
             BoxField.WEIGHTS:
                 ground_truths[BoxField.WEIGHTS],
             BoxField.NUM_BOXES:
@@ -176,13 +176,13 @@ class DeTr(tf.keras.Model):
                                                    self.non_object_weight)
         # Caveats GIoU is buggy and if the batch_size is 1 and the sample_weight
         # is provided will raise an error
-        giou = self.giou(y_true[BoxField.BOXES],
-                         y_pred[BoxField.BOXES],
+        giou = self.giou(convert_to_xyxy_coordinates(y_true[BoxField.BOXES]),
+                         convert_to_xyxy_coordinates(y_pred[BoxField.BOXES]),
                          sample_weight=weights[BoxField.BOXES])
 
         # L1 with coordinates in y_cent, x_cent, w, h
-        mae = self.mae(convert_to_center_coordinates(y_true[BoxField.BOXES]),
-                       convert_to_center_coordinates(y_pred[BoxField.BOXES]),
+        mae = self.mae(y_true[BoxField.BOXES],
+                       y_pred[BoxField.BOXES],
                        sample_weight=weights[BoxField.BOXES])
 
         # SparseCategoricalCrossentropy

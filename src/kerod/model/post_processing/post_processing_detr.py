@@ -1,6 +1,7 @@
 import tensorflow as tf
 from kerod.core.standard_fields import BoxField
 from kerod.utils.ops import get_full_indices
+from kerod.core.box_ops import convert_to_xyxy_coordinates
 
 
 def post_processing(boxes: tf.Tensor,
@@ -21,7 +22,7 @@ def post_processing(boxes: tf.Tensor,
 
     - *logits*: A Tensor of shape [batch_size, num_queries, num_classes + 1] representing
         the class probability.
-    - *localization_pred*: A Tensor of shape [batch_size, num_queries, 4]
+    - *localization_pred*: A Tensor of shape [batch_size, num_queries, (y_cent, x_cent, h, w)]
     - *image_information*: A 2-D tensor of float32 and shape [2, (height, width)]. It contains the shape
         of the image without any padding.
     - *image_padded_information*: A 2-D tensor of float32 and shape [(height_pad, width_pad)]. It contains the shape
@@ -49,6 +50,7 @@ def post_processing(boxes: tf.Tensor,
     image_information = tf.cast(image_information, boxes.dtype)
     # [batch_size, (y1_coeff, x1_coeff, y2_coeff, x2_coeff)]
     coeffs = tf.tile(image_padded_information, [2]) / tf.tile(image_information, [1, 2])
+    boxes = convert_to_xyxy_coordinates(boxes)
     boxes_without_padding = boxes * coeffs[:, None]
     boxes_without_padding = tf.clip_by_value(boxes_without_padding, 0, 1, name=BoxField.BOXES)
 
