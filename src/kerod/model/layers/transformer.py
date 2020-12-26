@@ -11,6 +11,18 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     - *num_heads*: The number of heads in the multiheadattention models.
     - *dropout_rate*: Float between 0 and 1. Fraction of the input units to drop.
     The same rate is shared in all the layers using dropout in the transformer.
+
+    Arguments call method:
+
+    - *value*: A 3-D tensor of shape [batch_size, seq_len, depth_v]
+    - *key*: A 3-D tensor of shape [batch_size, seq_len, depth]
+    - *query*: A 3-D tensor of shape [batch_size, seq_len_q, depth]
+    - *key_padding_mask*: A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
+    False means padding and True means pixel from the original image.
+
+    Return:
+
+    A 3-D tensor of shape [batch_size, seq_len_q, d_model]
     """
 
     def __init__(self, d_model: int, num_heads: int, dropout_rate=0., **kwargs):
@@ -386,7 +398,6 @@ class Transformer(tf.keras.Model):
         the output sequence length of a transformer is same as the input
         sequence (i.e. target) length of the decoder (num_object_queries).
         - *encoder_output*: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]
-
         """
         flatten_tensor, mask, pos_embed, object_queries = inputs
         # (batch_size, inp_seq_len, d_model)
