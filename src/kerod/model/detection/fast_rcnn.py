@@ -4,10 +4,11 @@ from typing import Dict
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
-from tensorflow.keras.losses import SparseCategoricalCrossentropy, MeanAbsoluteError
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
 from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
+from kerod.core.losses import L1Loss
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.similarity import IoUSimilarity
 from kerod.core.standard_fields import BoxField
@@ -31,7 +32,7 @@ class FastRCNN(AbstractDetectionHead):
             num_classes,
             SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE,
                                           from_logits=True),
-            MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE),  # like in tensorpack
+            L1Loss(reduction=tf.keras.losses.Reduction.NONE),  # like in tensorpack
             kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.001),
             **kwargs)
@@ -261,10 +262,7 @@ class FastRCNN(AbstractDetectionHead):
         extracted_localization_pred = tf.boolean_mask(localization_pred, one_hot_targets > 0)
         extracted_localization_pred = tf.reshape(extracted_localization_pred, (batch_size, -1, 4))
 
-        y_pred = {
-            BoxField.LABELS: classification_pred,
-            BoxField.BOXES: extracted_localization_pred
-        }
+        y_pred = {BoxField.LABELS: classification_pred, BoxField.BOXES: extracted_localization_pred}
 
         return self.compute_losses(y_true, y_pred, weights)
 

@@ -3,11 +3,12 @@ from typing import List
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
-from tensorflow.keras.losses import SparseCategoricalCrossentropy, MeanAbsoluteError
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
 from kerod.core.anchor_generator import Anchors
 from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
+from kerod.core.losses import L1Loss
 from kerod.core.similarity import IoUSimilarity
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.standard_fields import BoxField
@@ -33,7 +34,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
             2,
             SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE,
                                           from_logits=True),
-            MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE),
+            L1Loss(reduction=tf.keras.losses.Reduction.NONE),
             multiples=len(anchor_ratios),
             kernel_initializer_classification_head=initializers.RandomNormal(stddev=0.01),
             kernel_initializer_box_prediction_head=initializers.RandomNormal(stddev=0.01),

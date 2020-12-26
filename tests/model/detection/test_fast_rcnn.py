@@ -139,7 +139,7 @@ def test_fast_rcnn_compute_loss(mock_add_loss, mock_add_metric):
     losses = fast_rcnn.compute_loss(y_true, weights, classification_pred, localization_pred)
 
     assert losses[BoxField.LABELS] == 400 / 3 / 2
-    assert losses[BoxField.BOXES] == 0.5
+    assert losses[BoxField.BOXES] == 2.0
     assert len(losses) == 2
 
 

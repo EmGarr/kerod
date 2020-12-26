@@ -11,7 +11,8 @@ from kerod.model.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
 from kerod.utils import item_assignment
 from kerod.utils.training import apply_kernel_regularization
-from tensorflow.keras.losses import (MeanAbsoluteError, SparseCategoricalCrossentropy)
+from kerod.core.losses import L1Loss
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.python.keras.engine import data_adapter
 from tensorflow_addons.losses.giou_loss import GIoULoss
 
@@ -78,12 +79,12 @@ class DeTr(tf.keras.Model):
 
         # Losses
         self.giou = GIoULoss(reduction=tf.keras.losses.Reduction.NONE)
-        self.mae = MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE)
+        self.l1 = L1Loss(reduction=tf.keras.losses.Reduction.NONE)
         self.scc = SparseCategoricalCrossentropy(from_logits=True)
 
         # Metrics
         self.giou_metric = tf.keras.metrics.Mean(name="giou")
-        self.mae_metric = tf.keras.metrics.Mean(name="mae")
+        self.l1_metric = tf.keras.metrics.Mean(name="l1")
         self.scc_metric = tf.keras.metrics.Mean(name="scc")
         self.loss_metric = tf.keras.metrics.Mean(name="loss")
         self.precision_metric = tf.keras.metrics.SparseCategoricalAccuracy()
@@ -93,7 +94,7 @@ class DeTr(tf.keras.Model):
     @property
     def metrics(self):
         return [
-            self.loss_metric, self.giou_metric, self.mae_metric, self.scc_metric,
+            self.loss_metric, self.giou_metric, self.l1_metric, self.scc_metric,
             self.precision_metric, self.recall_metric
         ]
 
@@ -181,9 +182,9 @@ class DeTr(tf.keras.Model):
                          sample_weight=weights[BoxField.BOXES])
 
         # L1 with coordinates in y_cent, x_cent, w, h
-        mae = self.mae(y_true[BoxField.BOXES],
-                       y_pred[BoxField.BOXES],
-                       sample_weight=weights[BoxField.BOXES])
+        l1 = self.l1(y_true[BoxField.BOXES],
+                     y_pred[BoxField.BOXES],
+                     sample_weight=weights[BoxField.BOXES])
 
         # SparseCategoricalCrossentropy
         scc = self.weight_class * self.scc(y_true[BoxField.LABELS],
@@ -196,8 +197,8 @@ class DeTr(tf.keras.Model):
         self.giou_metric.update_state(giou)
 
         # coeff giou equal 5 according to the paper Appendix A.4 losses
-        mae = self.weight_l1 * tf.reduce_sum(mae) / num_boxes
-        self.mae_metric.update_state(mae)
+        l1 = self.weight_l1 * tf.reduce_sum(l1) / num_boxes
+        self.l1_metric.update_state(l1)
 
         recall = compute_detr_metrics(y_true[BoxField.LABELS], y_pred[BoxField.SCORES])
         self.recall_metric.update_state(recall)
@@ -206,7 +207,7 @@ class DeTr(tf.keras.Model):
                                            y_pred[BoxField.SCORES],
                                            sample_weight=weights[BoxField.LABELS])
 
-        return giou, mae, scc
+        return giou, l1, scc
 
     def train_step(self, data):
         data = data_adapter.expand_1d(data)
