@@ -8,7 +8,6 @@ class BoxField:
     WEIGHTS = 'weights'
 
 
-
 class DatasetField:
     IMAGES = 'images'
     IMAGES_INFO = 'images_information'

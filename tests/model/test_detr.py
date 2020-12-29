@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 import tensorflow as tf
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.model.detr import DeTr, DeTrResnet50Pytorch, compute_detr_metrics
@@ -64,14 +65,22 @@ def test_compute_loss_detr():
         [[[0, 100, 0], [0, 100, 0], [0, 100, 0]], [[100, 0, 0], [0, -100, 0], [0, -100, 0]]],
         tf.float32)
 
-    y_pred = {BoxField.BOXES: boxes_inf, BoxField.SCORES: classification_logits}
+    # The tiling operation mimic the number of layers
+    num_layers = 4
+    y_pred = {
+        BoxField.BOXES: tf.tile(boxes_inf, [1, num_layers, 1]),
+        BoxField.SCORES: tf.tile(classification_logits, [1, num_layers, 1])
+    }
 
     detr = DeTr(num_classes, None)
-    giou, l1, scc = detr.compute_loss(ground_truths, y_pred, tf.constant([2., 2.]))
-
-    assert giou == 1.31
-    assert l1 == 93.333336
-    assert scc == 91.36464
+    detr.transformer.decoder.num_layers = num_layers
+    loss = detr.compute_loss(ground_truths, y_pred, tf.constant([2., 2.]))
+    # Since y_pred has been tiled we can know
+    # the losses value by multiplying by the number of layers
+    expected_giou = 1.31 * num_layers
+    expected_l1 = 93.333336 * num_layers
+    expected_scc = 91.36464 * num_layers
+    np.testing.assert_allclose(loss, expected_scc + expected_l1 + expected_giou)
 
 
 def test_compute_detr_metrics():

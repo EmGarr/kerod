@@ -1,17 +1,18 @@
+from typing import Dict
+
 import tensorflow as tf
-from kerod.core.box_ops import convert_to_center_coordinates, convert_to_xyxy_coordinates
+from kerod.core.box_ops import (convert_to_center_coordinates, convert_to_xyxy_coordinates)
+from kerod.core.losses import L1Loss
 from kerod.core.matcher import hungarian_matching
 from kerod.core.similarity import DetrSimilarity
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.core.target_assigner import TargetAssigner
-from kerod.model.backbone.resnet import ResNet50PytorchStyle
+from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
 from kerod.model.layers.positional_encoding import PositionEmbeddingSine
 from kerod.model.layers.transformer import Transformer
 from kerod.model.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
 from kerod.utils import item_assignment
-from kerod.utils.training import apply_kernel_regularization
-from kerod.core.losses import L1Loss
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.python.keras.engine import data_adapter
 from tensorflow_addons.losses.giou_loss import GIoULoss
@@ -38,6 +39,24 @@ class DeTr(tf.keras.Model):
     - *num_queries*: number of object queries, ie detection slot. This is the maximal number of objects
     DETR can detect in a single image. For COCO, we recommend 100 queries.
 
+    Inputs:
+
+    - *inputs*: Tuple
+        1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
+        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
+        of the image without any padding.
+        3. images_padding_mask: A 3D tensor of int8 and shape [batch_size, None, None] composed of 0 and 1 which allows to know where a padding has been applied.
+
+
+    - *training*: Is automatically set to `True` in train mode
+
+    Outputs:
+
+    - *logits*: A Tensor of shape [batch_size, h, num_classes + 1] class logits
+    - *boxes*: A Tensor of shape [batch_size, h, 4]
+
+    where h is num_queries * transformer_decoder.num_layers if
+    training is true and num_queries otherwise.
     """
 
     def __init__(self, num_classes, backbone, num_queries=100, **kwargs):
@@ -86,9 +105,9 @@ class DeTr(tf.keras.Model):
                                                  from_logits=True)
 
         # Metrics
-        self.giou_metric = tf.keras.metrics.Mean(name="giou")
-        self.l1_metric = tf.keras.metrics.Mean(name="l1")
-        self.scc_metric = tf.keras.metrics.Mean(name="scc")
+        self.giou_metric = tf.keras.metrics.Mean(name="giou_last_layer")
+        self.l1_metric = tf.keras.metrics.Mean(name="l1_last_layer")
+        self.scc_metric = tf.keras.metrics.Mean(name="scc_last_layer")
         self.loss_metric = tf.keras.metrics.Mean(name="loss")
         self.precision_metric = tf.keras.metrics.SparseCategoricalAccuracy()
         # Object recall = foreground
@@ -106,7 +125,7 @@ class DeTr(tf.keras.Model):
 
         Arguments:
 
-        - *inputs*:
+        - *inputs*: Tuple
             1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
             2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
             of the image without any padding.
@@ -119,6 +138,9 @@ class DeTr(tf.keras.Model):
 
         - *logits*: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
         - *boxes*: A Tensor of shape [batch_size, num_queries, 4]
+
+        where h is num_queries * transformer_decoder.num_layers if
+        training is true and num_queries otherwise.
         """
         images = inputs[DatasetField.IMAGES]
         images_padding_masks = inputs[DatasetField.IMAGES_PMASK]
@@ -156,7 +178,24 @@ class DeTr(tf.keras.Model):
             BoxField.BOXES: boxes,
         }
 
-    def compute_loss(self, ground_truths, y_pred, input_shape):
+    def compute_loss(
+        self,
+        ground_truths: Dict[str, tf.Tensor],
+        y_pred: Dict[str, tf.Tensor],
+        input_shape: tf.Tensor,
+    ) -> int:
+        """Apply the GIoU, L1 and SCC to each layers of the transformer decoder
+
+        Arguments:
+
+        - *ground_truths*:
+           see output kerod.dataset.preprocessing for the doc
+        - *y_pred*: A dict
+            - *scores: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
+            - *bbox*: A Tensor of shape [batch_size, num_queries, 4]
+        - *input_shape*: [height, width] of the input tensor. It is the shape of the images will all the
+        padding included. It is used to normalize the ground_truths boxes.
+        """
         normalized_boxes = ground_truths[BoxField.BOXES] / tf.tile(input_shape[None], [1, 2])
         centered_normalized_boxes = convert_to_center_coordinates(normalized_boxes)
         ground_truths = {
@@ -170,9 +209,39 @@ class DeTr(tf.keras.Model):
             BoxField.NUM_BOXES:
                 ground_truths[BoxField.NUM_BOXES]
         }
-        y_true, weights = self.target_assigner.assign(y_pred, ground_truths)
+        boxes_per_lvl = tf.split(y_pred[BoxField.BOXES],
+                                 self.transformer.decoder.num_layers,
+                                 axis=1)
+        logits_per_lvl = tf.split(y_pred[BoxField.SCORES],
+                                  self.transformer.decoder.num_layers,
+                                  axis=1)
+
+        y_pred_per_lvl = [{
+            BoxField.BOXES: boxes,
+            BoxField.SCORES: logits
+        } for boxes, logits in zip(boxes_per_lvl, logits_per_lvl)]
 
         num_boxes = tf.cast(tf.reduce_sum(ground_truths[BoxField.NUM_BOXES]), tf.float32)
+        loss = 0
+        # Compute the Giou, L1 and SCC at each layers of the transformer decoder
+        for i, y_pred in enumerate(y_pred_per_lvl):
+            # Logs the metrics for the last layer of the decoder
+            compute_metrics = i == self.transformer.decoder.num_layers - 1
+            loss += self._compute_loss(y_pred,
+                                       ground_truths,
+                                       num_boxes,
+                                       compute_metrics=compute_metrics)
+        return loss
+
+    def _compute_loss(
+        self,
+        y_pred: Dict[str, tf.Tensor],
+        ground_truths: Dict[str, tf.Tensor],
+        num_boxes: int,
+        compute_metrics=False,
+    ):
+        y_true, weights = self.target_assigner.assign(y_pred, ground_truths)
+
         # Reduce the class imbalanced by applying to the weights
         # self.non_object_weight for the non object (pos 0)
         weights[BoxField.LABELS] = item_assignment(weights[BoxField.LABELS],
@@ -184,7 +253,6 @@ class DeTr(tf.keras.Model):
                          convert_to_xyxy_coordinates(y_pred[BoxField.BOXES]),
                          sample_weight=weights[BoxField.BOXES])
 
-        # L1 with coordinates in y_cent, x_cent, w, h
         l1 = self.l1(y_true[BoxField.BOXES],
                      y_pred[BoxField.BOXES],
                      sample_weight=weights[BoxField.BOXES])
@@ -194,25 +262,23 @@ class DeTr(tf.keras.Model):
                        y_pred[BoxField.SCORES],
                        sample_weight=weights[BoxField.LABELS])
 
-        # coeff giou equal 2 according to the paper Appendix A.4 losses
         giou = self.weight_giou * tf.reduce_sum(giou) / num_boxes
-        self.giou_metric.update_state(giou)
 
-        # coeff giou equal 5 according to the paper Appendix A.4 losses
         l1 = self.weight_l1 * tf.reduce_sum(l1) / num_boxes
-        self.l1_metric.update_state(l1)
 
         scc = self.weight_class * tf.reduce_sum(scc) / tf.reduce_sum(weights[BoxField.LABELS])
-        self.scc_metric.update_state(scc)
 
-        recall = compute_detr_metrics(y_true[BoxField.LABELS], y_pred[BoxField.SCORES])
-        self.recall_metric.update_state(recall)
+        if compute_metrics:
+            self.giou_metric.update_state(giou)
+            self.l1_metric.update_state(l1)
+            self.scc_metric.update_state(scc)
+            self.precision_metric.update_state(y_true[BoxField.LABELS],
+                                               y_pred[BoxField.SCORES],
+                                               sample_weight=weights[BoxField.LABELS])
 
-        self.precision_metric.update_state(y_true[BoxField.LABELS],
-                                           y_pred[BoxField.SCORES],
-                                           sample_weight=weights[BoxField.LABELS])
-
-        return giou, l1, scc
+            recall = compute_detr_metrics(y_true[BoxField.LABELS], y_pred[BoxField.SCORES])
+            self.recall_metric.update_state(recall)
+        return giou + l1 + scc
 
     def train_step(self, data):
         data = data_adapter.expand_1d(data)
@@ -221,10 +287,9 @@ class DeTr(tf.keras.Model):
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
             input_shape = tf.cast(tf.shape(x[DatasetField.IMAGES])[1:3], self.compute_dtype)
-            giou, mae, scc = self.compute_loss(ground_truths, y_pred, input_shape)
+            loss = self.compute_loss(ground_truths, y_pred, input_shape)
 
-            reg_loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
-            loss = reg_loss + giou + mae + scc
+            loss += self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
 
         self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
         self.loss_metric.update_state(loss)
@@ -236,10 +301,8 @@ class DeTr(tf.keras.Model):
 
         y_pred = self(x, training=False)
         input_shape = tf.cast(tf.shape(x[DatasetField.IMAGES])[1:3], self.compute_dtype)
-        giou, mae, scc = self.compute_loss(ground_truths, y_pred, input_shape)
-
-        reg_loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
-        loss = reg_loss + giou + mae + scc
+        loss = self.compute_loss(ground_truths, y_pred, input_shape)
+        loss += self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
         self.loss_metric.update_state(loss)
         return {m.name: m.result() for m in self.metrics}
 
@@ -276,6 +339,13 @@ class DeTr(tf.keras.Model):
             tf.shape(x[DatasetField.IMAGES])[1:3],
         )
         return boxes_without_padding, scores, labels
+
+
+class DeTrResnet50(DeTr):
+
+    def __init__(self, num_classes, num_queries=100, **kwargs):
+        resnet = ResNet50(input_shape=[None, None, 3], weights='imagenet')
+        super().__init__(num_classes, resnet, num_queries=num_queries, **kwargs)
 
 
 class DeTrResnet50Pytorch(DeTr):

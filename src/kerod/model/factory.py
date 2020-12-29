@@ -2,14 +2,15 @@ import tensorflow as tf
 
 from kerod.model.faster_rcnn import FasterRcnnFPNResnet50Caffe, FasterRcnnFPNResnet50Pytorch
 from enum import Enum
-from kerod.model.detr import DeTrResnet50Pytorch
+from kerod.model.detr import DeTrResnet50Pytorch, DeTrResnet50
 from kerod.utils.training import (freeze_batch_normalization, freeze_layers_before)
 
 
 class KerodModel(str, Enum):
     faster_rcnn_resnet50_pytorch = 'resnet50_pytorch'
     faster_rcnn_resnet50_caffe = 'resnet50_caffe'
-    detr_resnet50 = 'detr_resnet50_pytorch'
+    detr_resnet50 = 'detr_resnet50'
+    detr_resnet50_pytorch = 'detr_resnet50_pytorch'
 
 
 def build_model(num_classes: int,
@@ -40,10 +41,15 @@ def build_model(num_classes: int,
         freeze_batch_normalization(model.backbone)
         freeze_layers_before(model.backbone, 'conv2_block3_out')
         return model
-    elif name == KerodModel.detr_resnet50:
+    elif name == KerodModel.detr_resnet50_pytorch:
         model = DeTrResnet50Pytorch(num_classes)
         freeze_batch_normalization(model.backbone)
         freeze_layers_before(model.backbone, 'resnet50/group0/block2/last_relu')
+        return model
+    elif name == KerodModel.detr_resnet50:
+        model = DeTrResnet50(num_classes)
+        freeze_batch_normalization(model.backbone)
+        freeze_layers_before(model.backbone, 'conv2_block3_out')
         return model
 
     raise NotImplementedError(f'Name: {name} is not implemented.')
