@@ -9,8 +9,8 @@ from kerod.utils.training import (freeze_batch_normalization, freeze_layers_befo
 class KerodModel(str, Enum):
     faster_rcnn_resnet50_pytorch = 'resnet50_pytorch'
     faster_rcnn_resnet50_caffe = 'resnet50_caffe'
-    detr_resnet50 = 'detr_resnet50'
-    detr_resnet50_pytorch = 'detr_resnet50_pytorch'
+    detr_resnet50 = 'detr_resnet50_pytorch'
+    detr_resnet50_caffe = 'detr_resnet50'
 
 
 def build_model(num_classes: int,
@@ -41,12 +41,12 @@ def build_model(num_classes: int,
         freeze_batch_normalization(model.backbone)
         freeze_layers_before(model.backbone, 'conv2_block3_out')
         return model
-    elif name == KerodModel.detr_resnet50_pytorch:
+    elif name == KerodModel.detr_resnet50:
         model = DeTrResnet50Pytorch(num_classes)
         freeze_batch_normalization(model.backbone)
         freeze_layers_before(model.backbone, 'resnet50/group0/block2/last_relu')
         return model
-    elif name == KerodModel.detr_resnet50:
+    elif name == KerodModel.detr_resnet50_caffe:
         model = DeTrResnet50(num_classes)
         freeze_batch_normalization(model.backbone)
         freeze_layers_before(model.backbone, 'conv2_block3_out')
