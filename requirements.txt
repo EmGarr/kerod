@@ -1,4 +1,4 @@
 tensorflow>=2.4.0
-tfa-nightly # tensorflow-addons tensorflow 2.4.0 not supported currently
+tensorflow-addons
 scipy
 matplotlib
