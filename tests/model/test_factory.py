@@ -102,7 +102,7 @@ def test_detr(tmpdir):
     data = data.map(partial(preprocess, padded_mask=True))
     data = data.padded_batch(batch_size, padded_shape)
 
-    base_lr = 0.02
+    base_lr = 0.00002
     optimizer = tf.keras.optimizers.SGD(learning_rate=base_lr)
     model.compile(optimizer=optimizer, loss=None)
     model.fit(data,
