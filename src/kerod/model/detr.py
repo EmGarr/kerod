@@ -66,11 +66,10 @@ class DeTr(tf.keras.Model):
         self.num_queries = num_queries
         self.hidden_dim = 256
 
-        self.l2 = tf.keras.regularizers.l2(1e-4)
         self.backbone = backbone
         self.input_proj = tf.keras.layers.Conv2D(self.hidden_dim, 1)
         self.pos_embed = PositionEmbeddingSine(output_dim=self.hidden_dim)
-        self.transformer = Transformer(d_model=self.hidden_dim)
+        self.transformer = Transformer(d_model=self.hidden_dim, num_heads=8, dim_feedforward=2048)
 
         self.bbox_embed = tf.keras.models.Sequential([
             tf.keras.layers.Dense(self.hidden_dim, activation='relu'),

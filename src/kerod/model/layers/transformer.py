@@ -17,7 +17,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     - *value*: A 3-D tensor of shape [batch_size, seq_len, depth_v]
     - *key*: A 3-D tensor of shape [batch_size, seq_len, depth]
     - *query*: A 3-D tensor of shape [batch_size, seq_len_q, depth]
-    - *key_padding_mask*: A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
+    - *key_padding_mask*: A 2-D bool Tensor of shape [batch_size, seq_len] where
     False means padding and True means pixel from the original image.
 
     Output:
@@ -55,8 +55,8 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         - *value*: A 3-D tensor of shape [batch_size, seq_len, depth_v]
         - *key*: A 3-D tensor of shape [batch_size, seq_len, depth]
         - *query*: A 3-D tensor of shape [batch_size, seq_len_q, depth]
-        - *key_padding_mask*: A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
-        False means padding and True means pixel from the original image.
+        - *key_padding_mask*: A 2-D bool Tensor of shape [batch_size, seq_len]. the positions with the
+        value of ``True`` will be ignored while the position with the value of ``False`` will be unchanged.
 
         Return:
 
@@ -64,7 +64,6 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         """
 
         v, k, q, key_padding_mask = inputs
-        seq_len_q = tf.shape(q)[1]
         batch_size = tf.shape(q)[0]
 
         # (batch_size, num_heads, seq_len_q, depth)
@@ -81,20 +80,14 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         # Here we normalize by depth_k suppose K and Q are two matrices
         # with mean=0 and var=1. After QK^T will have a matrix with
         # mean=0 and var= 1 * depth_k. QK^T/sqrt(depth_k) => mean=0 and var=1
-        depth_k = tf.cast(tf.shape(k)[-1], self.compute_dtype)
-        scaled_attention_logits = matmul_qk / tf.math.sqrt(depth_k)
+        scaled_attention_logits = matmul_qk / tf.math.sqrt(tf.cast(self.depth, self.compute_dtype))
 
         if key_padding_mask is not None:
-            # Tile the tensor from [batch_size, seq_len] to [batch_size, nh, seq_len_q, seq_len]
-            key_padding_mask = tf.tile(key_padding_mask[:, None, None],
-                                       [1, self.num_heads, seq_len_q, 1])
-
             # Apply -inf if the pixels is a padding
             # False means padded so we take: not key_padding_mask
             scaled_attention_logits = tf.where(
-                ~key_padding_mask,
+                ~key_padding_mask[:, None, None],
                 tf.zeros_like(scaled_attention_logits) + float('-inf'), scaled_attention_logits)
-
         # softmax is normalized on the last axis (seq_len_k) so that the scores
         # add up to 1.
         # (..., seq_len_q, seq_len_k)
@@ -220,8 +213,8 @@ class DecoderLayer(tf.keras.layers.Layer):
                  dropout_rate=0.1,
                  **kwargs):
         super().__init__(**kwargs)
-        self.mha1 = MultiHeadAttention(d_model, num_heads)
-        self.mha2 = MultiHeadAttention(d_model, num_heads)
+        self.mha1 = MultiHeadAttention(d_model, num_heads, dropout_rate=dropout_rate)
+        self.mha2 = MultiHeadAttention(d_model, num_heads, dropout_rate=dropout_rate)
 
         self.ffn = tf.keras.Sequential([
             tf.keras.layers.Dense(dim_feedforward, activation='relu'),

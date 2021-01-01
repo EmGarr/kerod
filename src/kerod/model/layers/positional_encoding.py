@@ -112,9 +112,9 @@ class PositionEmbeddingSine(tf.keras.layers.Layer):
             tf.math.cos(pos_y[..., 1::2]),
         ], axis=4)
 
-        batch_size, w, h = tf.shape(masks)[0], tf.shape(masks)[1], tf.shape(masks)[2]
-        pos_x = tf.reshape(pos_x, (batch_size, w, h, -1))
-        pos_y = tf.reshape(pos_y, (batch_size, w, h, -1))
+        batch_size, h, w = tf.shape(masks)[0], tf.shape(masks)[1], tf.shape(masks)[2]
+        pos_x = tf.reshape(pos_x, (batch_size, h, w, -1))
+        pos_y = tf.reshape(pos_y, (batch_size, h, w, -1))
 
         pos_emb = tf.concat([pos_y, pos_x], axis=-1)
         return pos_emb
