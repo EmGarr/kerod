@@ -298,7 +298,9 @@ class DeTr(tf.keras.Model):
         data = data_adapter.expand_1d(data)
         x, ground_truths, _ = data_adapter.unpack_x_y_sample_weight(data)
 
-        y_pred = self(x, training=False)
+        # To compute the loss we need to get the results of each decoder layer
+        # Setting training to True will provide it
+        y_pred = self(x, training=True)
         input_shape = tf.cast(tf.shape(x[DatasetField.IMAGES])[1:3], self.compute_dtype)
         loss = self.compute_loss(ground_truths, y_pred, input_shape)
         loss += self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
