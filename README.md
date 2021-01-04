@@ -46,7 +46,7 @@ You can find examples in the [notebooks folder](./notebooks). There are no runne
 | [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | PascalVoc |             |          |                 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/pascal_voc_training_fpn50.ipynb) |
 | [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | PascalVoc |             |                    | :heavy_check_mark: | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/mixed_precision_pascal_voc_training_fpn50.ipynb) |   |
 | [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | COCO      |             |                    |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb)                             |   |
-| [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | COCO      | 30 mAP      | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training_multi_gpu.ipynb)                   |   |
+| [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | COCO      | 30 mAP on old code base. A bug has been removed since. I need 4 GPUs to rerun the training. | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training_multi_gpu.ipynb)                   |   |
 | [DetrResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/detr.py) | COCO      | NEED 16 GPUS for 3 days | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/detr_coco_training_multi_gpu.ipynb)              |   |
 
 Pytorch: means resnet implementation Pytorch style. In the residual block we have: conv (1x1) stride 1 -> conv (3x3) stride 2 instead of conv (1x1) stride 2 -> conv (3x3) stride 1 (Caffe, Keras implementations)
@@ -252,8 +252,3 @@ or
 ```bash
 pytest tests/
 ```
-## Caveats
-
-`Warning`: It is still a work in progress and some breaking changes could arrive soon. If you need to have SOTA performances I'll advise to choose [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) (This is actually the same developer than Detectron2) for Faster RCNN for now but my aim is too match its benchmarks soon. The current AP@[.5:.95] on the [coco notebook](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb) is `30` which is quite low (38 for mmdetection or detectron2), so let's found those bugs. 
-
-
