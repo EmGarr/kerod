@@ -1,0 +1,1761 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="shortcut icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.14">
+    
+    
+      
+        <title>Pooling Ops - kerod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.d3202873.min.css">
+      
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ff0a5ce4.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#4cae4f">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="green" data-md-color-accent="lightgreen">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#module-kerodmodeldetectionpooling_ops" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../../../../.." title="kerod" class="md-header-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            kerod
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Pooling Ops
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="kerod" class="md-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    kerod
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../CONTRIBUTING/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../docs/BENCHMARKS/" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      Reference
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Reference" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" type="checkbox" id="nav-4-1" checked>
+    
+    <label class="md-nav__link" for="nav-4-1">
+      Kerod
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Kerod" data-md-level="2">
+      <label class="md-nav__title" for="nav-4-1">
+        <span class="md-nav__icon md-icon"></span>
+        Kerod
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-2" type="checkbox" id="nav-4-1-2">
+    
+    <label class="md-nav__link" for="nav-4-1-2">
+      Core
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Core
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/anchor_generator/" title="Anchor Generator" class="md-nav__link">
+      Anchor Generator
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/box_coder/" title="Box Coder" class="md-nav__link">
+      Box Coder
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/box_ops/" title="Box Ops" class="md-nav__link">
+      Box Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/constants/" title="Constants" class="md-nav__link">
+      Constants
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/learning_rate_schedule/" title="Learning Rate Schedule" class="md-nav__link">
+      Learning Rate Schedule
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/losses/" title="Losses" class="md-nav__link">
+      Losses
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/matcher/" title="Matcher" class="md-nav__link">
+      Matcher
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/sampling_ops/" title="Sampling Ops" class="md-nav__link">
+      Sampling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/similarity/" title="Similarity" class="md-nav__link">
+      Similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/standard_fields/" title="Standard Fields" class="md-nav__link">
+      Standard Fields
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/target_assigner/" title="Target Assigner" class="md-nav__link">
+      Target Assigner
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-3" type="checkbox" id="nav-4-1-3">
+    
+    <label class="md-nav__link" for="nav-4-1-3">
+      Dataset
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Dataset" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        Dataset
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/augmentation/" title="Augmentation" class="md-nav__link">
+      Augmentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/preprocessing/" title="Preprocessing" class="md-nav__link">
+      Preprocessing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4" type="checkbox" id="nav-4-1-4" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-4">
+      Model
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Model" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-4">
+        <span class="md-nav__icon md-icon"></span>
+        Model
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detr/" title="Detr" class="md-nav__link">
+      Detr
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../factory/" title="Factory" class="md-nav__link">
+      Factory
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../faster_rcnn/" title="Faster Rcnn" class="md-nav__link">
+      Faster Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-5" type="checkbox" id="nav-4-1-4-5">
+    
+    <label class="md-nav__link" for="nav-4-1-4-5">
+      Backbone
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Backbone" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-5">
+        <span class="md-nav__icon md-icon"></span>
+        Backbone
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../backbone/fpn/" title="Fpn" class="md-nav__link">
+      Fpn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../backbone/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../backbone/resnet/" title="Resnet" class="md-nav__link">
+      Resnet
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-6" type="checkbox" id="nav-4-1-4-6" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-4-6">
+      Detection
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Detection" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-6">
+        <span class="md-nav__icon md-icon"></span>
+        Detection
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../abstract_detection_head/" title="Abstract Detection Head" class="md-nav__link">
+      Abstract Detection Head
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../fast_rcnn/" title="Fast Rcnn" class="md-nav__link">
+      Fast Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Pooling Ops
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" title="Pooling Ops" class="md-nav__link md-nav__link--active">
+      Pooling Ops
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#assign_pyramid_level_to_boxes" class="md-nav__link">
+    assign_pyramid_level_to_boxes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#match_boxes_to_their_pyramid_level" class="md-nav__link">
+    match_boxes_to_their_pyramid_level
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multilevel_roi_align" class="md-nav__link">
+    multilevel_roi_align
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roi_align" class="md-nav__link">
+    roi_align
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpn/" title="Rpn" class="md-nav__link">
+      Rpn
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-7" type="checkbox" id="nav-4-1-4-7">
+    
+    <label class="md-nav__link" for="nav-4-1-4-7">
+      Layers
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Layers" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-7">
+        <span class="md-nav__icon md-icon"></span>
+        Layers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../layers/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../layers/positional_encoding/" title="Positional Encoding" class="md-nav__link">
+      Positional Encoding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../layers/transformer/" title="Transformer" class="md-nav__link">
+      Transformer
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-8" type="checkbox" id="nav-4-1-4-8">
+    
+    <label class="md-nav__link" for="nav-4-1-4-8">
+      Post Processing
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Post Processing" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-8">
+        <span class="md-nav__icon md-icon"></span>
+        Post Processing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../post_processing/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../post_processing/non_maximum_suppression/" title="Non Maximum Suppression" class="md-nav__link">
+      Non Maximum Suppression
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../post_processing/post_processing_detr/" title="Post Processing Detr" class="md-nav__link">
+      Post Processing Detr
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" type="checkbox" id="nav-4-1-5">
+    
+    <label class="md-nav__link" for="nav-4-1-5">
+      Utils
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Utils" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-5">
+        <span class="md-nav__icon md-icon"></span>
+        Utils
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/drawing/" title="Drawing" class="md-nav__link">
+      Drawing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/ops/" title="Ops" class="md-nav__link">
+      Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/training/" title="Training" class="md-nav__link">
+      Training
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#assign_pyramid_level_to_boxes" class="md-nav__link">
+    assign_pyramid_level_to_boxes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#match_boxes_to_their_pyramid_level" class="md-nav__link">
+    match_boxes_to_their_pyramid_level
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multilevel_roi_align" class="md-nav__link">
+    multilevel_roi_align
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roi_align" class="md-nav__link">
+    roi_align
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/EmGarr/kerod/edit/master/reference/kerod/model/detection/pooling_ops.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="module-kerodmodeldetectionpooling_ops">Module kerod.model.detection.pooling_ops</h1>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">as</span> <span class="nn">KL</span>
+
+<span class="kn">from</span> <span class="nn">tensorflow.keras</span> <span class="kn">import</span> <span class="n">backend</span> <span class="k">as</span> <span class="n">K</span>
+
+<span class="kn">from</span> <span class="nn">kerod.core.box_ops</span> <span class="kn">import</span> <span class="p">(</span><span class="n">compute_area</span><span class="p">,</span> <span class="n">normalize_box_coordinates</span><span class="p">,</span> <span class="n">transform_fpcoor_for_tf</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_crop_and_resize</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">box_indices</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Taken from tensorpack (https://github.com/tensorpack/tensorpack/blob/master/examples/FasterRCNN/modeling/model_box.py)</span>
+
+<span class="sd">    Aligned version of tf.image.crop_and_resize, following our definition of floating point boxes.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *tensor*: A 4-D tensor of shape [batch, image_height, image_width, depth].</span>
+
+<span class="sd">            Both image_height and image_width need to be positive.</span>
+
+<span class="sd">    - *boxes*: A 2-D tensor of shape [num_boxes, 4].</span>
+
+<span class="sd">            The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is</span>
+
+<span class="sd">            specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is</span>
+
+<span class="sd">            mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of</span>
+
+<span class="sd">            normalized image height is mapped to [0, image_height - 1] in image height coordinates.</span>
+
+<span class="sd">            We do allow y1 &gt; y2, in which case the sampled crop is an up-down flipped version of the</span>
+
+<span class="sd">            original image. The width dimension is treated similarly. Normalized coordinates outside the</span>
+
+<span class="sd">            [0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input</span>
+
+<span class="sd">            image values.</span>
+
+<span class="sd">    - *box_indices*: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
+
+<span class="sd">            The value of box_ind[i] specifies the image that the i-th box refers to.</span>
+
+<span class="sd">    - *crop_size*: An int representing the ouput size of the crop.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
+
+    <span class="c1"># TF&#39;s crop_and_resize produces zeros on border. The symetric padding</span>
+
+    <span class="c1"># allows to have a better interpolation for the boxes on the border of the image.</span>
+
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;SYMMETRIC&#39;</span><span class="p">)</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">boxes</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Height, width extraction</span>
+
+    <span class="n">tensor_shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">tensor</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="c1"># The boxes should be at the size of the input tensor</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">transform_fpcoor_for_tf</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">tensor_shape</span><span class="p">,</span> <span class="p">[</span><span class="n">crop_size</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">])</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">crop_and_resize</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span>
+
+                                   <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="c1"># crop and resize needs float32</span>
+
+                                   <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">box_indices</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+
+                                   <span class="n">crop_size</span><span class="o">=</span><span class="p">[</span><span class="n">crop_size</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">ret</span>
+
+<span class="k">def</span> <span class="nf">roi_align</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">box_indices</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;RoI align like operation from the paper Mask-RCNN.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *inputs*: A 4-D tensor of shape [batch, height, tensor_width, depth].</span>
+
+<span class="sd">            Both image_height and image_width need to be positive.</span>
+
+<span class="sd">    - *boxes*: A 2-D tensor of shape [num_boxes, 4].</span>
+
+<span class="sd">            The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is</span>
+
+<span class="sd">            specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is</span>
+
+<span class="sd">            mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of</span>
+
+<span class="sd">            normalized image height is mapped to [0, image_height - 1] in image height coordinates.</span>
+
+<span class="sd">            We do allow y1 &gt; y2, in which case the sampled crop is an up-down flipped version of the</span>
+
+<span class="sd">            original image. The width dimension is treated similarly. Normalized coordinates outside the</span>
+
+<span class="sd">            [0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input</span>
+
+<span class="sd">            image values.</span>
+
+<span class="sd">    - *box_indices*: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
+
+<span class="sd">            The value of box_ind[i] specifies the image that the i-th box refers to.</span>
+
+<span class="sd">    - *image_shape*: A tuple with the height and the width of the original image input image</span>
+
+<span class="sd">    - *crop_size*: An int representing the ouput size of the crop.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">normalized_boxes</span> <span class="o">=</span> <span class="n">normalize_box_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Normalized the boxes to the input tensor_shape</span>
+
+    <span class="c1"># TODO rewrite this normalization unnomarlization isn&#39;t pretty at all</span>
+
+    <span class="n">tensor_shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">inputs</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="n">normalized_boxes</span> <span class="o">*=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tensor_shape</span><span class="p">[</span><span class="bp">None</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span>
+
+                                <span class="n">normalized_boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">_crop_and_resize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">normalized_boxes</span><span class="p">,</span> <span class="n">box_indices</span><span class="p">,</span> <span class="n">crop_size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">KL</span><span class="o">.</span><span class="n">AveragePooling2D</span><span class="p">(</span><span class="n">padding</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)(</span><span class="n">ret</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">multilevel_roi_align</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Perform a batch multilevel roi_align on the inputs</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *inputs*: A list of tensors of shape [batch_size, width, height, channel]</span>
+
+<span class="sd">            representing the pyramid.</span>
+
+<span class="sd">    - *boxes*: A tensor  and shape [batch_size, num_boxes, (y1, x1, y2, x2)]</span>
+
+<span class="sd">    - *image_shape*: A tuple with the height and the width of the original image input image</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor and shape [batch_size * num_boxes, 7, 7, channel]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">boxes_per_level</span><span class="p">,</span> <span class="n">box_indices_per_level</span><span class="p">,</span> <span class="n">pos_per_level</span> <span class="o">=</span> <span class="n">match_boxes_to_their_pyramid_level</span><span class="p">(</span>
+
+        <span class="n">boxes</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
+
+    <span class="n">tensors_per_level</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">target_boxes</span><span class="p">,</span> <span class="n">box_indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">boxes_per_level</span><span class="p">,</span> <span class="n">box_indices_per_level</span><span class="p">):</span>
+
+        <span class="n">tensors_per_level</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+
+            <span class="n">roi_align</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">target_boxes</span><span class="p">,</span> <span class="n">box_indices</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">))</span>
+
+    <span class="n">tensors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">tensors_per_level</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">original_pos</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">pos_per_level</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Reorder the tensor per batch</span>
+
+    <span class="n">indices_to_reorder_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">invert_permutation</span><span class="p">(</span><span class="n">original_pos</span><span class="p">)</span>
+
+    <span class="n">tensors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">tensors</span><span class="p">,</span> <span class="n">indices_to_reorder_boxes</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tensors</span>
+
+<span class="k">def</span> <span class="nf">match_boxes_to_their_pyramid_level</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_level</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Match the boxes to the proper level based on their area</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: A tensor of shape [batch_size, num_boxes, 4]</span>
+
+<span class="sd">    - *num_level*: Number of level of the target pyramid</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    - *boxes_per_level*: A list of 2-D tensor and shape [N, 4]</span>
+
+<span class="sd">    - *box_indices_per_level*: A list of 1-D tensor with int32 values in [0, batch).</span>
+
+<span class="sd">    The value of a box_indices_per_level[lvl][i] specifies the image that the i-th box refers to.</span>
+
+<span class="sd">    - *original_pos_per_level* A list of 1-D tensor with int32 values in [0, num_boxes * batch_size)</span>
+
+<span class="sd">    It will be useful to reorder our boxes after the roi_align operation.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_select_level</span><span class="p">(</span><span class="n">tensors</span><span class="p">,</span> <span class="n">levels</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">tensors</span><span class="p">,</span> <span class="n">selected_level</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">selected_level</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">]</span>
+
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">boxes</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">num_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">boxes</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="n">box_levels</span> <span class="o">=</span> <span class="n">assign_pyramid_level_to_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_level</span><span class="p">)</span>
+
+    <span class="n">box_indices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_boxes</span><span class="p">])</span>
+
+    <span class="n">box_indices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">box_indices</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+
+    <span class="n">box_original_pos</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="n">num_boxes</span><span class="p">)</span>
+
+    <span class="n">levels</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">box_levels</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_level</span><span class="p">)]</span>
+
+    <span class="n">boxes_per_level</span> <span class="o">=</span> <span class="n">_select_level</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">levels</span><span class="p">)</span>
+
+    <span class="n">box_indices_per_level</span> <span class="o">=</span> <span class="n">_select_level</span><span class="p">(</span><span class="n">box_indices</span><span class="p">,</span> <span class="n">levels</span><span class="p">)</span>
+
+    <span class="n">original_pos_per_level</span> <span class="o">=</span> <span class="n">_select_level</span><span class="p">(</span><span class="n">box_original_pos</span><span class="p">,</span> <span class="n">levels</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">boxes_per_level</span><span class="p">,</span> <span class="n">box_indices_per_level</span><span class="p">,</span> <span class="n">original_pos_per_level</span>
+
+<span class="k">def</span> <span class="nf">assign_pyramid_level_to_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_level</span><span class="p">,</span> <span class="n">level_target</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Compute the pyramid level of an RoI</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: A tensor of shape</span>
+
+<span class="sd">            [nb_batches * nb_boxes, 4]</span>
+
+<span class="sd">    - *num_level*: Assign all the boxes mapped to a superior level to the num_level.</span>
+
+<span class="sd">        level_target: Will affect all the boxes of area 224^2 to the level_target of the pyramid.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A 2-D tensor of type int32 and shape [nb_batches * nb_boxes]</span>
+
+<span class="sd">    corresponding to the target level of the pyramid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">area</span> <span class="o">=</span> <span class="n">compute_area</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">level_target</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">area</span><span class="p">)</span> <span class="o">/</span> <span class="n">denominator</span> <span class="o">+</span> <span class="n">K</span><span class="o">.</span><span class="n">epsilon</span><span class="p">())</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+
+        <span class="mf">1.</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">clip_by_value</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">num_level</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">k</span>
+</code></pre></div>
+
+</details>
+<h2 id="functions">Functions</h2>
+<h3 id="assign_pyramid_level_to_boxes">assign_pyramid_level_to_boxes</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">assign_pyramid_level_to_boxes</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">,</span>
+    <span class="n">num_level</span><span class="p">,</span>
+    <span class="n">level_target</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Compute the pyramid level of an RoI</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: A tensor of shape
+        [nb_batches * nb_boxes, 4]</li>
+<li><em>num_level</em>: Assign all the boxes mapped to a superior level to the num_level.
+    level_target: Will affect all the boxes of area 224^2 to the level_target of the pyramid.</li>
+</ul>
+<p>Returns:</p>
+<p>A 2-D tensor of type int32 and shape [nb_batches * nb_boxes]
+corresponding to the target level of the pyramid.</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">assign_pyramid_level_to_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_level</span><span class="p">,</span> <span class="n">level_target</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Compute the pyramid level of an RoI</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: A tensor of shape</span>
+
+<span class="sd">            [nb_batches * nb_boxes, 4]</span>
+
+<span class="sd">    - *num_level*: Assign all the boxes mapped to a superior level to the num_level.</span>
+
+<span class="sd">        level_target: Will affect all the boxes of area 224^2 to the level_target of the pyramid.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A 2-D tensor of type int32 and shape [nb_batches * nb_boxes]</span>
+
+<span class="sd">    corresponding to the target level of the pyramid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">area</span> <span class="o">=</span> <span class="n">compute_area</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">level_target</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">area</span><span class="p">)</span> <span class="o">/</span> <span class="n">denominator</span> <span class="o">+</span> <span class="n">K</span><span class="o">.</span><span class="n">epsilon</span><span class="p">())</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+
+        <span class="mf">1.</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">clip_by_value</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">num_level</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">k</span>
+</code></pre></div>
+
+</details>
+<h3 id="match_boxes_to_their_pyramid_level">match_boxes_to_their_pyramid_level</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">match_boxes_to_their_pyramid_level</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">,</span>
+    <span class="n">num_level</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Match the boxes to the proper level based on their area</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: A tensor of shape [batch_size, num_boxes, 4]</li>
+<li><em>num_level</em>: Number of level of the target pyramid</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li><em>boxes_per_level</em>: A list of 2-D tensor and shape [N, 4]</li>
+<li><em>box_indices_per_level</em>: A list of 1-D tensor with int32 values in [0, batch).
+The value of a box_indices_per_level[lvl][i] specifies the image that the i-th box refers to.</li>
+<li><em>original_pos_per_level</em> A list of 1-D tensor with int32 values in [0, num_boxes * batch_size)
+It will be useful to reorder our boxes after the roi_align operation.</li>
+</ul>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">match_boxes_to_their_pyramid_level</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="n">num_level</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">    </span><span class="ss">&quot;&quot;&quot;Match the boxes to the proper level based on their area</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes*: A tensor of shape [batch_size, num_boxes, 4]</span>
+
+<span class="ss">    - *num_level*: Number of level of the target pyramid</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    - *boxes_per_level*: A list of 2-D tensor and shape [N, 4]</span>
+
+<span class="ss">    - *box_indices_per_level*: A list of 1-D tensor with int32 values in [0, batch).</span>
+
+<span class="ss">    The value of a box_indices_per_level[lvl][i] specifies the image that the i-th box refers to.</span>
+
+<span class="ss">    - *original_pos_per_level* A list of 1-D tensor with int32 values in [0, num_boxes * batch_size)</span>
+
+<span class="ss">    It will be useful to reorder our boxes after the roi_align operation.</span>
+
+<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">def</span><span class="w"> </span><span class="n">_select_level</span><span class="p">(</span><span class="n">tensors</span><span class="p">,</span><span class="w"> </span><span class="n">levels</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">[</span><span class="n">tf.squeeze(tf.gather(tensors, selected_level), 1) for selected_level in levels</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">batch_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">num_boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">))</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">box_levels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">assign_pyramid_level_to_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="n">num_level</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">box_indices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="k">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">batch_size</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="o">[</span><span class="n">1, num_boxes</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">box_indices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">box_indices</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">box_original_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="k">range</span><span class="p">(</span><span class="n">batch_size</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_boxes</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">levels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">tf.where(tf.equal(box_levels, i)) for i in range(num_level)</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">boxes_per_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_select_level</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="n">levels</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">box_indices_per_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_select_level</span><span class="p">(</span><span class="n">box_indices</span><span class="p">,</span><span class="w"> </span><span class="n">levels</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">original_pos_per_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_select_level</span><span class="p">(</span><span class="n">box_original_pos</span><span class="p">,</span><span class="w"> </span><span class="n">levels</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">boxes_per_level</span><span class="p">,</span><span class="w"> </span><span class="n">box_indices_per_level</span><span class="p">,</span><span class="w"> </span><span class="n">original_pos_per_level</span><span class="w"></span>
+</code></pre></div>
+
+</details>
+<h3 id="multilevel_roi_align">multilevel_roi_align</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">multilevel_roi_align</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="p">,</span>
+    <span class="n">boxes</span><span class="p">,</span>
+    <span class="n">image_shape</span><span class="p">,</span>
+    <span class="n">crop_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">7</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Perform a batch multilevel roi_align on the inputs</p>
+<p>Arguments:</p>
+<ul>
+<li><em>inputs</em>: A list of tensors of shape [batch_size, width, height, channel]
+        representing the pyramid.</li>
+<li>
+<p><em>boxes</em>: A tensor  and shape [batch_size, num_boxes, (y1, x1, y2, x2)]</p>
+</li>
+<li>
+<p><em>image_shape</em>: A tuple with the height and the width of the original image input image</p>
+</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor and shape [batch_size * num_boxes, 7, 7, channel]</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">multilevel_roi_align</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">):</span>
+
+    <span class="ss">&quot;&quot;&quot;Perform a batch multilevel roi_align on the inputs</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *inputs*: A list of tensors of shape [batch_size, width, height, channel]</span>
+
+<span class="ss">            representing the pyramid.</span>
+
+<span class="ss">    - *boxes*: A tensor  and shape [batch_size, num_boxes, (y1, x1, y2, x2)]</span>
+
+<span class="ss">    - *image_shape*: A tuple with the height and the width of the original image input image</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor and shape [batch_size * num_boxes, 7, 7, channel]</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">boxes_per_level</span><span class="p">,</span> <span class="n">box_indices_per_level</span><span class="p">,</span> <span class="n">pos_per_level</span> <span class="o">=</span> <span class="n">match_boxes_to_their_pyramid_level</span><span class="p">(</span>
+
+        <span class="n">boxes</span><span class="p">,</span> <span class="n">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
+
+    <span class="n">tensors_per_level</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">target_boxes</span><span class="p">,</span> <span class="n">box_indices</span> <span class="k">in</span> <span class="n">zip</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">boxes_per_level</span><span class="p">,</span> <span class="n">box_indices_per_level</span><span class="p">):</span>
+
+        <span class="n">tensors_per_level</span><span class="p">.</span><span class="n">append</span><span class="p">(</span>
+
+            <span class="n">roi_align</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">target_boxes</span><span class="p">,</span> <span class="n">box_indices</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">))</span>
+
+    <span class="n">tensors</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="k">values</span><span class="o">=</span><span class="n">tensors_per_level</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">original_pos</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="k">values</span><span class="o">=</span><span class="n">pos_per_level</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="o">#</span> <span class="n">Reorder</span> <span class="n">the</span> <span class="n">tensor</span> <span class="n">per</span> <span class="n">batch</span>
+
+    <span class="n">indices_to_reorder_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">invert_permutation</span><span class="p">(</span><span class="n">original_pos</span><span class="p">)</span>
+
+    <span class="n">tensors</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">gather</span><span class="p">(</span><span class="n">tensors</span><span class="p">,</span> <span class="n">indices_to_reorder_boxes</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tensors</span>
+</code></pre></div>
+
+</details>
+<h3 id="roi_align">roi_align</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">roi_align</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="p">,</span>
+    <span class="n">boxes</span><span class="p">,</span>
+    <span class="n">box_indices</span><span class="p">,</span>
+    <span class="n">image_shape</span><span class="p">,</span>
+    <span class="n">crop_size</span><span class="p">:</span><span class="nb">int</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>RoI align like operation from the paper Mask-RCNN.</p>
+<p>Arguments:</p>
+<ul>
+<li>
+<p><em>inputs</em>: A 4-D tensor of shape [batch, height, tensor_width, depth].
+        Both image_height and image_width need to be positive.</p>
+</li>
+<li>
+<p><em>boxes</em>: A 2-D tensor of shape [num_boxes, 4].
+        The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is
+        specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is
+        mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of
+        normalized image height is mapped to [0, image_height - 1] in image height coordinates.
+        We do allow y1 &gt; y2, in which case the sampled crop is an up-down flipped version of the
+        original image. The width dimension is treated similarly. Normalized coordinates outside the
+        [0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input
+        image values.</p>
+</li>
+<li>
+<p><em>box_indices</em>: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).
+        The value of box_ind[i] specifies the image that the i-th box refers to.</p>
+</li>
+<li>
+<p><em>image_shape</em>: A tuple with the height and the width of the original image input image</p>
+</li>
+<li>
+<p><em>crop_size</em>: An int representing the ouput size of the crop.</p>
+</li>
+</ul>
+<p>Returns:</p>
+<p>A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">roi_align</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span><span class="w"> </span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="n">box_indices</span><span class="p">,</span><span class="w"> </span><span class="n">image_shape</span><span class="p">,</span><span class="w"> </span><span class="nl">crop_size</span><span class="p">:</span><span class="w"> </span><span class="nc">int</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">    </span><span class="ss">&quot;&quot;&quot;RoI align like operation from the paper Mask-RCNN.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *inputs*: A 4-D tensor of shape [batch, height, tensor_width, depth].</span>
+
+<span class="ss">            Both image_height and image_width need to be positive.</span>
+
+<span class="ss">    - *boxes*: A 2-D tensor of shape [num_boxes, 4].</span>
+
+<span class="ss">            The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is</span>
+
+<span class="ss">            specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is</span>
+
+<span class="ss">            mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of</span>
+
+<span class="ss">            normalized image height is mapped to [0, image_height - 1] in image height coordinates.</span>
+
+<span class="ss">            We do allow y1 &gt; y2, in which case the sampled crop is an up-down flipped version of the</span>
+
+<span class="ss">            original image. The width dimension is treated similarly. Normalized coordinates outside the</span>
+
+<span class="ss">            [0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input</span>
+
+<span class="ss">            image values.</span>
+
+<span class="ss">    - *box_indices*: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
+
+<span class="ss">            The value of box_ind[i] specifies the image that the i-th box refers to.</span>
+
+<span class="ss">    - *image_shape*: A tuple with the height and the width of the original image input image</span>
+
+<span class="ss">    - *crop_size*: An int representing the ouput size of the crop.</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
+
+<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">normalized_boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">normalize_box_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="n">image_shape</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">image_shape</span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="err">#</span><span class="w"> </span><span class="n">Normalized</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">boxes</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">input</span><span class="w"> </span><span class="n">tensor_shape</span><span class="w"></span>
+
+<span class="w">    </span><span class="err">#</span><span class="w"> </span><span class="n">TODO</span><span class="w"> </span><span class="n">rewrite</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="n">normalization</span><span class="w"> </span><span class="n">unnomarlization</span><span class="w"> </span><span class="n">isn</span><span class="s1">&#39;t pretty at all</span>
+
+<span class="s1">    tensor_shape = tf.shape(inputs)[1:3]</span>
+
+<span class="s1">    normalized_boxes *= tf.cast(tf.tile(tensor_shape[None], [1, 2]),</span>
+
+<span class="s1">                                normalized_boxes.dtype)</span>
+
+<span class="s1">    ret = _crop_and_resize(inputs, normalized_boxes, box_indices, crop_size * 2)</span>
+
+<span class="s1">    return KL.AveragePooling2D(padding=&#39;</span><span class="n">same</span><span class="err">&#39;</span><span class="p">)(</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../" title="Index" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Index
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../rpn/" title="Rpn" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Rpn
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Powered by
+        <a href="http://timothycrosley.github.io/portray">portray.</a>
+        You too can
+        <a href="http://timothycrosley.github.io/portray">
+          portray</a>
+        your Python project well using automatic documentation.
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../../assets/javascripts/vendor.2d1db4bd.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../../../assets/javascripts/worker/search.5eca75d3.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

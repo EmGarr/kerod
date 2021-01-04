@@ -1,0 +1,1822 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="shortcut icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.14">
+    
+    
+      
+        <title>Target Assigner - kerod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.d3202873.min.css">
+      
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ff0a5ce4.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#4cae4f">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="green" data-md-color-accent="lightgreen">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#module-kerodcoretarget_assigner" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../../../.." title="kerod" class="md-header-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            kerod
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Target Assigner
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="kerod" class="md-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    kerod
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../CONTRIBUTING/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../docs/BENCHMARKS/" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      Reference
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Reference" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" type="checkbox" id="nav-4-1" checked>
+    
+    <label class="md-nav__link" for="nav-4-1">
+      Kerod
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Kerod" data-md-level="2">
+      <label class="md-nav__title" for="nav-4-1">
+        <span class="md-nav__icon md-icon"></span>
+        Kerod
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-2" type="checkbox" id="nav-4-1-2" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-2">
+      Core
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Core
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../anchor_generator/" title="Anchor Generator" class="md-nav__link">
+      Anchor Generator
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../box_coder/" title="Box Coder" class="md-nav__link">
+      Box Coder
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../box_ops/" title="Box Ops" class="md-nav__link">
+      Box Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../constants/" title="Constants" class="md-nav__link">
+      Constants
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../learning_rate_schedule/" title="Learning Rate Schedule" class="md-nav__link">
+      Learning Rate Schedule
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../losses/" title="Losses" class="md-nav__link">
+      Losses
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../matcher/" title="Matcher" class="md-nav__link">
+      Matcher
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../sampling_ops/" title="Sampling Ops" class="md-nav__link">
+      Sampling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../similarity/" title="Similarity" class="md-nav__link">
+      Similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../standard_fields/" title="Standard Fields" class="md-nav__link">
+      Standard Fields
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Target Assigner
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" title="Target Assigner" class="md-nav__link md-nav__link--active">
+      Target Assigner
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#classes" class="md-nav__link">
+    Classes
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#targetassigner" class="md-nav__link">
+    TargetAssigner
+  </a>
+  
+    <nav class="md-nav" aria-label="TargetAssigner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instance-variables" class="md-nav__link">
+    Instance variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#assign" class="md-nav__link">
+    assign
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gather" class="md-nav__link">
+    gather
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-3" type="checkbox" id="nav-4-1-3">
+    
+    <label class="md-nav__link" for="nav-4-1-3">
+      Dataset
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Dataset" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        Dataset
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/augmentation/" title="Augmentation" class="md-nav__link">
+      Augmentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/preprocessing/" title="Preprocessing" class="md-nav__link">
+      Preprocessing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4" type="checkbox" id="nav-4-1-4">
+    
+    <label class="md-nav__link" for="nav-4-1-4">
+      Model
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Model" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-4">
+        <span class="md-nav__icon md-icon"></span>
+        Model
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detr/" title="Detr" class="md-nav__link">
+      Detr
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/factory/" title="Factory" class="md-nav__link">
+      Factory
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/faster_rcnn/" title="Faster Rcnn" class="md-nav__link">
+      Faster Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-5" type="checkbox" id="nav-4-1-4-5">
+    
+    <label class="md-nav__link" for="nav-4-1-4-5">
+      Backbone
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Backbone" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-5">
+        <span class="md-nav__icon md-icon"></span>
+        Backbone
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/fpn/" title="Fpn" class="md-nav__link">
+      Fpn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/resnet/" title="Resnet" class="md-nav__link">
+      Resnet
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-6" type="checkbox" id="nav-4-1-4-6">
+    
+    <label class="md-nav__link" for="nav-4-1-4-6">
+      Detection
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Detection" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-6">
+        <span class="md-nav__icon md-icon"></span>
+        Detection
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/abstract_detection_head/" title="Abstract Detection Head" class="md-nav__link">
+      Abstract Detection Head
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/fast_rcnn/" title="Fast Rcnn" class="md-nav__link">
+      Fast Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/pooling_ops/" title="Pooling Ops" class="md-nav__link">
+      Pooling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/rpn/" title="Rpn" class="md-nav__link">
+      Rpn
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-7" type="checkbox" id="nav-4-1-4-7">
+    
+    <label class="md-nav__link" for="nav-4-1-4-7">
+      Layers
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Layers" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-7">
+        <span class="md-nav__icon md-icon"></span>
+        Layers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/positional_encoding/" title="Positional Encoding" class="md-nav__link">
+      Positional Encoding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/transformer/" title="Transformer" class="md-nav__link">
+      Transformer
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-8" type="checkbox" id="nav-4-1-4-8">
+    
+    <label class="md-nav__link" for="nav-4-1-4-8">
+      Post Processing
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Post Processing" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-8">
+        <span class="md-nav__icon md-icon"></span>
+        Post Processing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/non_maximum_suppression/" title="Non Maximum Suppression" class="md-nav__link">
+      Non Maximum Suppression
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/post_processing_detr/" title="Post Processing Detr" class="md-nav__link">
+      Post Processing Detr
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" type="checkbox" id="nav-4-1-5">
+    
+    <label class="md-nav__link" for="nav-4-1-5">
+      Utils
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Utils" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-5">
+        <span class="md-nav__icon md-icon"></span>
+        Utils
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/drawing/" title="Drawing" class="md-nav__link">
+      Drawing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/ops/" title="Ops" class="md-nav__link">
+      Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/training/" title="Training" class="md-nav__link">
+      Training
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#classes" class="md-nav__link">
+    Classes
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#targetassigner" class="md-nav__link">
+    TargetAssigner
+  </a>
+  
+    <nav class="md-nav" aria-label="TargetAssigner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instance-variables" class="md-nav__link">
+    Instance variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#assign" class="md-nav__link">
+    assign
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gather" class="md-nav__link">
+    gather
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/EmGarr/kerod/edit/master/reference/kerod/core/target_assigner.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="module-kerodcoretarget_assigner">Module kerod.core.target_assigner</h1>
+<p>[Documentation taken from tensorflow/models/object_detection]. The code has been completely
+rewritten.</p>
+<p>Base target assigner module.</p>
+<p>The job of a TargetAssigner is, for a given set of anchors (bounding boxes) and
+groundtruth detections (bounding boxes), to assign classification and regression
+targets to each anchor as well as weights to each anchor (specifying, e.g.,
+which anchors should not contribute to training loss).</p>
+<p>It assigns classification/regression targets by performing the following steps:</p>
+<ol>
+<li>Computing pairwise similarity between anchors and groundtruth boxes using a
+  provided RegionSimilarity Calculator</li>
+<li>Computing a matching based on the similarity matrix using a provided Matcher</li>
+<li>Assigning regression targets based on the matching and a provided BoxCoder</li>
+<li>Assigning classification targets based on the matching and groundtruth labels</li>
+</ol>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="sd">&quot;&quot;&quot;[Documentation taken from tensorflow/models/object_detection]. The code has been completely</span>
+
+<span class="sd">rewritten.</span>
+
+<span class="sd">Base target assigner module.</span>
+
+<span class="sd">The job of a TargetAssigner is, for a given set of anchors (bounding boxes) and</span>
+
+<span class="sd">groundtruth detections (bounding boxes), to assign classification and regression</span>
+
+<span class="sd">targets to each anchor as well as weights to each anchor (specifying, e.g.,</span>
+
+<span class="sd">which anchors should not contribute to training loss).</span>
+
+<span class="sd">It assigns classification/regression targets by performing the following steps:</span>
+
+<span class="sd">1. Computing pairwise similarity between anchors and groundtruth boxes using a</span>
+
+<span class="sd">  provided RegionSimilarity Calculator</span>
+
+<span class="sd">2. Computing a matching based on the similarity matrix using a provided Matcher</span>
+
+<span class="sd">3. Assigning regression targets based on the matching and a provided BoxCoder</span>
+
+<span class="sd">4. Assigning classification targets based on the matching and groundtruth labels</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+
+<span class="kn">from</span> <span class="nn">tensorflow.keras</span> <span class="kn">import</span> <span class="n">backend</span> <span class="k">as</span> <span class="n">K</span>
+
+<span class="kn">from</span> <span class="nn">kerod.core.matcher</span> <span class="kn">import</span> <span class="n">Matcher</span>
+
+<span class="kn">from</span> <span class="nn">kerod.core.standard_fields</span> <span class="kn">import</span> <span class="n">BoxField</span>
+
+<span class="kn">from</span> <span class="nn">kerod.utils</span> <span class="kn">import</span> <span class="n">item_assignment</span><span class="p">,</span> <span class="n">get_full_indices</span>
+
+<span class="k">class</span> <span class="nc">TargetAssigner</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Target assigner to compute classification and regression targets.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+
+                 <span class="n">similarity_calc</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+
+                 <span class="n">matcher</span><span class="p">:</span> <span class="n">Matcher</span><span class="p">,</span>
+
+                 <span class="n">box_encoder</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+
+                 <span class="n">negative_class_weight</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+
+                 <span class="n">positive_class_weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
+
+                 <span class="n">dtype</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Construct Object Detection Target Assigner.</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">        - *similarity_calc*: a method wich allow to compute a similarity between two batch of boxes</span>
+
+<span class="sd">        - *matcher*: an od.core.Matcher used to match groundtruth to anchors.</span>
+
+<span class="sd">        - *box_encoder*: a method which allow to encode matching</span>
+
+<span class="sd">            groundtruth boxes with respect to anchors.</span>
+
+<span class="sd">        - *negative_class_weight*: A negative_class can be an unmatched anchors or a padded boxes.</span>
+
+<span class="sd">            All negative classes will have a associated set to this corresponding value</span>
+
+<span class="sd">            for the classification target.</span>
+
+<span class="sd">        - *positive_class_weight*: A positive_class is a matched foreground object</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_similarity_calc</span> <span class="o">=</span> <span class="n">similarity_calc</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span> <span class="o">=</span> <span class="n">matcher</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_box_encoder</span> <span class="o">=</span> <span class="n">box_encoder</span>
+
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">floatx</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">negative_class_weight</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">negative_class_weight</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">positive_class_weight</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">positive_class_weight</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+
+    <span class="k">def</span> <span class="nf">box_encoder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box_encoder</span>
+
+    <span class="k">def</span> <span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anchors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">groundtruth</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Assign classification and regression targets to each anchor.</span>
+
+<span class="sd">        For a given set of anchors and groundtruth detections, match anchors</span>
+
+<span class="sd">        to groundtruth and assign classification and regression targets to</span>
+
+<span class="sd">        each anchor as well as weights based on the resulting match (specifying,</span>
+
+<span class="sd">        e.g., which anchors should not contribute to training loss).</span>
+
+<span class="sd">        Anchors that are not matched to anything are given a classification target</span>
+
+<span class="sd">        of self._unmatched_cls_target which can be specified via the constructor.</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">        - *anchors*: a dict representing a batch of M anchors</span>
+
+<span class="sd">            1. BoxField.BOXES: A tensor of shape [batch_size, num_anchors, (y1, x1, y2, x2)] representing the boxes and resized to the image shape.</span>
+
+<span class="sd">        - *groundtruth*: a dict representing a batch of M groundtruth boxes</span>
+
+<span class="sd">            1. BoxField.BOXES: A tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)] representing</span>
+
+<span class="sd">            the boxes and resized to the image shape</span>
+
+<span class="sd">            2. BoxField.LABELS: A tensor of shape [batch_size, num_gt, ]</span>
+
+<span class="sd">            3. BoxField.NUM_BOXES: A tensor of shape [batch_size].</span>
+
+<span class="sd">            It is usefull to unpad the data in case of a batched training</span>
+
+<span class="sd">            4. BoxField.WEIGHTS: A tensor of shape [batch_size, num_gt]</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        - *y_true*: A dict with :</span>
+
+<span class="sd">            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors]</span>
+
+<span class="sd">            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,</span>
+
+<span class="sd">            box_code_dimension]</span>
+
+<span class="sd">        - *weights*: A dict with:</span>
+
+<span class="sd">            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors],</span>
+
+<span class="sd">            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">groundtruth</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">])</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">num_gt_boxes</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">groundtruth_labels</span> <span class="o">=</span> <span class="n">groundtruth</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">)</span>
+
+        <span class="n">groundtruth_weights</span> <span class="o">=</span> <span class="n">groundtruth</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BoxField</span><span class="o">.</span><span class="n">WEIGHTS</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">groundtruth_weights</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+
+            <span class="n">groundtruth_weights</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_gt_boxes</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">match_quality_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similarity_calc</span><span class="p">(</span><span class="n">groundtruth</span><span class="p">,</span> <span class="n">anchors</span><span class="p">)</span>
+
+        <span class="n">matches</span><span class="p">,</span> <span class="n">matched_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span><span class="p">(</span><span class="n">match_quality_matrix</span><span class="p">,</span>
+
+                                                <span class="n">groundtruth</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">NUM_BOXES</span><span class="p">])</span>
+
+        <span class="n">reg_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_regression_targets</span><span class="p">(</span><span class="n">anchors</span><span class="p">,</span> <span class="n">groundtruth</span><span class="p">,</span> <span class="n">matches</span><span class="p">,</span> <span class="n">matched_labels</span><span class="p">)</span>
+
+        <span class="n">cls_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_classification_targets</span><span class="p">(</span><span class="n">groundtruth_labels</span><span class="p">,</span> <span class="n">matches</span><span class="p">,</span>
+
+                                                          <span class="n">matched_labels</span><span class="p">)</span>
+
+        <span class="n">groundtruth_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">groundtruth_weights</span><span class="p">,</span> <span class="n">matches</span><span class="p">)</span>
+
+        <span class="n">reg_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_regression_weights</span><span class="p">(</span><span class="n">groundtruth_weights</span><span class="p">,</span> <span class="n">matched_labels</span><span class="p">)</span>
+
+        <span class="n">cls_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_classification_weights</span><span class="p">(</span><span class="n">groundtruth_weights</span><span class="p">,</span> <span class="n">matched_labels</span><span class="p">)</span>
+
+        <span class="n">y_true</span> <span class="o">=</span> <span class="p">{</span>
+
+            <span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">cls_targets</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+
+            <span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">reg_targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="p">}</span>
+
+        <span class="n">weights</span> <span class="o">=</span> <span class="p">{</span>
+
+            <span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">cls_weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+
+            <span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">reg_weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">weights</span>
+
+    <span class="k">def</span> <span class="nf">gather</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">get_full_indices</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_regression_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anchors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">groundtruth</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">matches</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                                   <span class="n">matched_labels</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+        <span class="sd">&quot;&quot;&quot;Returns a regression target for each anchor.</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">        - *anchors*: A tensor of shape [batch_size, num_anchors, (y1, x1, y2, x2)] representing the boxes</span>
+
+<span class="sd">        and resized to the image shape.</span>
+
+<span class="sd">        - *groundtruth*: a dict representing a batch of M groundtruth boxes</span>
+
+<span class="sd">            1. BoxField.BOXES: A tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)] representing</span>
+
+<span class="sd">            the boxes and resized to the image shape</span>
+
+<span class="sd">            2. BoxField.LABELS: A tensor of shape [batch_size, num_gt, ]</span>
+
+<span class="sd">            3. BoxField.NUM_BOXES: A tensor of shape [batch_size].</span>
+
+<span class="sd">            It is usefull to unpad the data in case of a batched training</span>
+
+<span class="sd">            4. BoxField.WEIGHTS: A tensor of shape [batch_size, num_gt]</span>
+
+<span class="sd">        - *matches*: a tensor of float32 and shape [batch_size, N], where matches[b, i] is a matched</span>
+
+<span class="sd">               ground-truth index in [b, 0, M)</span>
+
+<span class="sd">        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates</span>
+
+<span class="sd">                whether a prediction is a true (1) or false positive (0) or ignored (-1)</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        *reg_targets*: A tensor with shape [N, box_code_dimension]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">matched_gt_boxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">groundtruth</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">],</span> <span class="n">matches</span><span class="p">)</span>
+
+        <span class="n">matched_reg_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box_encoder</span><span class="p">(</span><span class="n">matched_gt_boxes</span><span class="p">,</span> <span class="n">anchors</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">])</span>
+
+        <span class="c1"># Zero out the unmatched and ignored regression targets.</span>
+
+        <span class="n">unmatched_ignored_reg_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">matched_reg_targets</span><span class="p">,</span>
+
+                                                      <span class="n">dtype</span><span class="o">=</span><span class="n">matched_reg_targets</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">matched_anchors_mask</span> <span class="o">=</span> <span class="n">matched_labels</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+
+        <span class="n">reg_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">matched_anchors_mask</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">None</span><span class="p">],</span>
+
+                               <span class="n">x</span><span class="o">=</span><span class="n">matched_reg_targets</span><span class="p">,</span>
+
+                               <span class="n">y</span><span class="o">=</span><span class="n">unmatched_ignored_reg_targets</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">reg_targets</span>
+
+    <span class="k">def</span> <span class="nf">_create_classification_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groundtruth_labels</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">matches</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                                       <span class="n">matched_labels</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Create classification targets for each anchor.</span>
+
+<span class="sd">        Assign a classification target of for each anchor to the matching</span>
+
+<span class="sd">        groundtruth label that is provided by match.  Anchors that are not matched</span>
+
+<span class="sd">        to anything are given the target self._unmatched_cls_target</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">        - *groundtruth_labels*:  a tensor of shape [num_gt_boxes, d_1, ... d_k]</span>
+
+<span class="sd">            with labels for each of the ground_truth boxes. The subshape</span>
+
+<span class="sd">            [d_1, ... d_k] can be empty (corresponding to scalar labels).</span>
+
+<span class="sd">        - *matches*: a tensor of float32 and shape [batch_size, N], where matches[b, i] is a matched</span>
+
+<span class="sd">               ground-truth index in [b, 0, M)</span>
+
+<span class="sd">        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates</span>
+
+<span class="sd">                whether a prediction is a true (1) or false positive (0) or ignored (-1)</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        A tensor of shape [num_anchors, d_1, d_2 ... d_k], where the</span>
+
+<span class="sd">        subshape [d_1, ..., d_k] is compatible with groundtruth_labels which has</span>
+
+<span class="sd">        shape [num_gt_boxes, d_1, d_2, ... d_k].</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">gathered_tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">groundtruth_labels</span><span class="p">,</span> <span class="n">matches</span><span class="p">)</span>
+
+        <span class="c1"># Set all the match values inferior or equal to 0 to background_classes</span>
+
+        <span class="n">indicator</span> <span class="o">=</span> <span class="n">matched_labels</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+
+        <span class="n">gathered_tensor</span> <span class="o">=</span> <span class="n">item_assignment</span><span class="p">(</span><span class="n">gathered_tensor</span><span class="p">,</span> <span class="n">indicator</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">gathered_tensor</span>
+
+    <span class="k">def</span> <span class="nf">_create_regression_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groundtruth_weights</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">matched_labels</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Set regression weight for each anchor.</span>
+
+<span class="sd">        Only positive anchors are set to contribute to the regression loss, so this</span>
+
+<span class="sd">        method returns a weight of 1 for every positive anchor and 0 for every</span>
+
+<span class="sd">        negative anchor.</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">        - *groundtruth_weights*: a float tensor of shape [M] indicating the weight to</span>
+
+<span class="sd">            assign to all anchors match to a particular groundtruth box.</span>
+
+<span class="sd">        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates</span>
+
+<span class="sd">                whether a prediction is a true (1) or false positive (0) or ignored (-1)</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        A tensor of shape [batch_size, num_anchors] representing the box regression weights.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">indicator</span> <span class="o">=</span> <span class="n">matched_labels</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">indicator</span><span class="p">,</span> <span class="n">groundtruth_weights</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">weights</span>
+
+    <span class="k">def</span> <span class="nf">_create_classification_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groundtruth_weights</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                                       <span class="n">matched_labels</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Create classification weights for each anchor.</span>
+
+<span class="sd">        Positive (matched) anchors are associated with a weight of</span>
+
+<span class="sd">        positive_class_weight and negative (unmatched) anchors are associated with</span>
+
+<span class="sd">        a weight of negative_class_weight. When anchors are ignored, weights are set</span>
+
+<span class="sd">        to zero. By default, both positive/negative weights are set to 1.0,</span>
+
+<span class="sd">        but they can be adjusted to handle class imbalance (which is almost always</span>
+
+<span class="sd">        the case in object detection).</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">        - *groundtruth_weights*: a float tensor of shape [M] indicating the weight to</span>
+
+<span class="sd">            assign to all anchors match to a particular groundtruth box.</span>
+
+<span class="sd">        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates</span>
+
+<span class="sd">                whether a prediction is a true (1) or false positive (0) or ignored (-1)</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        A tensor of shape [batch_size, num_anchors] representing classification weights.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">indicator</span> <span class="o">=</span> <span class="n">matched_labels</span> <span class="o">&lt;</span> <span class="mi">0</span>
+
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">indicator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">negative_class_weight</span><span class="p">,</span> <span class="n">groundtruth_weights</span><span class="p">)</span>
+
+        <span class="n">indicator</span> <span class="o">=</span> <span class="n">matched_labels</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">indicator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive_class_weight</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">weights</span>
+</code></pre></div>
+
+</details>
+<h2 id="classes">Classes</h2>
+<h3 id="targetassigner">TargetAssigner</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">TargetAssigner</span><span class="p">(</span>
+    <span class="n">similarity_calc</span><span class="p">:</span><span class="n">Callable</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="p">:</span><span class="n">kerod</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">matcher</span><span class="o">.</span><span class="n">Matcher</span><span class="p">,</span>
+    <span class="n">box_encoder</span><span class="p">:</span><span class="n">Callable</span><span class="p">,</span>
+    <span class="n">negative_class_weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">positive_class_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Target assigner to compute classification and regression targets.</p>
+<h4 id="instance-variables">Instance variables</h4>
+<div class="codehilite"><pre><span></span><code><span class="n">box_encoder</span>
+</code></pre></div>
+
+<h4 id="methods">Methods</h4>
+<h5 id="assign">assign</h5>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">assign</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">anchors</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span>
+    <span class="n">groundtruth</span><span class="p">:</span><span class="nb">dict</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Assign classification and regression targets to each anchor.</p>
+<p>For a given set of anchors and groundtruth detections, match anchors
+to groundtruth and assign classification and regression targets to
+each anchor as well as weights based on the resulting match (specifying,
+e.g., which anchors should not contribute to training loss).</p>
+<p>Anchors that are not matched to anything are given a classification target
+of self._unmatched_cls_target which can be specified via the constructor.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>anchors</em>: a dict representing a batch of M anchors<ol>
+<li>BoxField.BOXES: A tensor of shape [batch_size, num_anchors, (y1, x1, y2, x2)] representing the boxes and resized to the image shape.</li>
+</ol>
+</li>
+<li><em>groundtruth</em>: a dict representing a batch of M groundtruth boxes<ol>
+<li>BoxField.BOXES: A tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)] representing
+the boxes and resized to the image shape</li>
+<li>BoxField.LABELS: A tensor of shape [batch_size, num_gt, ]</li>
+<li>BoxField.NUM_BOXES: A tensor of shape [batch_size].
+It is usefull to unpad the data in case of a batched training</li>
+<li>BoxField.WEIGHTS: A tensor of shape [batch_size, num_gt]</li>
+</ol>
+</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li>
+<p><em>y_true</em>: A dict with :</p>
+<ul>
+<li><em>BoxField.LABELS</em>: a tensor with shape [batch_size, num_anchors]</li>
+<li><em>BoxField.BOXES</em>: a tensor with shape [batch_size, num_anchors,
+box_code_dimension]</li>
+</ul>
+</li>
+<li>
+<p><em>weights</em>: A dict with:</p>
+<ul>
+<li><em>BoxField.LABELS</em>: a tensor with shape [batch_size, num_anchors],</li>
+<li><em>BoxField.BOXES</em>: a tensor with shape [batch_size, num_anchors],</li>
+</ul>
+</li>
+</ul>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="n">def</span><span class="w"> </span><span class="n">assign</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="nl">anchors</span><span class="p">:</span><span class="w"> </span><span class="n">dict</span><span class="p">,</span><span class="w"> </span><span class="nl">groundtruth</span><span class="p">:</span><span class="w"> </span><span class="n">dict</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">        </span><span class="ss">&quot;&quot;&quot;Assign classification and regression targets to each anchor.</span>
+
+<span class="ss">        For a given set of anchors and groundtruth detections, match anchors</span>
+
+<span class="ss">        to groundtruth and assign classification and regression targets to</span>
+
+<span class="ss">        each anchor as well as weights based on the resulting match (specifying,</span>
+
+<span class="ss">        e.g., which anchors should not contribute to training loss).</span>
+
+<span class="ss">        Anchors that are not matched to anything are given a classification target</span>
+
+<span class="ss">        of self._unmatched_cls_target which can be specified via the constructor.</span>
+
+<span class="ss">        Arguments:</span>
+
+<span class="ss">        - *anchors*: a dict representing a batch of M anchors</span>
+
+<span class="ss">            1. BoxField.BOXES: A tensor of shape [batch_size, num_anchors, (y1, x1, y2, x2)] representing the boxes and resized to the image shape.</span>
+
+<span class="ss">        - *groundtruth*: a dict representing a batch of M groundtruth boxes</span>
+
+<span class="ss">            1. BoxField.BOXES: A tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)] representing</span>
+
+<span class="ss">            the boxes and resized to the image shape</span>
+
+<span class="ss">            2. BoxField.LABELS: A tensor of shape [batch_size, num_gt, ]</span>
+
+<span class="ss">            3. BoxField.NUM_BOXES: A tensor of shape [batch_size].</span>
+
+<span class="ss">            It is usefull to unpad the data in case of a batched training</span>
+
+<span class="ss">            4. BoxField.WEIGHTS: A tensor of shape [batch_size, num_gt]</span>
+
+<span class="ss">        Returns:</span>
+
+<span class="ss">        - *y_true*: A dict with :</span>
+
+<span class="ss">            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors]</span>
+
+<span class="ss">            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,</span>
+
+<span class="ss">            box_code_dimension]</span>
+
+<span class="ss">        - *weights*: A dict with:</span>
+
+<span class="ss">            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors],</span>
+
+<span class="ss">            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],</span>
+
+<span class="ss">        &quot;&quot;&quot;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">groundtruth</span><span class="o">[</span><span class="n">BoxField.BOXES</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">batch_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shape</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">num_gt_boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shape</span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">groundtruth_labels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">groundtruth</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">groundtruth_weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">groundtruth</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="n">BoxField</span><span class="p">.</span><span class="n">WEIGHTS</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">groundtruth_weights</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">None</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">groundtruth_weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">ones</span><span class="p">(</span><span class="o">[</span><span class="n">batch_size, num_gt_boxes</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">match_quality_matrix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_similarity_calc</span><span class="p">(</span><span class="n">groundtruth</span><span class="p">,</span><span class="w"> </span><span class="n">anchors</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">matches</span><span class="p">,</span><span class="w"> </span><span class="n">matched_labels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_matcher</span><span class="p">(</span><span class="n">match_quality_matrix</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                                </span><span class="n">groundtruth</span><span class="o">[</span><span class="n">BoxField.NUM_BOXES</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">reg_targets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_create_regression_targets</span><span class="p">(</span><span class="n">anchors</span><span class="p">,</span><span class="w"> </span><span class="n">groundtruth</span><span class="p">,</span><span class="w"> </span><span class="n">matches</span><span class="p">,</span><span class="w"> </span><span class="n">matched_labels</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">cls_targets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_create_classification_targets</span><span class="p">(</span><span class="n">groundtruth_labels</span><span class="p">,</span><span class="w"> </span><span class="n">matches</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                                          </span><span class="n">matched_labels</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">groundtruth_weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">gather</span><span class="p">(</span><span class="n">groundtruth_weights</span><span class="p">,</span><span class="w"> </span><span class="n">matches</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">reg_weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_create_regression_weights</span><span class="p">(</span><span class="n">groundtruth_weights</span><span class="p">,</span><span class="w"> </span><span class="n">matched_labels</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">cls_weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_create_classification_weights</span><span class="p">(</span><span class="n">groundtruth_weights</span><span class="p">,</span><span class="w"> </span><span class="n">matched_labels</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">y_true</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">BoxField</span><span class="p">.</span><span class="nl">LABELS</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">cls_targets</span><span class="p">,</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">BoxField</span><span class="p">.</span><span class="nl">BOXES</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">reg_targets</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="err">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">BoxField</span><span class="p">.</span><span class="nl">LABELS</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">cls_weights</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">dtype</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">BoxField</span><span class="p">.</span><span class="nl">BOXES</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">reg_weights</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="err">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">y_true</span><span class="p">,</span><span class="w"> </span><span class="n">weights</span><span class="w"></span>
+</code></pre></div>
+
+</details>
+<h5 id="gather">gather</h5>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">gather</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">tensor</span><span class="p">,</span>
+    <span class="n">indices</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="n">gather</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">get_full_indices</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../standard_fields/" title="Standard Fields" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Standard Fields
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../../dataset/augmentation/" title="Augmentation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Augmentation
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Powered by
+        <a href="http://timothycrosley.github.io/portray">portray.</a>
+        You too can
+        <a href="http://timothycrosley.github.io/portray">
+          portray</a>
+        your Python project well using automatic documentation.
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../assets/javascripts/vendor.2d1db4bd.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../../assets/javascripts/worker/search.5eca75d3.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

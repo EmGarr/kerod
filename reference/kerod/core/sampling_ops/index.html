@@ -1,0 +1,1638 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="shortcut icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.14">
+    
+    
+      
+        <title>Sampling Ops - kerod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.d3202873.min.css">
+      
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ff0a5ce4.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#4cae4f">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="green" data-md-color-accent="lightgreen">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#module-kerodcoresampling_ops" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../../../.." title="kerod" class="md-header-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            kerod
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Sampling Ops
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="kerod" class="md-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    kerod
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../CONTRIBUTING/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../docs/BENCHMARKS/" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      Reference
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Reference" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" type="checkbox" id="nav-4-1" checked>
+    
+    <label class="md-nav__link" for="nav-4-1">
+      Kerod
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Kerod" data-md-level="2">
+      <label class="md-nav__title" for="nav-4-1">
+        <span class="md-nav__icon md-icon"></span>
+        Kerod
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-2" type="checkbox" id="nav-4-1-2" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-2">
+      Core
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Core
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../anchor_generator/" title="Anchor Generator" class="md-nav__link">
+      Anchor Generator
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../box_coder/" title="Box Coder" class="md-nav__link">
+      Box Coder
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../box_ops/" title="Box Ops" class="md-nav__link">
+      Box Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../constants/" title="Constants" class="md-nav__link">
+      Constants
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../learning_rate_schedule/" title="Learning Rate Schedule" class="md-nav__link">
+      Learning Rate Schedule
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../losses/" title="Losses" class="md-nav__link">
+      Losses
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../matcher/" title="Matcher" class="md-nav__link">
+      Matcher
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Sampling Ops
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" title="Sampling Ops" class="md-nav__link md-nav__link--active">
+      Sampling Ops
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#batch_sample_balanced_positive_negative" class="md-nav__link">
+    batch_sample_balanced_positive_negative
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sample_balanced_positive_negative" class="md-nav__link">
+    sample_balanced_positive_negative
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subsample_indicator" class="md-nav__link">
+    subsample_indicator
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../similarity/" title="Similarity" class="md-nav__link">
+      Similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../standard_fields/" title="Standard Fields" class="md-nav__link">
+      Standard Fields
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../target_assigner/" title="Target Assigner" class="md-nav__link">
+      Target Assigner
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-3" type="checkbox" id="nav-4-1-3">
+    
+    <label class="md-nav__link" for="nav-4-1-3">
+      Dataset
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Dataset" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        Dataset
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/augmentation/" title="Augmentation" class="md-nav__link">
+      Augmentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/preprocessing/" title="Preprocessing" class="md-nav__link">
+      Preprocessing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4" type="checkbox" id="nav-4-1-4">
+    
+    <label class="md-nav__link" for="nav-4-1-4">
+      Model
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Model" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-4">
+        <span class="md-nav__icon md-icon"></span>
+        Model
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detr/" title="Detr" class="md-nav__link">
+      Detr
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/factory/" title="Factory" class="md-nav__link">
+      Factory
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/faster_rcnn/" title="Faster Rcnn" class="md-nav__link">
+      Faster Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-5" type="checkbox" id="nav-4-1-4-5">
+    
+    <label class="md-nav__link" for="nav-4-1-4-5">
+      Backbone
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Backbone" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-5">
+        <span class="md-nav__icon md-icon"></span>
+        Backbone
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/fpn/" title="Fpn" class="md-nav__link">
+      Fpn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/resnet/" title="Resnet" class="md-nav__link">
+      Resnet
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-6" type="checkbox" id="nav-4-1-4-6">
+    
+    <label class="md-nav__link" for="nav-4-1-4-6">
+      Detection
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Detection" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-6">
+        <span class="md-nav__icon md-icon"></span>
+        Detection
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/abstract_detection_head/" title="Abstract Detection Head" class="md-nav__link">
+      Abstract Detection Head
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/fast_rcnn/" title="Fast Rcnn" class="md-nav__link">
+      Fast Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/pooling_ops/" title="Pooling Ops" class="md-nav__link">
+      Pooling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/rpn/" title="Rpn" class="md-nav__link">
+      Rpn
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-7" type="checkbox" id="nav-4-1-4-7">
+    
+    <label class="md-nav__link" for="nav-4-1-4-7">
+      Layers
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Layers" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-7">
+        <span class="md-nav__icon md-icon"></span>
+        Layers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/positional_encoding/" title="Positional Encoding" class="md-nav__link">
+      Positional Encoding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/transformer/" title="Transformer" class="md-nav__link">
+      Transformer
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-8" type="checkbox" id="nav-4-1-4-8">
+    
+    <label class="md-nav__link" for="nav-4-1-4-8">
+      Post Processing
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Post Processing" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-8">
+        <span class="md-nav__icon md-icon"></span>
+        Post Processing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/non_maximum_suppression/" title="Non Maximum Suppression" class="md-nav__link">
+      Non Maximum Suppression
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/post_processing_detr/" title="Post Processing Detr" class="md-nav__link">
+      Post Processing Detr
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" type="checkbox" id="nav-4-1-5">
+    
+    <label class="md-nav__link" for="nav-4-1-5">
+      Utils
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Utils" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-5">
+        <span class="md-nav__icon md-icon"></span>
+        Utils
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/drawing/" title="Drawing" class="md-nav__link">
+      Drawing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/ops/" title="Ops" class="md-nav__link">
+      Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/training/" title="Training" class="md-nav__link">
+      Training
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#batch_sample_balanced_positive_negative" class="md-nav__link">
+    batch_sample_balanced_positive_negative
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sample_balanced_positive_negative" class="md-nav__link">
+    sample_balanced_positive_negative
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subsample_indicator" class="md-nav__link">
+    subsample_indicator
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/EmGarr/kerod/edit/master/reference/kerod/core/sampling_ops.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="module-kerodcoresampling_ops">Module kerod.core.sampling_ops</h1>
+<p>Method to subsample minibatches by balancing positives and negatives.</p>
+<p>Subsamples minibatches based on a pre-specified positive fraction in range
+[0,1]. The class presumes there are many more negatives than positive examples:
+if the desired sample_size cannot be achieved with the pre-specified positive
+fraction, it fills the rest with negative examples. If this is not sufficient
+for obtaining the desired sample_size, it returns fewer examples.</p>
+<p>The main function to call is Subsample(self, indicator, labels). For convenience
+one can also call SubsampleWeights(self, weights, labels) which is defined in
+the minibatch_sampler base class.</p>
+<p>When is_static is True, it implements a method that guarantees static shapes.
+It also ensures the length of output of the subsample is always sample_size, even
+when number of examples set to True in indicator is less than sample_size.</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="c1"># Copyright 2017 The TensorFlow Authors and modified by Emilien Garreau. All Rights Reserved.</span>
+
+<span class="c1">#</span>
+
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+
+<span class="c1"># You may obtain a copy of the License at</span>
+
+<span class="c1">#</span>
+
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="c1">#</span>
+
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+
+<span class="c1"># See the License for the specific language governing permissions and</span>
+
+<span class="c1"># limitations under the License.</span>
+
+<span class="c1"># ==============================================================================</span>
+
+<span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Method to subsample minibatches by balancing positives and negatives.</span>
+
+<span class="s2">Subsamples minibatches based on a pre-specified positive fraction in range</span>
+
+<span class="s2">[0,1]. The class presumes there are many more negatives than positive examples:</span>
+
+<span class="s2">if the desired sample_size cannot be achieved with the pre-specified positive</span>
+
+<span class="s2">fraction, it fills the rest with negative examples. If this is not sufficient</span>
+
+<span class="s2">for obtaining the desired sample_size, it returns fewer examples.</span>
+
+<span class="s2">The main function to call is Subsample(self, indicator, labels). For convenience</span>
+
+<span class="s2">one can also call SubsampleWeights(self, weights, labels) which is defined in</span>
+
+<span class="s2">the minibatch_sampler base class.</span>
+
+<span class="s2">When is_static is True, it implements a method that guarantees static shapes.</span>
+
+<span class="s2">It also ensures the length of output of the subsample is always sample_size, even</span>
+
+<span class="s2">when number of examples set to True in indicator is less than sample_size.</span>
+
+<span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+<span class="k">import</span> <span class="n">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="k">from</span> <span class="n">kerod</span><span class="p">.</span><span class="n">utils</span> <span class="k">import</span> <span class="n">ops</span>
+
+<span class="n">def</span> <span class="n">subsample_indicator</span><span class="p">(</span><span class="n">indicator</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span><span class="o">:</span>
+
+    <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Subsample indicator vector.</span>
+
+<span class="s2">    Given a boolean indicator vector with M elements set to `True`, the function</span>
+
+<span class="s2">    assigns all but `num_samples` of these previously `True` elements to</span>
+
+<span class="s2">    `False`. If `num_samples` is greater than M, the original indicator vector</span>
+
+<span class="s2">    is returned.</span>
+
+<span class="s2">    Arguments:</span>
+
+<span class="s2">    - *indicator*: a 1-dimensional boolean tensor indicating which elements</span>
+
+<span class="s2">        are allowed to be sampled and which are not.</span>
+
+<span class="s2">    - *num_samples*: int32 scalar tensor</span>
+
+<span class="s2">    Returns:</span>
+
+<span class="s2">    A boolean tensor with the same shape as input (indicator) tensor</span>
+
+<span class="s2">    </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="k">where</span><span class="p">(</span><span class="n">indicator</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="k">random</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="err">[</span><span class="o">-</span><span class="mi">1</span><span class="err">]</span><span class="p">)</span>
+
+    <span class="n">num_samples</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span> <span class="n">num_samples</span><span class="p">)</span>
+
+    <span class="n">selected_indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">slice</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="err">[</span><span class="mi">0</span><span class="err">]</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="err">[</span><span class="mi">1</span><span class="err">]</span><span class="p">))</span>
+
+    <span class="n">selected_indicator</span> <span class="o">=</span> <span class="n">ops</span><span class="p">.</span><span class="n">indices_to_dense_vector</span><span class="p">(</span><span class="n">selected_indices</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">indicator</span><span class="p">)</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">selected_indicator</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">def</span> <span class="n">sample_balanced_positive_negative</span><span class="p">(</span><span class="n">indicator</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">positive_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">:</span>
+
+    <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Subsamples minibatches to a desired balance of positives and negatives.</span>
+
+<span class="s2">    Arguments:</span>
+
+<span class="s2">    - *indicator*: boolean tensor of shape [N] whose True entries can be sampled.</span>
+
+<span class="s2">    - *sample_size*: desired batch size. If None, keeps all positive samples and</span>
+
+<span class="s2">        randomly selects negative samples so that the positive sample fraction</span>
+
+<span class="s2">        matches positive_fraction.</span>
+
+<span class="s2">    - *labels*: boolean tensor of shape [N] denoting positive(=True) and negative</span>
+
+<span class="s2">        (=False) examples.</span>
+
+<span class="s2">    - *positive_fraction*: desired fraction of positive examples (scalar in [0,1])</span>
+
+<span class="s2">        in the batch.</span>
+
+<span class="s2">    Returns:</span>
+
+<span class="s2">    *sampled_idx_indicator*: boolean tensor of shape [N], True for entries which are sampled.</span>
+
+<span class="s2">    </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+    <span class="n">negative_idx</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">positive_idx</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">indicator</span><span class="p">)</span>
+
+    <span class="n">negative_idx</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">negative_idx</span><span class="p">,</span> <span class="n">indicator</span><span class="p">)</span>
+
+    <span class="c1"># Sample positive and negative samples separately</span>
+
+    <span class="k">if</span> <span class="n">sample_size</span> <span class="k">is</span> <span class="k">None</span><span class="o">:</span>
+
+        <span class="n">max_num_pos</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">positive_idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">))</span>
+
+    <span class="k">else</span><span class="o">:</span>
+
+        <span class="n">max_num_pos</span> <span class="o">=</span> <span class="kt">int</span><span class="p">(</span><span class="n">positive_fraction</span> <span class="o">*</span> <span class="n">sample_size</span><span class="p">)</span>
+
+    <span class="n">sampled_pos_idx</span> <span class="o">=</span> <span class="n">subsample_indicator</span><span class="p">(</span><span class="n">positive_idx</span><span class="p">,</span> <span class="n">max_num_pos</span><span class="p">)</span>
+
+    <span class="n">num_sampled_pos</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">sampled_pos_idx</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">sample_size</span> <span class="k">is</span> <span class="k">None</span><span class="o">:</span>
+
+        <span class="n">negative_positive_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">positive_fraction</span><span class="p">)</span> <span class="o">/</span> <span class="n">positive_fraction</span>
+
+        <span class="n">max_num_neg</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">negative_positive_ratio</span> <span class="o">*</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">num_sampled_pos</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">),</span>
+
+                              <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="o">:</span>
+
+        <span class="n">max_num_neg</span> <span class="o">=</span> <span class="n">sample_size</span> <span class="o">-</span> <span class="n">num_sampled_pos</span>
+
+    <span class="n">sampled_neg_idx</span> <span class="o">=</span> <span class="n">subsample_indicator</span><span class="p">(</span><span class="n">negative_idx</span><span class="p">,</span> <span class="n">max_num_neg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">sampled_pos_idx</span><span class="p">,</span> <span class="n">sampled_neg_idx</span><span class="p">)</span>
+
+<span class="n">def</span> <span class="n">batch_sample_balanced_positive_negative</span><span class="p">(</span><span class="n">indicators</span><span class="p">,</span>
+
+                                            <span class="n">sample_size</span><span class="p">,</span>
+
+                                            <span class="n">labels</span><span class="p">,</span>
+
+                                            <span class="n">positive_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+
+                                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span><span class="o">:</span>
+
+    <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Subsamples minibatches to a desired balance of positives and negatives.</span>
+
+<span class="s2">    Arguments:</span>
+
+<span class="s2">    - *indicator*: boolean tensor of shape [batch_size, N] whose True entries can be sampled.</span>
+
+<span class="s2">    - *sample_size*: desired batch size. If None, keeps all positive samples and</span>
+
+<span class="s2">        randomly selects negative samples so that the positive sample fraction</span>
+
+<span class="s2">        matches positive_fraction.</span>
+
+<span class="s2">    - *labels*: boolean tensor of shape [batch_size, N] denoting positive(=True) and negative</span>
+
+<span class="s2">        (=False) examples.</span>
+
+<span class="s2">    - *positive_fraction*: desired fraction of positive examples (scalar in [0,1])</span>
+
+<span class="s2">        in the batch.</span>
+
+<span class="s2">    Returns:</span>
+
+<span class="s2">    A boolean tensor of shape [M, N], True for entries which are sampled.</span>
+
+<span class="s2">    </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+    <span class="n">def</span> <span class="n">_minibatch_subsample_fn</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">:</span>
+
+        <span class="n">indicators</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="k">return</span> <span class="n">sample_balanced_positive_negative</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">indicators</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="kt">bool</span><span class="p">),</span>
+
+                                                 <span class="n">sample_size</span><span class="p">,</span>
+
+                                                 <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="kt">bool</span><span class="p">),</span>
+
+                                                 <span class="n">positive_fraction</span><span class="o">=</span><span class="n">positive_fraction</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">map_fn</span><span class="p">(</span><span class="n">_minibatch_subsample_fn</span><span class="p">,</span> <span class="err">[</span><span class="n">indicators</span><span class="p">,</span> <span class="n">labels</span><span class="err">]</span><span class="p">,</span>
+
+                             <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="kt">bool</span><span class="p">,</span>
+
+                             <span class="n">parallel_iterations</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+
+                             <span class="n">back_prop</span><span class="o">=</span><span class="no">True</span><span class="p">),</span>
+
+                   <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h2 id="functions">Functions</h2>
+<h3 id="batch_sample_balanced_positive_negative">batch_sample_balanced_positive_negative</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">batch_sample_balanced_positive_negative</span><span class="p">(</span>
+    <span class="n">indicators</span><span class="p">,</span>
+    <span class="n">sample_size</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">,</span>
+    <span class="n">positive_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Subsamples minibatches to a desired balance of positives and negatives.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>indicator</em>: boolean tensor of shape [batch_size, N] whose True entries can be sampled.</li>
+<li><em>sample_size</em>: desired batch size. If None, keeps all positive samples and
+    randomly selects negative samples so that the positive sample fraction
+    matches positive_fraction.</li>
+<li><em>labels</em>: boolean tensor of shape [batch_size, N] denoting positive(=True) and negative
+    (=False) examples.</li>
+<li><em>positive_fraction</em>: desired fraction of positive examples (scalar in [0,1])
+    in the batch.</li>
+</ul>
+<p>Returns:</p>
+<p>A boolean tensor of shape [M, N], True for entries which are sampled.</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">batch_sample_balanced_positive_negative</span><span class="p">(</span><span class="n">indicators</span><span class="p">,</span>
+
+                                            <span class="n">sample_size</span><span class="p">,</span>
+
+                                            <span class="n">labels</span><span class="p">,</span>
+
+                                            <span class="n">positive_fraction</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="p">,</span>
+
+                                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">):</span>
+
+    <span class="ss">&quot;&quot;&quot;Subsamples minibatches to a desired balance of positives and negatives.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *indicator*: boolean tensor of shape [batch_size, N] whose True entries can be sampled.</span>
+
+<span class="ss">    - *sample_size*: desired batch size. If None, keeps all positive samples and</span>
+
+<span class="ss">        randomly selects negative samples so that the positive sample fraction</span>
+
+<span class="ss">        matches positive_fraction.</span>
+
+<span class="ss">    - *labels*: boolean tensor of shape [batch_size, N] denoting positive(=True) and negative</span>
+
+<span class="ss">        (=False) examples.</span>
+
+<span class="ss">    - *positive_fraction*: desired fraction of positive examples (scalar in [0,1])</span>
+
+<span class="ss">        in the batch.</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A boolean tensor of shape [M, N], True for entries which are sampled.</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">def</span> <span class="n">_minibatch_subsample_fn</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+
+        <span class="n">indicators</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="k">return</span> <span class="n">sample_balanced_positive_negative</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">indicators</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">bool</span><span class="p">),</span>
+
+                                                 <span class="n">sample_size</span><span class="p">,</span>
+
+                                                 <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">bool</span><span class="p">),</span>
+
+                                                 <span class="n">positive_fraction</span><span class="o">=</span><span class="n">positive_fraction</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">map_fn</span><span class="p">(</span><span class="n">_minibatch_subsample_fn</span><span class="p">,</span> <span class="p">[</span><span class="n">indicators</span><span class="p">,</span> <span class="n">labels</span><span class="p">],</span>
+
+                             <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">bool</span><span class="p">,</span>
+
+                             <span class="n">parallel_iterations</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+
+                             <span class="n">back_prop</span><span class="o">=</span><span class="k">True</span><span class="p">),</span>
+
+                   <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h3 id="sample_balanced_positive_negative">sample_balanced_positive_negative</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">sample_balanced_positive_negative</span><span class="p">(</span>
+    <span class="n">indicator</span><span class="p">,</span>
+    <span class="n">sample_size</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">,</span>
+    <span class="n">positive_fraction</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Subsamples minibatches to a desired balance of positives and negatives.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>indicator</em>: boolean tensor of shape [N] whose True entries can be sampled.</li>
+<li><em>sample_size</em>: desired batch size. If None, keeps all positive samples and
+    randomly selects negative samples so that the positive sample fraction
+    matches positive_fraction.</li>
+<li><em>labels</em>: boolean tensor of shape [N] denoting positive(=True) and negative
+    (=False) examples.</li>
+<li><em>positive_fraction</em>: desired fraction of positive examples (scalar in [0,1])
+    in the batch.</li>
+</ul>
+<p>Returns:</p>
+<p><em>sampled_idx_indicator</em>: boolean tensor of shape [N], True for entries which are sampled.</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">sample_balanced_positive_negative</span><span class="p">(</span><span class="k">indicator</span><span class="p">,</span><span class="w"> </span><span class="n">sample_size</span><span class="p">,</span><span class="w"> </span><span class="n">labels</span><span class="p">,</span><span class="w"> </span><span class="n">positive_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">    </span><span class="ss">&quot;&quot;&quot;Subsamples minibatches to a desired balance of positives and negatives.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *indicator*: boolean tensor of shape [N] whose True entries can be sampled.</span>
+
+<span class="ss">    - *sample_size*: desired batch size. If None, keeps all positive samples and</span>
+
+<span class="ss">        randomly selects negative samples so that the positive sample fraction</span>
+
+<span class="ss">        matches positive_fraction.</span>
+
+<span class="ss">    - *labels*: boolean tensor of shape [N] denoting positive(=True) and negative</span>
+
+<span class="ss">        (=False) examples.</span>
+
+<span class="ss">    - *positive_fraction*: desired fraction of positive examples (scalar in [0,1])</span>
+
+<span class="ss">        in the batch.</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    *sampled_idx_indicator*: boolean tensor of shape [N], True for entries which are sampled.</span>
+
+<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">negative_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">positive_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span><span class="w"> </span><span class="k">indicator</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">negative_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">negative_idx</span><span class="p">,</span><span class="w"> </span><span class="k">indicator</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="err">#</span><span class="w"> </span><span class="n">Sample</span><span class="w"> </span><span class="n">positive</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">negative</span><span class="w"> </span><span class="n">samples</span><span class="w"> </span><span class="n">separately</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">sample_size</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">None</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">max_num_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">positive_idx</span><span class="p">,</span><span class="w"> </span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">))</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">else</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">max_num_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">int</span><span class="p">(</span><span class="n">positive_fraction</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sample_size</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">sampled_pos_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subsample_indicator</span><span class="p">(</span><span class="n">positive_idx</span><span class="p">,</span><span class="w"> </span><span class="n">max_num_pos</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">num_sampled_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">sampled_pos_idx</span><span class="p">,</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">))</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">sample_size</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">None</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">negative_positive_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">positive_fraction</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">positive_fraction</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">max_num_neg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">negative_positive_ratio</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">num_sampled_pos</span><span class="p">,</span><span class="w"> </span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">                              </span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">else</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">max_num_neg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sample_size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">num_sampled_pos</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">sampled_neg_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subsample_indicator</span><span class="p">(</span><span class="n">negative_idx</span><span class="p">,</span><span class="w"> </span><span class="n">max_num_neg</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">sampled_pos_idx</span><span class="p">,</span><span class="w"> </span><span class="n">sampled_neg_idx</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+</details>
+<h3 id="subsample_indicator">subsample_indicator</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">subsample_indicator</span><span class="p">(</span>
+    <span class="n">indicator</span><span class="p">,</span>
+    <span class="n">num_samples</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Subsample indicator vector.</p>
+<p>Given a boolean indicator vector with M elements set to <code>True</code>, the function
+assigns all but <code>num_samples</code> of these previously <code>True</code> elements to
+<code>False</code>. If <code>num_samples</code> is greater than M, the original indicator vector
+is returned.</p>
+<p>Arguments:
+- <em>indicator</em>: a 1-dimensional boolean tensor indicating which elements
+    are allowed to be sampled and which are not.</p>
+<ul>
+<li><em>num_samples</em>: int32 scalar tensor</li>
+</ul>
+<p>Returns:</p>
+<p>A boolean tensor with the same shape as input (indicator) tensor</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">subsample_indicator</span><span class="p">(</span><span class="n">indicator</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span><span class="o">:</span>
+
+    <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Subsample indicator vector.</span>
+
+<span class="s2">    Given a boolean indicator vector with M elements set to `True`, the function</span>
+
+<span class="s2">    assigns all but `num_samples` of these previously `True` elements to</span>
+
+<span class="s2">    `False`. If `num_samples` is greater than M, the original indicator vector</span>
+
+<span class="s2">    is returned.</span>
+
+<span class="s2">    Arguments:</span>
+
+<span class="s2">    - *indicator*: a 1-dimensional boolean tensor indicating which elements</span>
+
+<span class="s2">        are allowed to be sampled and which are not.</span>
+
+<span class="s2">    - *num_samples*: int32 scalar tensor</span>
+
+<span class="s2">    Returns:</span>
+
+<span class="s2">    A boolean tensor with the same shape as input (indicator) tensor</span>
+
+<span class="s2">    </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="k">where</span><span class="p">(</span><span class="n">indicator</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="k">random</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="err">[</span><span class="o">-</span><span class="mi">1</span><span class="err">]</span><span class="p">)</span>
+
+    <span class="n">num_samples</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span> <span class="n">num_samples</span><span class="p">)</span>
+
+    <span class="n">selected_indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">slice</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="err">[</span><span class="mi">0</span><span class="err">]</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="err">[</span><span class="mi">1</span><span class="err">]</span><span class="p">))</span>
+
+    <span class="n">selected_indicator</span> <span class="o">=</span> <span class="n">ops</span><span class="p">.</span><span class="n">indices_to_dense_vector</span><span class="p">(</span><span class="n">selected_indices</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">indicator</span><span class="p">)</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">selected_indicator</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../matcher/" title="Matcher" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Matcher
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../similarity/" title="Similarity" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Similarity
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Powered by
+        <a href="http://timothycrosley.github.io/portray">portray.</a>
+        You too can
+        <a href="http://timothycrosley.github.io/portray">
+          portray</a>
+        your Python project well using automatic documentation.
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../assets/javascripts/vendor.2d1db4bd.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../../assets/javascripts/worker/search.5eca75d3.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

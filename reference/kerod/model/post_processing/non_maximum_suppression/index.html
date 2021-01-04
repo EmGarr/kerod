@@ -1,0 +1,1777 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="shortcut icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.14">
+    
+    
+      
+        <title>Non Maximum Suppression - kerod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.d3202873.min.css">
+      
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ff0a5ce4.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#4cae4f">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="green" data-md-color-accent="lightgreen">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#module-kerodmodelpost_processingnon_maximum_suppression" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../../../../.." title="kerod" class="md-header-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            kerod
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Non Maximum Suppression
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="kerod" class="md-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    kerod
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../CONTRIBUTING/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../docs/BENCHMARKS/" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      Reference
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Reference" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" type="checkbox" id="nav-4-1" checked>
+    
+    <label class="md-nav__link" for="nav-4-1">
+      Kerod
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Kerod" data-md-level="2">
+      <label class="md-nav__title" for="nav-4-1">
+        <span class="md-nav__icon md-icon"></span>
+        Kerod
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-2" type="checkbox" id="nav-4-1-2">
+    
+    <label class="md-nav__link" for="nav-4-1-2">
+      Core
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Core
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/anchor_generator/" title="Anchor Generator" class="md-nav__link">
+      Anchor Generator
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/box_coder/" title="Box Coder" class="md-nav__link">
+      Box Coder
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/box_ops/" title="Box Ops" class="md-nav__link">
+      Box Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/constants/" title="Constants" class="md-nav__link">
+      Constants
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/learning_rate_schedule/" title="Learning Rate Schedule" class="md-nav__link">
+      Learning Rate Schedule
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/losses/" title="Losses" class="md-nav__link">
+      Losses
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/matcher/" title="Matcher" class="md-nav__link">
+      Matcher
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/sampling_ops/" title="Sampling Ops" class="md-nav__link">
+      Sampling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/similarity/" title="Similarity" class="md-nav__link">
+      Similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/standard_fields/" title="Standard Fields" class="md-nav__link">
+      Standard Fields
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/target_assigner/" title="Target Assigner" class="md-nav__link">
+      Target Assigner
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-3" type="checkbox" id="nav-4-1-3">
+    
+    <label class="md-nav__link" for="nav-4-1-3">
+      Dataset
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Dataset" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        Dataset
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/augmentation/" title="Augmentation" class="md-nav__link">
+      Augmentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/preprocessing/" title="Preprocessing" class="md-nav__link">
+      Preprocessing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4" type="checkbox" id="nav-4-1-4" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-4">
+      Model
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Model" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-4">
+        <span class="md-nav__icon md-icon"></span>
+        Model
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detr/" title="Detr" class="md-nav__link">
+      Detr
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../factory/" title="Factory" class="md-nav__link">
+      Factory
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../faster_rcnn/" title="Faster Rcnn" class="md-nav__link">
+      Faster Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-5" type="checkbox" id="nav-4-1-4-5">
+    
+    <label class="md-nav__link" for="nav-4-1-4-5">
+      Backbone
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Backbone" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-5">
+        <span class="md-nav__icon md-icon"></span>
+        Backbone
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../backbone/fpn/" title="Fpn" class="md-nav__link">
+      Fpn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../backbone/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../backbone/resnet/" title="Resnet" class="md-nav__link">
+      Resnet
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-6" type="checkbox" id="nav-4-1-4-6">
+    
+    <label class="md-nav__link" for="nav-4-1-4-6">
+      Detection
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Detection" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-6">
+        <span class="md-nav__icon md-icon"></span>
+        Detection
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/abstract_detection_head/" title="Abstract Detection Head" class="md-nav__link">
+      Abstract Detection Head
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/fast_rcnn/" title="Fast Rcnn" class="md-nav__link">
+      Fast Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/pooling_ops/" title="Pooling Ops" class="md-nav__link">
+      Pooling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/rpn/" title="Rpn" class="md-nav__link">
+      Rpn
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-7" type="checkbox" id="nav-4-1-4-7">
+    
+    <label class="md-nav__link" for="nav-4-1-4-7">
+      Layers
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Layers" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-7">
+        <span class="md-nav__icon md-icon"></span>
+        Layers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../layers/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../layers/positional_encoding/" title="Positional Encoding" class="md-nav__link">
+      Positional Encoding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../layers/transformer/" title="Transformer" class="md-nav__link">
+      Transformer
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-8" type="checkbox" id="nav-4-1-4-8" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-4-8">
+      Post Processing
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Post Processing" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-8">
+        <span class="md-nav__icon md-icon"></span>
+        Post Processing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Non Maximum Suppression
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" title="Non Maximum Suppression" class="md-nav__link md-nav__link--active">
+      Non Maximum Suppression
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post_process_fast_rcnn_boxes" class="md-nav__link">
+    post_process_fast_rcnn_boxes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post_process_rpn" class="md-nav__link">
+    post_process_rpn
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../post_processing_detr/" title="Post Processing Detr" class="md-nav__link">
+      Post Processing Detr
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" type="checkbox" id="nav-4-1-5">
+    
+    <label class="md-nav__link" for="nav-4-1-5">
+      Utils
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Utils" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-5">
+        <span class="md-nav__icon md-icon"></span>
+        Utils
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/drawing/" title="Drawing" class="md-nav__link">
+      Drawing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/ops/" title="Ops" class="md-nav__link">
+      Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/training/" title="Training" class="md-nav__link">
+      Training
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post_process_fast_rcnn_boxes" class="md-nav__link">
+    post_process_fast_rcnn_boxes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post_process_rpn" class="md-nav__link">
+    post_process_rpn
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/EmGarr/kerod/edit/master/reference/kerod/model/post_processing/non_maximum_suppression.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="module-kerodmodelpost_processingnon_maximum_suppression">Module kerod.model.post_processing.non_maximum_suppression</h1>
+<p>Methods using non maximum_suppression to handle overlaps between boxes.</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="sd">&quot;&quot;&quot;Methods using non maximum_suppression to handle overlaps between boxes.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+
+<span class="kn">from</span> <span class="nn">kerod.core.box_coder</span> <span class="kn">import</span> <span class="n">decode_boxes_faster_rcnn</span>
+
+<span class="kn">from</span> <span class="nn">kerod.core.box_ops</span> <span class="kn">import</span> <span class="n">clip_boxes</span>
+
+<span class="kn">from</span> <span class="nn">kerod.core.standard_fields</span> <span class="kn">import</span> <span class="n">BoxField</span>
+
+<span class="kn">from</span> <span class="nn">kerod.utils.ops</span> <span class="kn">import</span> <span class="n">get_full_indices</span>
+
+<span class="k">def</span> <span class="nf">post_process_rpn</span><span class="p">(</span><span class="n">cls_pred_per_lvl</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+
+                     <span class="n">loc_pred_per_lvl</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+
+                     <span class="n">anchors_per_lvl</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+
+                     <span class="n">image_information</span><span class="p">,</span>
+
+                     <span class="n">pre_nms_topk_per_lvl</span><span class="p">,</span>
+
+                     <span class="n">post_nms_topk</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+
+                     <span class="n">iou_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Sample RPN proposals by the following steps:</span>
+
+<span class="sd">    1. Pick top k1 by scores</span>
+
+<span class="sd">    2. NMS them</span>
+
+<span class="sd">    3. Pick top k2 by scores. Default k2 == k1, i.e. does not filter the NMS output.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *cls_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes, 2].</span>
+
+<span class="sd">    One item per level of the pyramid.</span>
+
+<span class="sd">    - *loc_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes, 4 * (num_anchors)].</span>
+
+<span class="sd">    One item per level of the pyramid.</span>
+
+<span class="sd">    - *anchors_per_lvl*: A list of Tensor of shape [batch_size, num_boxes * num_anchors, 4]</span>
+
+<span class="sd">    One item per level of the pyramid.</span>
+
+<span class="sd">    - *image_informations*: A Tensor of shape [batch_size, (height, width)] The height and the</span>
+
+<span class="sd">    width are without the padding.</span>
+
+<span class="sd">    - *pre_nms_topk_per_lvl*: Will extract at each level this amount of boxes</span>
+
+<span class="sd">    - post_nms_topk: Number of boxes selected after the nms</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]</span>
+
+<span class="sd">      containing the non-max suppressed boxes.</span>
+
+<span class="sd">    - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing</span>
+
+<span class="sd">      the scores for the boxes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">topk_boxes_per_lvl</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">topk_scores_per_lvl</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">cls_pred</span><span class="p">,</span> <span class="n">loc_pred</span><span class="p">,</span> <span class="n">anchors</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cls_pred_per_lvl</span><span class="p">,</span> <span class="n">loc_pred_per_lvl</span><span class="p">,</span> <span class="n">anchors_per_lvl</span><span class="p">):</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">cls_pred</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">loc_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">loc_pred</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+        <span class="n">boxes</span> <span class="o">=</span> <span class="n">decode_boxes_faster_rcnn</span><span class="p">(</span><span class="n">loc_pred</span><span class="p">,</span> <span class="n">anchors</span><span class="p">)</span>
+
+        <span class="n">boxes</span> <span class="o">=</span> <span class="n">clip_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">image_information</span><span class="p">)</span>
+
+        <span class="c1"># Remove the background classes</span>
+
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">cls_pred</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">topk</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">pre_nms_topk_per_lvl</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="n">topk_scores</span><span class="p">,</span> <span class="n">topk_indices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">topk</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="n">topk_indices</span> <span class="o">=</span> <span class="n">get_full_indices</span><span class="p">(</span><span class="n">topk_indices</span><span class="p">)</span>
+
+        <span class="n">topk_boxes_per_lvl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">topk_indices</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="n">topk_scores_per_lvl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">topk_scores</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+    <span class="n">topk_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">topk_boxes_per_lvl</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">topk_scores</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">topk_scores_per_lvl</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">post_nms_topk</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="n">post_nms_topk</span> <span class="o">=</span> <span class="n">pre_nms_topk_per_lvl</span>
+
+    <span class="n">nmsed_boxes</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">combined_non_max_suppression</span><span class="p">(</span><span class="n">topk_boxes</span><span class="p">[:,</span> <span class="p">:,</span> <span class="bp">None</span><span class="p">],</span>
+
+                                                                 <span class="n">topk_scores</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">None</span><span class="p">],</span>
+
+                                                                 <span class="n">post_nms_topk</span><span class="p">,</span>
+
+                                                                 <span class="n">post_nms_topk</span><span class="p">,</span>
+
+                                                                 <span class="n">iou_threshold</span><span class="o">=</span><span class="n">iou_threshold</span><span class="p">,</span>
+
+                                                                 <span class="n">score_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+
+                                                                 <span class="n">clip_boxes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">nmsed_boxes</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">post_process_fast_rcnn_boxes</span><span class="p">(</span><span class="n">cls_pred</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                                 <span class="n">loc_pred</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                                 <span class="n">anchors</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                                 <span class="n">image_information</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                                 <span class="n">num_classes</span><span class="p">,</span>
+
+                                 <span class="n">max_output_size_per_class</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+
+                                 <span class="n">max_total_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+
+                                 <span class="n">iou_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+
+                                 <span class="n">score_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;This is the classical post_processing for the Faster RCNN paper.</span>
+
+<span class="sd">    This operation performs non_max_suppression on the inputs per batch, across</span>
+
+<span class="sd">    all classes.</span>
+
+<span class="sd">    Prunes away boxes that have high intersection-over-union (IOU) overlap</span>
+
+<span class="sd">    with previously selected boxes.  Bounding boxes are supplied as</span>
+
+<span class="sd">    [y1, x1, y2, x2], where (y1, x1) and (y2, x2) are the coordinates of any</span>
+
+<span class="sd">    diagonal pair of box corners and the coordinates can be provided as normalized</span>
+
+<span class="sd">    (i.e., lying in the interval [0, 1]) or absolute.  Note that this algorithm</span>
+
+<span class="sd">    is agnostic to where the origin is in the coordinate system. Also note that</span>
+
+<span class="sd">    this algorithm is invariant to orthogonal transformations and translations</span>
+
+<span class="sd">    of the coordinate system; thus translating or reflections of the coordinate</span>
+
+<span class="sd">    system result in the same boxes being selected by the algorithm.</span>
+
+<span class="sd">    The output of this operation is the final boxes, scores and classes tensor</span>
+
+<span class="sd">    returned after performing non_max_suppression.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *cls_pred*: A Tensor of shape [batch_size, num_boxes, num_classes]</span>
+
+<span class="sd">    - *loc_pred*: A Tensor of shape [batch_size, num_boxes, 4 * num_classes]</span>
+
+<span class="sd">    - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]</span>
+
+<span class="sd">    - *image_informations*: A Tensor of shape [batch_size, (height, width)] The height and the</span>
+
+<span class="sd">    width are without the padding.</span>
+
+<span class="sd">    - *num_classes*: The number of classes (background is not included).</span>
+
+<span class="sd">    - *max_output_size_per_class*: A scalar integer `Tensor` representing the</span>
+
+<span class="sd">      maximum number of boxes to be selected by non max suppression per class</span>
+
+<span class="sd">    - *max_total_size*: A scalar representing maximum number of boxes retained over</span>
+
+<span class="sd">      all classes.</span>
+
+<span class="sd">    - *iou_threshold*: A float representing the threshold for deciding whether boxes</span>
+
+<span class="sd">      overlap too much with respect to IOU.</span>
+
+<span class="sd">    - *score_threshold*: A float representing the threshold for deciding when to</span>
+
+<span class="sd">      remove boxes based on score. `O.05` is used like in Detectron or Tensorpack.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]</span>
+
+<span class="sd">      containing the non-max suppressed boxes. The coordinates returned are</span>
+
+<span class="sd">    between 0 and 1.</span>
+
+<span class="sd">    - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing</span>
+
+<span class="sd">      the scores for the boxes.</span>
+
+<span class="sd">    - *nmsed_classes*: A Tensor of shape [batch_size, max_detections]</span>
+
+<span class="sd">      containing the class for boxes.</span>
+
+<span class="sd">    - *valid_detections*: A [batch_size] int32 tensor indicating the number of</span>
+
+<span class="sd">      valid detections per batch item. Only the top valid_detections[i] entries</span>
+
+<span class="sd">      in nms_boxes[i], nms_scores[i] and nms_class[i] are valid. The rest of the</span>
+
+<span class="sd">      entries are zero paddings.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">cls_pred</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">loc_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">loc_pred</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="n">anchors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">anchors</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">]),</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">decode_boxes_faster_rcnn</span><span class="p">(</span><span class="n">loc_pred</span><span class="p">,</span> <span class="n">anchors</span><span class="p">,</span> <span class="n">scale_factors</span><span class="o">=</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">))</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">clip_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">image_information</span><span class="p">)</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="n">nmsed_boxes</span><span class="p">,</span> <span class="n">nmsed_scores</span><span class="p">,</span> <span class="n">nmsed_labels</span><span class="p">,</span> <span class="n">valid_detections</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">combined_non_max_suppression</span><span class="p">(</span>
+
+        <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+
+        <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">cls_pred</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+
+        <span class="n">max_output_size_per_class</span><span class="p">,</span>
+
+        <span class="n">max_total_size</span><span class="p">,</span>
+
+        <span class="n">iou_threshold</span><span class="o">=</span><span class="n">iou_threshold</span><span class="p">,</span>
+
+        <span class="n">score_threshold</span><span class="o">=</span><span class="n">score_threshold</span><span class="p">,</span>
+
+        <span class="n">clip_boxes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="n">normalizer_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">image_information</span><span class="p">[:,</span> <span class="bp">None</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">nmsed_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">nmsed_boxes</span><span class="p">,</span> <span class="n">normalizer_boxes</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">)</span>
+
+    <span class="n">nmsed_scores</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">nmsed_scores</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">BoxField</span><span class="o">.</span><span class="n">SCORES</span><span class="p">)</span>
+
+    <span class="n">nmsed_labels</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">nmsed_labels</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">)</span>
+
+    <span class="n">valid_detections</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">valid_detections</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">BoxField</span><span class="o">.</span><span class="n">NUM_BOXES</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nmsed_boxes</span><span class="p">,</span> <span class="n">nmsed_scores</span><span class="p">,</span> <span class="n">nmsed_labels</span><span class="p">,</span> <span class="n">valid_detections</span>
+</code></pre></div>
+
+</details>
+<h2 id="functions">Functions</h2>
+<h3 id="post_process_fast_rcnn_boxes">post_process_fast_rcnn_boxes</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">post_process_fast_rcnn_boxes</span><span class="p">(</span>
+    <span class="n">cls_pred</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">loc_pred</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">anchors</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">image_information</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="p">,</span>
+    <span class="n">max_output_size_per_class</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">max_total_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">iou_threshold</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">score_threshold</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.05</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>This is the classical post_processing for the Faster RCNN paper.
+This operation performs non_max_suppression on the inputs per batch, across
+all classes.
+Prunes away boxes that have high intersection-over-union (IOU) overlap
+with previously selected boxes.  Bounding boxes are supplied as
+[y1, x1, y2, x2], where (y1, x1) and (y2, x2) are the coordinates of any
+diagonal pair of box corners and the coordinates can be provided as normalized
+(i.e., lying in the interval [0, 1]) or absolute.  Note that this algorithm
+is agnostic to where the origin is in the coordinate system. Also note that
+this algorithm is invariant to orthogonal transformations and translations
+of the coordinate system; thus translating or reflections of the coordinate
+system result in the same boxes being selected by the algorithm.
+The output of this operation is the final boxes, scores and classes tensor
+returned after performing non_max_suppression.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>cls_pred</em>: A Tensor of shape [batch_size, num_boxes, num_classes]</li>
+<li><em>loc_pred</em>: A Tensor of shape [batch_size, num_boxes, 4 * num_classes]</li>
+<li><em>anchors</em>: A Tensor of shape [batch_size, num_boxes, 4]</li>
+<li><em>image_informations</em>: A Tensor of shape [batch_size, (height, width)] The height and the
+width are without the padding.</li>
+<li><em>num_classes</em>: The number of classes (background is not included).</li>
+<li><em>max_output_size_per_class</em>: A scalar integer <code>Tensor</code> representing the
+  maximum number of boxes to be selected by non max suppression per class</li>
+<li><em>max_total_size</em>: A scalar representing maximum number of boxes retained over
+  all classes.</li>
+<li><em>iou_threshold</em>: A float representing the threshold for deciding whether boxes
+  overlap too much with respect to IOU.</li>
+<li><em>score_threshold</em>: A float representing the threshold for deciding when to
+  remove boxes based on score. <code>O.05</code> is used like in Detectron or Tensorpack.</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li><em>nmsed_boxes</em>: A Tensor of shape [batch_size, max_detections, 4]
+  containing the non-max suppressed boxes. The coordinates returned are
+between 0 and 1.</li>
+<li><em>nmsed_scores</em>: A Tensor of shape [batch_size, max_detections] containing
+  the scores for the boxes.</li>
+<li><em>nmsed_classes</em>: A Tensor of shape [batch_size, max_detections] 
+  containing the class for boxes.</li>
+<li><em>valid_detections</em>: A [batch_size] int32 tensor indicating the number of
+  valid detections per batch item. Only the top valid_detections[i] entries
+  in nms_boxes[i], nms_scores[i] and nms_class[i] are valid. The rest of the
+  entries are zero paddings.</li>
+</ul>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">post_process_fast_rcnn_boxes</span><span class="p">(</span><span class="nl">cls_pred</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                 </span><span class="nl">loc_pred</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                 </span><span class="nl">anchors</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                 </span><span class="nl">image_information</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                 </span><span class="n">num_classes</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                 </span><span class="nl">max_output_size_per_class</span><span class="p">:</span><span class="w"> </span><span class="nc">int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                 </span><span class="nl">max_total_size</span><span class="p">:</span><span class="w"> </span><span class="nc">int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                 </span><span class="nl">iou_threshold</span><span class="p">:</span><span class="w"> </span><span class="nc">float</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">                                 </span><span class="nl">score_threshold</span><span class="p">:</span><span class="w"> </span><span class="nc">float</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
+
+<span class="w">    </span><span class="ss">&quot;&quot;&quot;This is the classical post_processing for the Faster RCNN paper.</span>
+
+<span class="ss">    This operation performs non_max_suppression on the inputs per batch, across</span>
+
+<span class="ss">    all classes.</span>
+
+<span class="ss">    Prunes away boxes that have high intersection-over-union (IOU) overlap</span>
+
+<span class="ss">    with previously selected boxes.  Bounding boxes are supplied as</span>
+
+<span class="ss">    [y1, x1, y2, x2], where (y1, x1) and (y2, x2) are the coordinates of any</span>
+
+<span class="ss">    diagonal pair of box corners and the coordinates can be provided as normalized</span>
+
+<span class="ss">    (i.e., lying in the interval [0, 1]) or absolute.  Note that this algorithm</span>
+
+<span class="ss">    is agnostic to where the origin is in the coordinate system. Also note that</span>
+
+<span class="ss">    this algorithm is invariant to orthogonal transformations and translations</span>
+
+<span class="ss">    of the coordinate system; thus translating or reflections of the coordinate</span>
+
+<span class="ss">    system result in the same boxes being selected by the algorithm.</span>
+
+<span class="ss">    The output of this operation is the final boxes, scores and classes tensor</span>
+
+<span class="ss">    returned after performing non_max_suppression.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *cls_pred*: A Tensor of shape [batch_size, num_boxes, num_classes]</span>
+
+<span class="ss">    - *loc_pred*: A Tensor of shape [batch_size, num_boxes, 4 * num_classes]</span>
+
+<span class="ss">    - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]</span>
+
+<span class="ss">    - *image_informations*: A Tensor of shape [batch_size, (height, width)] The height and the</span>
+
+<span class="ss">    width are without the padding.</span>
+
+<span class="ss">    - *num_classes*: The number of classes (background is not included).</span>
+
+<span class="ss">    - *max_output_size_per_class*: A scalar integer `Tensor` representing the</span>
+
+<span class="ss">      maximum number of boxes to be selected by non max suppression per class</span>
+
+<span class="ss">    - *max_total_size*: A scalar representing maximum number of boxes retained over</span>
+
+<span class="ss">      all classes.</span>
+
+<span class="ss">    - *iou_threshold*: A float representing the threshold for deciding whether boxes</span>
+
+<span class="ss">      overlap too much with respect to IOU.</span>
+
+<span class="ss">    - *score_threshold*: A float representing the threshold for deciding when to</span>
+
+<span class="ss">      remove boxes based on score. `O.05` is used like in Detectron or Tensorpack.</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]</span>
+
+<span class="ss">      containing the non-max suppressed boxes. The coordinates returned are</span>
+
+<span class="ss">    between 0 and 1.</span>
+
+<span class="ss">    - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing</span>
+
+<span class="ss">      the scores for the boxes.</span>
+
+<span class="ss">    - *nmsed_classes*: A Tensor of shape [batch_size, max_detections]</span>
+
+<span class="ss">      containing the class for boxes.</span>
+
+<span class="ss">    - *valid_detections*: A [batch_size] int32 tensor indicating the number of</span>
+
+<span class="ss">      valid detections per batch item. Only the top valid_detections[i] entries</span>
+
+<span class="ss">      in nms_boxes[i], nms_scores[i] and nms_class[i] are valid. The rest of the</span>
+
+<span class="ss">      entries are zero paddings.</span>
+
+<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">batch_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">cls_pred</span><span class="p">)</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">loc_pred</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">loc_pred</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">))</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">anchors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">anchors</span><span class="p">,</span><span class="w"> </span><span class="o">[</span><span class="n">1, 1, num_classes</span><span class="o">]</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">))</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">decode_boxes_faster_rcnn</span><span class="p">(</span><span class="n">loc_pred</span><span class="p">,</span><span class="w"> </span><span class="n">anchors</span><span class="p">,</span><span class="w"> </span><span class="n">scale_factors</span><span class="o">=</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">))</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clip_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="n">image_information</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_classes</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">))</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">nmsed_boxes</span><span class="p">,</span><span class="w"> </span><span class="n">nmsed_scores</span><span class="p">,</span><span class="w"> </span><span class="n">nmsed_labels</span><span class="p">,</span><span class="w"> </span><span class="n">valid_detections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="nc">image</span><span class="p">.</span><span class="n">combined_non_max_suppression</span><span class="p">(</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">cls_pred</span><span class="p">,</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">max_output_size_per_class</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">max_total_size</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">iou_threshold</span><span class="o">=</span><span class="n">iou_threshold</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">score_threshold</span><span class="o">=</span><span class="n">score_threshold</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">clip_boxes</span><span class="o">=</span><span class="k">False</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">normalizer_boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">image_information</span><span class="o">[</span><span class="n">:, None</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="o">[</span><span class="n">1, 1, 2</span><span class="o">]</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">nmsed_boxes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">divide</span><span class="p">(</span><span class="n">nmsed_boxes</span><span class="p">,</span><span class="w"> </span><span class="n">normalizer_boxes</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">nmsed_scores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="k">identity</span><span class="p">(</span><span class="n">nmsed_scores</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="n">BoxField</span><span class="p">.</span><span class="n">SCORES</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">nmsed_labels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="k">identity</span><span class="p">(</span><span class="n">nmsed_labels</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">valid_detections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="k">identity</span><span class="p">(</span><span class="n">valid_detections</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="n">BoxField</span><span class="p">.</span><span class="n">NUM_BOXES</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">nmsed_boxes</span><span class="p">,</span><span class="w"> </span><span class="n">nmsed_scores</span><span class="p">,</span><span class="w"> </span><span class="n">nmsed_labels</span><span class="p">,</span><span class="w"> </span><span class="n">valid_detections</span><span class="w"></span>
+</code></pre></div>
+
+</details>
+<h3 id="post_process_rpn">post_process_rpn</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">post_process_rpn</span><span class="p">(</span>
+    <span class="n">cls_pred_per_lvl</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">loc_pred_per_lvl</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">anchors_per_lvl</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">image_information</span><span class="p">,</span>
+    <span class="n">pre_nms_topk_per_lvl</span><span class="p">,</span>
+    <span class="n">post_nms_topk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">iou_threshold</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.7</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Sample RPN proposals by the following steps:</p>
+<ol>
+<li>Pick top k1 by scores</li>
+<li>NMS them</li>
+<li>Pick top k2 by scores. Default k2 == k1, i.e. does not filter the NMS output.</li>
+</ol>
+<p>Arguments:</p>
+<ul>
+<li><em>cls_pred_per_lvl</em>: A list of Tensor of shape [batch_size, num_boxes, 2].
+One item per level of the pyramid.</li>
+<li><em>loc_pred_per_lvl</em>: A list of Tensor of shape [batch_size, num_boxes, 4 * (num_anchors)].
+One item per level of the pyramid.</li>
+<li><em>anchors_per_lvl</em>: A list of Tensor of shape [batch_size, num_boxes * num_anchors, 4]
+One item per level of the pyramid.</li>
+<li><em>image_informations</em>: A Tensor of shape [batch_size, (height, width)] The height and the
+width are without the padding.</li>
+<li><em>pre_nms_topk_per_lvl</em>: Will extract at each level this amount of boxes</li>
+<li>post_nms_topk: Number of boxes selected after the nms</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li><em>nmsed_boxes</em>: A Tensor of shape [batch_size, max_detections, 4]
+  containing the non-max suppressed boxes.</li>
+<li><em>nmsed_scores</em>: A Tensor of shape [batch_size, max_detections] containing
+  the scores for the boxes.</li>
+</ul>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">post_process_rpn</span><span class="p">(</span><span class="n">cls_pred_per_lvl</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">],</span>
+
+                     <span class="n">loc_pred_per_lvl</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">],</span>
+
+                     <span class="n">anchors_per_lvl</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">],</span>
+
+                     <span class="n">image_information</span><span class="p">,</span>
+
+                     <span class="n">pre_nms_topk_per_lvl</span><span class="p">,</span>
+
+                     <span class="n">post_nms_topk</span><span class="o">=</span><span class="k">None</span><span class="p">,</span>
+
+                     <span class="n">iou_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">7</span><span class="p">):</span>
+
+    <span class="ss">&quot;&quot;&quot;Sample RPN proposals by the following steps:</span>
+
+<span class="ss">    1. Pick top k1 by scores</span>
+
+<span class="ss">    2. NMS them</span>
+
+<span class="ss">    3. Pick top k2 by scores. Default k2 == k1, i.e. does not filter the NMS output.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *cls_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes, 2].</span>
+
+<span class="ss">    One item per level of the pyramid.</span>
+
+<span class="ss">    - *loc_pred_per_lvl*: A list of Tensor of shape [batch_size, num_boxes, 4 * (num_anchors)].</span>
+
+<span class="ss">    One item per level of the pyramid.</span>
+
+<span class="ss">    - *anchors_per_lvl*: A list of Tensor of shape [batch_size, num_boxes * num_anchors, 4]</span>
+
+<span class="ss">    One item per level of the pyramid.</span>
+
+<span class="ss">    - *image_informations*: A Tensor of shape [batch_size, (height, width)] The height and the</span>
+
+<span class="ss">    width are without the padding.</span>
+
+<span class="ss">    - *pre_nms_topk_per_lvl*: Will extract at each level this amount of boxes</span>
+
+<span class="ss">    - post_nms_topk: Number of boxes selected after the nms</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    - *nmsed_boxes*: A Tensor of shape [batch_size, max_detections, 4]</span>
+
+<span class="ss">      containing the non-max suppressed boxes.</span>
+
+<span class="ss">    - *nmsed_scores*: A Tensor of shape [batch_size, max_detections] containing</span>
+
+<span class="ss">      the scores for the boxes.</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">topk_boxes_per_lvl</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">topk_scores_per_lvl</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">cls_pred</span><span class="p">,</span> <span class="n">loc_pred</span><span class="p">,</span> <span class="n">anchors</span> <span class="k">in</span> <span class="n">zip</span><span class="p">(</span><span class="n">cls_pred_per_lvl</span><span class="p">,</span> <span class="n">loc_pred_per_lvl</span><span class="p">,</span> <span class="n">anchors_per_lvl</span><span class="p">):</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">cls_pred</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">loc_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">loc_pred</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+        <span class="n">boxes</span> <span class="o">=</span> <span class="n">decode_boxes_faster_rcnn</span><span class="p">(</span><span class="n">loc_pred</span><span class="p">,</span> <span class="n">anchors</span><span class="p">)</span>
+
+        <span class="n">boxes</span> <span class="o">=</span> <span class="n">clip_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">image_information</span><span class="p">)</span>
+
+        <span class="o">#</span> <span class="n">Remove</span> <span class="n">the</span> <span class="n">background</span> <span class="n">classes</span>
+
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">cls_pred</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">topk</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">pre_nms_topk_per_lvl</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="k">size</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="n">topk_scores</span><span class="p">,</span> <span class="n">topk_indices</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">top_k</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">topk</span><span class="p">,</span> <span class="n">sorted</span><span class="o">=</span><span class="k">False</span><span class="p">)</span>
+
+        <span class="n">topk_indices</span> <span class="o">=</span> <span class="n">get_full_indices</span><span class="p">(</span><span class="n">topk_indices</span><span class="p">)</span>
+
+        <span class="n">topk_boxes_per_lvl</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">topk_indices</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="n">topk_scores_per_lvl</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">topk_scores</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+
+    <span class="n">topk_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="n">topk_boxes_per_lvl</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">topk_scores</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="n">topk_scores_per_lvl</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">post_nms_topk</span> <span class="k">is</span> <span class="k">None</span><span class="p">:</span>
+
+        <span class="n">post_nms_topk</span> <span class="o">=</span> <span class="n">pre_nms_topk_per_lvl</span>
+
+    <span class="n">nmsed_boxes</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">combined_non_max_suppression</span><span class="p">(</span><span class="n">topk_boxes</span><span class="p">[:,</span> <span class="p">:,</span> <span class="k">None</span><span class="p">],</span>
+
+                                                                 <span class="n">topk_scores</span><span class="p">[...,</span> <span class="k">None</span><span class="p">],</span>
+
+                                                                 <span class="n">post_nms_topk</span><span class="p">,</span>
+
+                                                                 <span class="n">post_nms_topk</span><span class="p">,</span>
+
+                                                                 <span class="n">iou_threshold</span><span class="o">=</span><span class="n">iou_threshold</span><span class="p">,</span>
+
+                                                                 <span class="n">score_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+
+                                                                 <span class="n">clip_boxes</span><span class="o">=</span><span class="k">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">nmsed_boxes</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../" title="Index" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Index
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../post_processing_detr/" title="Post Processing Detr" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Post Processing Detr
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Powered by
+        <a href="http://timothycrosley.github.io/portray">portray.</a>
+        You too can
+        <a href="http://timothycrosley.github.io/portray">
+          portray</a>
+        your Python project well using automatic documentation.
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../../assets/javascripts/vendor.2d1db4bd.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../../../assets/javascripts/worker/search.5eca75d3.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

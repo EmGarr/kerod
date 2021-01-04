@@ -1,0 +1,2326 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="shortcut icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.14">
+    
+    
+      
+        <title>Box Ops - kerod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.d3202873.min.css">
+      
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ff0a5ce4.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#4cae4f">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="green" data-md-color-accent="lightgreen">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#module-kerodcorebox_ops" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../../../.." title="kerod" class="md-header-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            kerod
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Box Ops
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="kerod" class="md-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    kerod
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../CONTRIBUTING/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../docs/BENCHMARKS/" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      Reference
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Reference" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" type="checkbox" id="nav-4-1" checked>
+    
+    <label class="md-nav__link" for="nav-4-1">
+      Kerod
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Kerod" data-md-level="2">
+      <label class="md-nav__title" for="nav-4-1">
+        <span class="md-nav__icon md-icon"></span>
+        Kerod
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-2" type="checkbox" id="nav-4-1-2" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-2">
+      Core
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Core
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../anchor_generator/" title="Anchor Generator" class="md-nav__link">
+      Anchor Generator
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../box_coder/" title="Box Coder" class="md-nav__link">
+      Box Coder
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Box Ops
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" title="Box Ops" class="md-nav__link md-nav__link--active">
+      Box Ops
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clip_boxes" class="md-nav__link">
+    clip_boxes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_area" class="md-nav__link">
+    compute_area
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_giou" class="md-nav__link">
+    compute_giou
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_intersection" class="md-nav__link">
+    compute_intersection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_iou" class="md-nav__link">
+    compute_iou
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_to_center_coordinates" class="md-nav__link">
+    convert_to_center_coordinates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_to_xyxy_coordinates" class="md-nav__link">
+    convert_to_xyxy_coordinates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flip_left_right" class="md-nav__link">
+    flip_left_right
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#normalize_box_coordinates" class="md-nav__link">
+    normalize_box_coordinates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transform_fpcoor_for_tf" class="md-nav__link">
+    transform_fpcoor_for_tf
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../constants/" title="Constants" class="md-nav__link">
+      Constants
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../learning_rate_schedule/" title="Learning Rate Schedule" class="md-nav__link">
+      Learning Rate Schedule
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../losses/" title="Losses" class="md-nav__link">
+      Losses
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../matcher/" title="Matcher" class="md-nav__link">
+      Matcher
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../sampling_ops/" title="Sampling Ops" class="md-nav__link">
+      Sampling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../similarity/" title="Similarity" class="md-nav__link">
+      Similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../standard_fields/" title="Standard Fields" class="md-nav__link">
+      Standard Fields
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../target_assigner/" title="Target Assigner" class="md-nav__link">
+      Target Assigner
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-3" type="checkbox" id="nav-4-1-3">
+    
+    <label class="md-nav__link" for="nav-4-1-3">
+      Dataset
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Dataset" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        Dataset
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/augmentation/" title="Augmentation" class="md-nav__link">
+      Augmentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/preprocessing/" title="Preprocessing" class="md-nav__link">
+      Preprocessing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4" type="checkbox" id="nav-4-1-4">
+    
+    <label class="md-nav__link" for="nav-4-1-4">
+      Model
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Model" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-4">
+        <span class="md-nav__icon md-icon"></span>
+        Model
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detr/" title="Detr" class="md-nav__link">
+      Detr
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/factory/" title="Factory" class="md-nav__link">
+      Factory
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/faster_rcnn/" title="Faster Rcnn" class="md-nav__link">
+      Faster Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-5" type="checkbox" id="nav-4-1-4-5">
+    
+    <label class="md-nav__link" for="nav-4-1-4-5">
+      Backbone
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Backbone" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-5">
+        <span class="md-nav__icon md-icon"></span>
+        Backbone
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/fpn/" title="Fpn" class="md-nav__link">
+      Fpn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/resnet/" title="Resnet" class="md-nav__link">
+      Resnet
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-6" type="checkbox" id="nav-4-1-4-6">
+    
+    <label class="md-nav__link" for="nav-4-1-4-6">
+      Detection
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Detection" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-6">
+        <span class="md-nav__icon md-icon"></span>
+        Detection
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/abstract_detection_head/" title="Abstract Detection Head" class="md-nav__link">
+      Abstract Detection Head
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/fast_rcnn/" title="Fast Rcnn" class="md-nav__link">
+      Fast Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/pooling_ops/" title="Pooling Ops" class="md-nav__link">
+      Pooling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/rpn/" title="Rpn" class="md-nav__link">
+      Rpn
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-7" type="checkbox" id="nav-4-1-4-7">
+    
+    <label class="md-nav__link" for="nav-4-1-4-7">
+      Layers
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Layers" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-7">
+        <span class="md-nav__icon md-icon"></span>
+        Layers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/positional_encoding/" title="Positional Encoding" class="md-nav__link">
+      Positional Encoding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/transformer/" title="Transformer" class="md-nav__link">
+      Transformer
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-8" type="checkbox" id="nav-4-1-4-8">
+    
+    <label class="md-nav__link" for="nav-4-1-4-8">
+      Post Processing
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Post Processing" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-8">
+        <span class="md-nav__icon md-icon"></span>
+        Post Processing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/non_maximum_suppression/" title="Non Maximum Suppression" class="md-nav__link">
+      Non Maximum Suppression
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/post_processing_detr/" title="Post Processing Detr" class="md-nav__link">
+      Post Processing Detr
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" type="checkbox" id="nav-4-1-5">
+    
+    <label class="md-nav__link" for="nav-4-1-5">
+      Utils
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Utils" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-5">
+        <span class="md-nav__icon md-icon"></span>
+        Utils
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/drawing/" title="Drawing" class="md-nav__link">
+      Drawing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/ops/" title="Ops" class="md-nav__link">
+      Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/training/" title="Training" class="md-nav__link">
+      Training
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clip_boxes" class="md-nav__link">
+    clip_boxes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_area" class="md-nav__link">
+    compute_area
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_giou" class="md-nav__link">
+    compute_giou
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_intersection" class="md-nav__link">
+    compute_intersection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_iou" class="md-nav__link">
+    compute_iou
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_to_center_coordinates" class="md-nav__link">
+    convert_to_center_coordinates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_to_xyxy_coordinates" class="md-nav__link">
+    convert_to_xyxy_coordinates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flip_left_right" class="md-nav__link">
+    flip_left_right
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#normalize_box_coordinates" class="md-nav__link">
+    normalize_box_coordinates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transform_fpcoor_for_tf" class="md-nav__link">
+    transform_fpcoor_for_tf
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/EmGarr/kerod/edit/master/reference/kerod/core/box_ops.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="module-kerodcorebox_ops">Module kerod.core.box_ops</h1>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="k">def</span> <span class="nf">transform_fpcoor_for_tf</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tensor_shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">crop_shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;The way tf.image.crop_and_resize works (with normalized box):</span>
+
+<span class="sd">    Initial point (the value of output[0]): x0_box * (W_img - 1)</span>
+
+<span class="sd">    Spacing: w_box * (W_img - 1) / (W_crop - 1)</span>
+
+<span class="sd">    Use the above grid to bilinear sample.</span>
+
+<span class="sd">    However, what we want is (with fpcoor box):</span>
+
+<span class="sd">    Spacing: w_box / W_crop</span>
+
+<span class="sd">    Initial point: x0_box + spacing/2 - 0.5</span>
+
+<span class="sd">    (-0.5 because bilinear sample (in my definition) assumes floating point coordinate</span>
+
+<span class="sd">        (0.0, 0.0) is the same as pixel value (0, 0))</span>
+
+<span class="sd">    This function transform fpcoor boxes to a format to be used by tf.image.crop_and_resize</span>
+
+<span class="sd">    This function has been taken from tensorpack:</span>
+
+<span class="sd">    (https://github.com/tensorpack/tensorpack/blob/master/examples/FasterRCNN/modeling/model_box.py)</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *normalized_boxes*:  A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]. These</span>
+
+<span class="sd">    boxes have already been normalized in the feature space. The coordinates are not in</span>
+
+<span class="sd">    the input image space.</span>
+
+<span class="sd">    - *tensor_shape*: Height and width respectively</span>
+
+<span class="sd">    - *crop_shape*:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor of shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">spacing_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">crop_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxes</span><span class="o">.</span><span class="kp">dtype</span><span class="p">)</span>
+
+    <span class="n">spacing_w</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">crop_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">boxes</span><span class="o">.</span><span class="kp">dtype</span><span class="p">)</span>
+
+    <span class="n">tensor_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tensor_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+
+                            <span class="n">boxes</span><span class="o">.</span><span class="kp">dtype</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tensor_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">boxes</span><span class="o">.</span><span class="kp">dtype</span><span class="p">))</span>
+
+    <span class="n">ny0</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_min</span> <span class="o">+</span> <span class="n">spacing_h</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">tensor_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">nx0</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_min</span> <span class="o">+</span> <span class="n">spacing_w</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">tensor_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">nh</span> <span class="o">=</span> <span class="n">spacing_h</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">crop_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">boxes</span><span class="o">.</span><span class="kp">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="n">tensor_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">nw</span> <span class="o">=</span> <span class="n">spacing_w</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">crop_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">boxes</span><span class="o">.</span><span class="kp">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="n">tensor_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ny0</span><span class="p">,</span> <span class="n">nx0</span><span class="p">,</span> <span class="n">ny0</span> <span class="o">+</span> <span class="n">nh</span><span class="p">,</span> <span class="n">nx0</span> <span class="o">+</span> <span class="n">nw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">convert_to_center_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Convert boxes to their center coordinates</span>
+
+<span class="sd">    y_min, x_min, y_max, x_max -&gt; y_cent, x_cent, h, w</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor of shape [N, ..., num_boxes, (ycenter, xcenter, height, width)]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">width</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span>
+
+    <span class="n">height</span> <span class="o">=</span> <span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span>
+
+    <span class="n">ycenter</span> <span class="o">=</span> <span class="n">y_min</span> <span class="o">+</span> <span class="n">height</span> <span class="o">/</span> <span class="mf">2.</span>
+
+    <span class="n">xcenter</span> <span class="o">=</span> <span class="n">x_min</span> <span class="o">+</span> <span class="n">width</span> <span class="o">/</span> <span class="mf">2.</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ycenter</span><span class="p">,</span> <span class="n">xcenter</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">convert_to_xyxy_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Convert boxes to their center coordinates</span>
+
+<span class="sd">    y_cent, x_cent, h, w -&gt; y_min, x_min, y_max, x_max</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: A Tensor of shape [N, ..., (y_cent, x_cent, h, w)]</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor of shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_cent</span><span class="p">,</span> <span class="n">x_cent</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">y_min</span> <span class="o">=</span> <span class="n">y_cent</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span>
+
+    <span class="n">x_min</span> <span class="o">=</span> <span class="n">x_cent</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">w</span>
+
+    <span class="n">y_max</span> <span class="o">=</span> <span class="n">y_cent</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span>
+
+    <span class="n">x_max</span> <span class="o">=</span> <span class="n">x_cent</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">w</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compute_area</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Compute the area of boxes.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: Tensor of shape [N, ..., (y_min,x_min,y_max_,x_max)]</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor of shape [N, ..., num_boxes]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s1">&#39;Area&#39;</span><span class="p">):</span>
+
+        <span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="kp">squeeze</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compute_intersection</span><span class="p">(</span><span class="n">boxes1</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Compute pairwise intersection areas between boxes.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes1*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</span>
+
+<span class="sd">    - *boxes2*: Tensor of shape [N, ..., (y_max,x_max,y_max,x_max)]</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor with shape [N, M] representing pairwise intersections</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s1">&#39;Intersection&#39;</span><span class="p">):</span>
+
+        <span class="n">y_min1</span><span class="p">,</span> <span class="n">x_min1</span><span class="p">,</span> <span class="n">y_max1</span><span class="p">,</span> <span class="n">x_max1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes1</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">y_min2</span><span class="p">,</span> <span class="n">x_min2</span><span class="p">,</span> <span class="n">y_max2</span><span class="p">,</span> <span class="n">x_max2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes2</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">all_pairs_min_ymax</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">minimum</span><span class="p">(</span><span class="n">y_max1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">transpose</span><span class="p">(</span><span class="n">y_max2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">all_pairs_max_ymin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">y_min1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">transpose</span><span class="p">(</span><span class="n">y_min2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">boxes1</span><span class="o">.</span><span class="kp">dtype</span><span class="p">)</span>
+
+        <span class="n">intersect_heights</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">all_pairs_min_ymax</span> <span class="o">-</span> <span class="n">all_pairs_max_ymin</span><span class="p">)</span>
+
+        <span class="n">all_pairs_min_xmax</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">minimum</span><span class="p">(</span><span class="n">x_max1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">transpose</span><span class="p">(</span><span class="n">x_max2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">all_pairs_max_xmin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">x_min1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">transpose</span><span class="p">(</span><span class="n">x_min2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">intersect_widths</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">all_pairs_min_xmax</span> <span class="o">-</span> <span class="n">all_pairs_max_xmin</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">intersect_heights</span> <span class="o">*</span> <span class="n">intersect_widths</span>
+
+<span class="k">def</span> <span class="nf">compute_iou</span><span class="p">(</span><span class="n">boxes1</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Computes pairwise intersection-over-union between boxes.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">   The axis x correspond to boxes2 and y the boxes1:</span>
+
+<span class="sd">    ```python</span>
+
+<span class="sd">    from kerod.core.box_ops import compute_iou</span>
+
+<span class="sd">    import numpy as np</span>
+
+<span class="sd">    boxes1 = np.array([[548.26666, 364.57202, 706.1333 , 524.472  ],</span>
+
+<span class="sd">           [473.6    , 547.924  , 565.3333 , 635.336  ],</span>
+
+<span class="sd">           [477.86664, 688.63605, 580.26666, 786.70795],</span>
+
+<span class="sd">           [497.06668, 750.464  , 576.     , 857.064  ]])</span>
+
+<span class="sd">    boxes2 = np.array([[474.74518, 553.37256, 565.2548 , 598.62744],</span>
+
+<span class="sd">                     [448., 736., 576., 864.],</span>
+
+<span class="sd">                      [464., 672., 592., 800.],</span>
+
+<span class="sd">                      [560., 368., 688., 496.]</span>
+
+<span class="sd">                     ])</span>
+
+<span class="sd">    compute_iou(boxes1, boxes2)</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    output</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    &lt;tf.Tensor: shape=(4, 4), dtype=float64, numpy=</span>
+
+<span class="sd">    array([[0.        , 0.        , 0.        , 0.6490545 ],</span>
+
+<span class="sd">           [0.51081317, 0.        , 0.        , 0.        ],</span>
+
+<span class="sd">           [0.        , 0.23198337, 0.61294949, 0.        ],</span>
+
+<span class="sd">           [0.        , 0.51356762, 0.18718853, 0.        ]])&gt;</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes1*: A 2D Tensor of shape [N, (y_min,x_min,y_max,x_max)] or a or 3D</span>
+
+<span class="sd">    Tensor of shape [batch_size, N, (y_min,x_min,y_max,x_max)]</span>
+
+<span class="sd">    - *boxes2*: A 2D Tensor of shape [M, (y_min,x_min,y_max,x_max)] or a or 3D</span>
+
+<span class="sd">    Tensor of shape [batch_size, M, (y_min,x_min,y_max,x_max)]    Returns:</span>
+
+<span class="sd">    Return:</span>
+
+<span class="sd">    A tensor with shape [N, M] or [batch_size, N, M] representing pairwise iou scores.</span>
+
+<span class="sd">    Raises:</span>
+
+<span class="sd">    ValueError: If your tensor is different than 2D or 3D.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">compute_giou</span><span class="p">(</span><span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;iou&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compute_giou</span><span class="p">(</span><span class="n">boxes1</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;giou&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Computes pairwise general intersection-over-union between boxes following:</span>
+
+<span class="sd">    https://giou.stanford.edu/</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes1*: A 2D Tensor of shape [N, (y_min,x_min,y_max,x_max)] or a or 3D</span>
+
+<span class="sd">    Tensor of shape [batch_size, N, (y_min,x_min,y_max,x_max)]</span>
+
+<span class="sd">    - *boxes2*: A 2D Tensor of shape [M, (y_min,x_min,y_max,x_max)] or a or 3D</span>
+
+<span class="sd">    Tensor of shape [batch_size, M, (y_min,x_min,y_max,x_max)]</span>
+
+<span class="sd">    - *mode*: You can select iou or giou.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor with shape [N, M] or [batch_size, N, M] representing pairwise iou scores.</span>
+
+<span class="sd">    Raises:</span>
+
+<span class="sd">    ValueError: If your tensor is different than 2D or 3D.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="n">mode</span><span class="o">.</span><span class="n">upper</span><span class="p">()):</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">boxes1</span><span class="o">.</span><span class="kp">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+
+            <span class="n">perm</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">which_dim_expands</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">boxes1</span><span class="o">.</span><span class="kp">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+
+            <span class="n">perm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">which_dim_expands</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Compute Iou is only suppoted for 2D and 3D Tensor&#39;</span><span class="p">)</span>
+
+        <span class="n">intersections</span> <span class="o">=</span> <span class="n">compute_intersection</span><span class="p">(</span><span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">)</span>
+
+        <span class="n">areas1</span> <span class="o">=</span> <span class="n">compute_area</span><span class="p">(</span><span class="n">boxes1</span><span class="p">)</span>
+
+        <span class="n">areas2</span> <span class="o">=</span> <span class="n">compute_area</span><span class="p">(</span><span class="n">boxes2</span><span class="p">)</span>
+
+        <span class="n">unions</span> <span class="o">=</span> <span class="n">areas1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="kp">expand_dims</span><span class="p">(</span><span class="n">areas2</span><span class="p">,</span> <span class="n">which_dim_expands</span><span class="p">)</span> <span class="o">-</span> <span class="n">intersections</span>
+
+        <span class="n">iou</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">where</span><span class="p">(</span><span class="n">intersections</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">zeros_like</span><span class="p">(</span><span class="n">intersections</span><span class="p">),</span>
+
+                       <span class="n">tf</span><span class="o">.</span><span class="n">truediv</span><span class="p">(</span><span class="n">intersections</span><span class="p">,</span> <span class="n">unions</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;iou&quot;</span><span class="p">:</span>
+
+            <span class="k">return</span> <span class="n">iou</span>
+
+        <span class="n">y_min1</span><span class="p">,</span> <span class="n">x_min1</span><span class="p">,</span> <span class="n">y_max1</span><span class="p">,</span> <span class="n">x_max1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">boxes1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">y_min2</span><span class="p">,</span> <span class="n">x_min2</span><span class="p">,</span> <span class="n">y_max2</span><span class="p">,</span> <span class="n">x_max2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">boxes2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">enclose_ymin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">minimum</span><span class="p">(</span><span class="n">y_min1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">transpose</span><span class="p">(</span><span class="n">y_min2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">enclose_xmin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">minimum</span><span class="p">(</span><span class="n">x_min1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">transpose</span><span class="p">(</span><span class="n">x_min2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">enclose_ymax</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">y_max1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">transpose</span><span class="p">(</span><span class="n">y_max2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">enclose_xmax</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">x_max1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="kp">transpose</span><span class="p">(</span><span class="n">x_max2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">boxes1</span><span class="o">.</span><span class="kp">dtype</span><span class="p">)</span>
+
+        <span class="n">enclose_width</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">enclose_xmax</span> <span class="o">-</span> <span class="n">enclose_xmin</span><span class="p">)</span>
+
+        <span class="n">enclose_height</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">enclose_ymax</span> <span class="o">-</span> <span class="n">enclose_ymin</span><span class="p">)</span>
+
+        <span class="n">enclose_area</span> <span class="o">=</span> <span class="n">enclose_width</span> <span class="o">*</span> <span class="n">enclose_height</span>
+
+        <span class="n">giou</span> <span class="o">=</span> <span class="n">iou</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">divide_no_nan</span><span class="p">((</span><span class="n">enclose_area</span> <span class="o">-</span> <span class="n">unions</span><span class="p">),</span> <span class="n">enclose_area</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">giou</span>
+
+<span class="k">def</span> <span class="nf">normalize_box_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Normalize the boxes coordinates with image shape</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</span>
+
+<span class="sd">    - *height*: An integer</span>
+
+<span class="sd">    - *width*: An integer</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">y_min</span> <span class="o">=</span> <span class="n">y_min</span> <span class="o">/</span> <span class="n">height</span>
+
+    <span class="n">x_min</span> <span class="o">=</span> <span class="n">x_min</span> <span class="o">/</span> <span class="n">width</span>
+
+    <span class="n">y_max</span> <span class="o">=</span> <span class="n">y_max</span> <span class="o">/</span> <span class="n">height</span>
+
+    <span class="n">x_max</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">/</span> <span class="n">width</span>
+
+    <span class="c1"># Won&#39;t be backpropagated to rois anyway, but to save time</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">boxes</span>
+
+<span class="k">def</span> <span class="nf">clip_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Perform a clipping according to a window on the boxes.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="sd">    - *window*: A tensor of shape [batch_size, h, w]</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">maximum</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">boxes</span><span class="o">.</span><span class="kp">dtype</span><span class="p">))</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">tile</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="kp">expand_dims</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">minimum</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">boxes</span><span class="o">.</span><span class="kp">dtype</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">boxes</span>
+
+<span class="k">def</span> <span class="nf">flip_left_right</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;[Taken from tensorflow models] Left-right flip the boxes.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].</span>
+
+<span class="sd">        Boxes are in normalized form meaning their coordinates vary</span>
+
+<span class="sd">        between [0, 1]. Each row is in the form of [ymin, xmin, ymax, xmax].</span>
+
+<span class="sd">    Return:</span>
+
+<span class="sd">    Flipped boxes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ymin</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">flipped_xmin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">subtract</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">xmax</span><span class="p">)</span>
+
+    <span class="n">flipped_xmax</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="kp">subtract</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">xmin</span><span class="p">)</span>
+
+    <span class="n">flipped_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ymin</span><span class="p">,</span> <span class="n">flipped_xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">flipped_xmax</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">flipped_boxes</span>
+</code></pre></div>
+
+</details>
+<h2 id="functions">Functions</h2>
+<h3 id="clip_boxes">clip_boxes</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">clip_boxes</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">window</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>Perform a clipping according to a window on the boxes.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</li>
+<li><em>window</em>: A tensor of shape [batch_size, h, w]</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">clip_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="ss">&quot;&quot;&quot;Perform a clipping according to a window on the boxes.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="ss">    - *window*: A tensor of shape [batch_size, h, w]</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">))</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">boxes</span>
+</code></pre></div>
+
+</details>
+<h3 id="compute_area">compute_area</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">compute_area</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>Compute the area of boxes.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: Tensor of shape [N, ..., (y_min,x_min,y_max_,x_max)]</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor of shape [N, ..., num_boxes]</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">compute_area</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="ss">&quot;&quot;&quot;Compute the area of boxes.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes*: Tensor of shape [N, ..., (y_min,x_min,y_max_,x_max)]</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor of shape [N, ..., num_boxes]</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s1">&#39;Area&#39;</span><span class="p">):</span>
+
+        <span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">squeeze</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h3 id="compute_giou">compute_giou</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">compute_giou</span><span class="p">(</span>
+    <span class="n">boxes1</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">boxes2</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;giou&#39;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>Computes pairwise general intersection-over-union between boxes following:
+https://giou.stanford.edu/</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes1</em>: A 2D Tensor of shape [N, (y_min,x_min,y_max,x_max)] or a or 3D
+Tensor of shape [batch_size, N, (y_min,x_min,y_max,x_max)]</li>
+<li><em>boxes2</em>: A 2D Tensor of shape [M, (y_min,x_min,y_max,x_max)] or a or 3D
+Tensor of shape [batch_size, M, (y_min,x_min,y_max,x_max)]</li>
+<li><em>mode</em>: You can select iou or giou.</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor with shape [N, M] or [batch_size, N, M] representing pairwise iou scores.</p>
+<p>Raises:</p>
+<p>ValueError: If your tensor is different than 2D or 3D.</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">compute_giou</span><span class="p">(</span><span class="n">boxes1</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="k">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="ss">&quot;giou&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="ss">&quot;&quot;&quot;Computes pairwise general intersection-over-union between boxes following:</span>
+
+<span class="ss">    https://giou.stanford.edu/</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes1*: A 2D Tensor of shape [N, (y_min,x_min,y_max,x_max)] or a or 3D</span>
+
+<span class="ss">    Tensor of shape [batch_size, N, (y_min,x_min,y_max,x_max)]</span>
+
+<span class="ss">    - *boxes2*: A 2D Tensor of shape [M, (y_min,x_min,y_max,x_max)] or a or 3D</span>
+
+<span class="ss">    Tensor of shape [batch_size, M, (y_min,x_min,y_max,x_max)]</span>
+
+<span class="ss">    - *mode*: You can select iou or giou.</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor with shape [N, M] or [batch_size, N, M] representing pairwise iou scores.</span>
+
+<span class="ss">    Raises:</span>
+
+<span class="ss">    ValueError: If your tensor is different than 2D or 3D.</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">name_scope</span><span class="p">(</span><span class="k">mode</span><span class="p">.</span><span class="k">upper</span><span class="p">()):</span>
+
+        <span class="k">if</span> <span class="n">len</span><span class="p">(</span><span class="n">boxes1</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+
+            <span class="n">perm</span> <span class="o">=</span> <span class="k">None</span>
+
+            <span class="n">which_dim_expands</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">elif</span> <span class="n">len</span><span class="p">(</span><span class="n">boxes1</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+
+            <span class="n">perm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">which_dim_expands</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">raise</span> <span class="n">ValueError</span><span class="p">(</span><span class="s1">&#39;Compute Iou is only suppoted for 2D and 3D Tensor&#39;</span><span class="p">)</span>
+
+        <span class="n">intersections</span> <span class="o">=</span> <span class="n">compute_intersection</span><span class="p">(</span><span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">)</span>
+
+        <span class="n">areas1</span> <span class="o">=</span> <span class="n">compute_area</span><span class="p">(</span><span class="n">boxes1</span><span class="p">)</span>
+
+        <span class="n">areas2</span> <span class="o">=</span> <span class="n">compute_area</span><span class="p">(</span><span class="n">boxes2</span><span class="p">)</span>
+
+        <span class="n">unions</span> <span class="o">=</span> <span class="n">areas1</span><span class="p">[...,</span> <span class="k">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">areas2</span><span class="p">,</span> <span class="n">which_dim_expands</span><span class="p">)</span> <span class="o">-</span> <span class="n">intersections</span>
+
+        <span class="n">iou</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="k">where</span><span class="p">(</span><span class="n">intersections</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">intersections</span><span class="p">),</span>
+
+                       <span class="n">tf</span><span class="p">.</span><span class="n">truediv</span><span class="p">(</span><span class="n">intersections</span><span class="p">,</span> <span class="n">unions</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="k">mode</span> <span class="o">==</span> <span class="ss">&quot;iou&quot;</span><span class="p">:</span>
+
+            <span class="k">return</span> <span class="n">iou</span>
+
+        <span class="n">y_min1</span><span class="p">,</span> <span class="n">x_min1</span><span class="p">,</span> <span class="n">y_max1</span><span class="p">,</span> <span class="n">x_max1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">boxes1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">y_min2</span><span class="p">,</span> <span class="n">x_min2</span><span class="p">,</span> <span class="n">y_max2</span><span class="p">,</span> <span class="n">x_max2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">boxes2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">enclose_ymin</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">y_min1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y_min2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">enclose_xmin</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">x_min1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x_min2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">enclose_ymax</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">y_max1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y_max2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">enclose_xmax</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">x_max1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x_max2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">boxes1</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">enclose_width</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">enclose_xmax</span> <span class="o">-</span> <span class="n">enclose_xmin</span><span class="p">)</span>
+
+        <span class="n">enclose_height</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">enclose_ymax</span> <span class="o">-</span> <span class="n">enclose_ymin</span><span class="p">)</span>
+
+        <span class="n">enclose_area</span> <span class="o">=</span> <span class="n">enclose_width</span> <span class="o">*</span> <span class="n">enclose_height</span>
+
+        <span class="n">giou</span> <span class="o">=</span> <span class="n">iou</span> <span class="o">-</span> <span class="n">tf</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">divide_no_nan</span><span class="p">((</span><span class="n">enclose_area</span> <span class="o">-</span> <span class="n">unions</span><span class="p">),</span> <span class="n">enclose_area</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">giou</span>
+</code></pre></div>
+
+</details>
+<h3 id="compute_intersection">compute_intersection</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">compute_intersection</span><span class="p">(</span>
+    <span class="n">boxes1</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">boxes2</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">perm</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>Compute pairwise intersection areas between boxes.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes1</em>: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</li>
+<li><em>boxes2</em>: Tensor of shape [N, ..., (y_max,x_max,y_max,x_max)]</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor with shape [N, M] representing pairwise intersections</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">compute_intersection</span><span class="p">(</span><span class="n">boxes1</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="k">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="ss">&quot;&quot;&quot;Compute pairwise intersection areas between boxes.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes1*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</span>
+
+<span class="ss">    - *boxes2*: Tensor of shape [N, ..., (y_max,x_max,y_max,x_max)]</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor with shape [N, M] representing pairwise intersections</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s1">&#39;Intersection&#39;</span><span class="p">):</span>
+
+        <span class="n">y_min1</span><span class="p">,</span> <span class="n">x_min1</span><span class="p">,</span> <span class="n">y_max1</span><span class="p">,</span> <span class="n">x_max1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes1</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">y_min2</span><span class="p">,</span> <span class="n">x_min2</span><span class="p">,</span> <span class="n">y_max2</span><span class="p">,</span> <span class="n">x_max2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes2</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">all_pairs_min_ymax</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">y_max1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y_max2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">all_pairs_max_ymin</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">y_min1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y_min2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">boxes1</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">intersect_heights</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">all_pairs_min_ymax</span> <span class="o">-</span> <span class="n">all_pairs_max_ymin</span><span class="p">)</span>
+
+        <span class="n">all_pairs_min_xmax</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">x_max1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x_max2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">all_pairs_max_xmin</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">x_min1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x_min2</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="n">perm</span><span class="p">))</span>
+
+        <span class="n">intersect_widths</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">all_pairs_min_xmax</span> <span class="o">-</span> <span class="n">all_pairs_max_xmin</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">intersect_heights</span> <span class="o">*</span> <span class="n">intersect_widths</span>
+</code></pre></div>
+
+</details>
+<h3 id="compute_iou">compute_iou</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">compute_iou</span><span class="p">(</span>
+    <span class="n">boxes1</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">boxes2</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>Computes pairwise intersection-over-union between boxes.</p>
+<p>Example:</p>
+<p>The axis x correspond to boxes2 and y the boxes1:</p>
+<p>```python
+ from kerod.core.box_ops import compute_iou
+ import numpy as np</p>
+<p>boxes1 = np.array([[548.26666, 364.57202, 706.1333 , 524.472  ],
+        [473.6    , 547.924  , 565.3333 , 635.336  ],
+        [477.86664, 688.63605, 580.26666, 786.70795],
+        [497.06668, 750.464  , 576.     , 857.064  ]])</p>
+<p>boxes2 = np.array([[474.74518, 553.37256, 565.2548 , 598.62744],
+                  [448., 736., 576., 864.],
+                   [464., 672., 592., 800.],
+                   [560., 368., 688., 496.]
+                  ])
+ compute_iou(boxes1, boxes2)
+ ```</p>
+<p>output</p>
+<p><code>&lt;tf.Tensor: shape=(4, 4), dtype=float64, numpy=
+ array([[0.        , 0.        , 0.        , 0.6490545 ],
+        [0.51081317, 0.        , 0.        , 0.        ],
+        [0.        , 0.23198337, 0.61294949, 0.        ],
+        [0.        , 0.51356762, 0.18718853, 0.        ]])&gt;</code></p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes1</em>: A 2D Tensor of shape [N, (y_min,x_min,y_max,x_max)] or a or 3D
+ Tensor of shape [batch_size, N, (y_min,x_min,y_max,x_max)]</li>
+<li><em>boxes2</em>: A 2D Tensor of shape [M, (y_min,x_min,y_max,x_max)] or a or 3D
+ Tensor of shape [batch_size, M, (y_min,x_min,y_max,x_max)]    Returns:</li>
+</ul>
+<p>Return:</p>
+<p>A tensor with shape [N, M] or [batch_size, N, M] representing pairwise iou scores.</p>
+<p>Raises:</p>
+<p>ValueError: If your tensor is different than 2D or 3D.</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">compute_iou</span><span class="p">(</span><span class="n">boxes1</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Computes pairwise intersection-over-union between boxes.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">   The axis x correspond to boxes2 and y the boxes1:</span>
+
+<span class="sd">    ```python</span>
+
+<span class="sd">    from kerod.core.box_ops import compute_iou</span>
+
+<span class="sd">    import numpy as np</span>
+
+<span class="sd">    boxes1 = np.array([[548.26666, 364.57202, 706.1333 , 524.472  ],</span>
+
+<span class="sd">           [473.6    , 547.924  , 565.3333 , 635.336  ],</span>
+
+<span class="sd">           [477.86664, 688.63605, 580.26666, 786.70795],</span>
+
+<span class="sd">           [497.06668, 750.464  , 576.     , 857.064  ]])</span>
+
+<span class="sd">    boxes2 = np.array([[474.74518, 553.37256, 565.2548 , 598.62744],</span>
+
+<span class="sd">                     [448., 736., 576., 864.],</span>
+
+<span class="sd">                      [464., 672., 592., 800.],</span>
+
+<span class="sd">                      [560., 368., 688., 496.]</span>
+
+<span class="sd">                     ])</span>
+
+<span class="sd">    compute_iou(boxes1, boxes2)</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    output</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    &lt;tf.Tensor: shape=(4, 4), dtype=float64, numpy=</span>
+
+<span class="sd">    array([[0.        , 0.        , 0.        , 0.6490545 ],</span>
+
+<span class="sd">           [0.51081317, 0.        , 0.        , 0.        ],</span>
+
+<span class="sd">           [0.        , 0.23198337, 0.61294949, 0.        ],</span>
+
+<span class="sd">           [0.        , 0.51356762, 0.18718853, 0.        ]])&gt;</span>
+
+<span class="sd">    ```</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes1*: A 2D Tensor of shape [N, (y_min,x_min,y_max,x_max)] or a or 3D</span>
+
+<span class="sd">    Tensor of shape [batch_size, N, (y_min,x_min,y_max,x_max)]</span>
+
+<span class="sd">    - *boxes2*: A 2D Tensor of shape [M, (y_min,x_min,y_max,x_max)] or a or 3D</span>
+
+<span class="sd">    Tensor of shape [batch_size, M, (y_min,x_min,y_max,x_max)]    Returns:</span>
+
+<span class="sd">    Return:</span>
+
+<span class="sd">    A tensor with shape [N, M] or [batch_size, N, M] representing pairwise iou scores.</span>
+
+<span class="sd">    Raises:</span>
+
+<span class="sd">    ValueError: If your tensor is different than 2D or 3D.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">compute_giou</span><span class="p">(</span><span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;iou&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h3 id="convert_to_center_coordinates">convert_to_center_coordinates</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">convert_to_center_coordinates</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>Convert boxes to their center coordinates</p>
+<p>y_min, x_min, y_max, x_max -&gt; y_cent, x_cent, h, w</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor of shape [N, ..., num_boxes, (ycenter, xcenter, height, width)]</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">convert_to_center_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="ss">&quot;&quot;&quot;Convert boxes to their center coordinates</span>
+
+<span class="ss">    y_min, x_min, y_max, x_max -&gt; y_cent, x_cent, h, w</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes*: A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor of shape [N, ..., num_boxes, (ycenter, xcenter, height, width)]</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">width</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span>
+
+    <span class="n">height</span> <span class="o">=</span> <span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span>
+
+    <span class="n">ycenter</span> <span class="o">=</span> <span class="n">y_min</span> <span class="o">+</span> <span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">.</span>
+
+    <span class="n">xcenter</span> <span class="o">=</span> <span class="n">x_min</span> <span class="o">+</span> <span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">.</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ycenter</span><span class="p">,</span> <span class="n">xcenter</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h3 id="convert_to_xyxy_coordinates">convert_to_xyxy_coordinates</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">convert_to_xyxy_coordinates</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>Convert boxes to their center coordinates</p>
+<p>y_cent, x_cent, h, w -&gt; y_min, x_min, y_max, x_max</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: A Tensor of shape [N, ..., (y_cent, x_cent, h, w)]</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor of shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">convert_to_xyxy_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="ss">&quot;&quot;&quot;Convert boxes to their center coordinates</span>
+
+<span class="ss">    y_cent, x_cent, h, w -&gt; y_min, x_min, y_max, x_max</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes*: A Tensor of shape [N, ..., (y_cent, x_cent, h, w)]</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor of shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_cent</span><span class="p">,</span> <span class="n">x_cent</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">y_min</span> <span class="o">=</span> <span class="n">y_cent</span> <span class="o">-</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">h</span>
+
+    <span class="n">x_min</span> <span class="o">=</span> <span class="n">x_cent</span> <span class="o">-</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">w</span>
+
+    <span class="n">y_max</span> <span class="o">=</span> <span class="n">y_cent</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">h</span>
+
+    <span class="n">x_max</span> <span class="o">=</span> <span class="n">x_cent</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">w</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h3 id="flip_left_right">flip_left_right</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">flip_left_right</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>[Taken from tensorflow models] Left-right flip the boxes.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].
+    Boxes are in normalized form meaning their coordinates vary
+    between [0, 1]. Each row is in the form of [ymin, xmin, ymax, xmax].</li>
+</ul>
+<p>Return:</p>
+<p>Flipped boxes.</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">flip_left_right</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;[Taken from tensorflow models] Left-right flip the boxes.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].</span>
+
+<span class="sd">        Boxes are in normalized form meaning their coordinates vary</span>
+
+<span class="sd">        between [0, 1]. Each row is in the form of [ymin, xmin, ymax, xmax].</span>
+
+<span class="sd">    Return:</span>
+
+<span class="sd">    Flipped boxes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ymin</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">flipped_xmin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">xmax</span><span class="p">)</span>
+
+    <span class="n">flipped_xmax</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">xmin</span><span class="p">)</span>
+
+    <span class="n">flipped_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ymin</span><span class="p">,</span> <span class="n">flipped_xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">flipped_xmax</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">flipped_boxes</span>
+</code></pre></div>
+
+</details>
+<h3 id="normalize_box_coordinates">normalize_box_coordinates</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">normalize_box_coordinates</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span><span class="nb">int</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Normalize the boxes coordinates with image shape</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</li>
+<li><em>height</em>: An integer</li>
+<li><em>width</em>: An integer</li>
+</ul>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">normalize_box_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+    <span class="ss">&quot;&quot;&quot; Normalize the boxes coordinates with image shape</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]</span>
+
+<span class="ss">    - *height*: An integer</span>
+
+<span class="ss">    - *width*: An integer</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">y_min</span> <span class="o">=</span> <span class="n">y_min</span> <span class="o">/</span> <span class="n">height</span>
+
+    <span class="n">x_min</span> <span class="o">=</span> <span class="n">x_min</span> <span class="o">/</span> <span class="n">width</span>
+
+    <span class="n">y_max</span> <span class="o">=</span> <span class="n">y_max</span> <span class="o">/</span> <span class="n">height</span>
+
+    <span class="n">x_max</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">/</span> <span class="n">width</span>
+
+    <span class="o">#</span> <span class="n">Won</span><span class="err">&#39;</span><span class="n">t</span> <span class="n">be</span> <span class="n">backpropagated</span> <span class="k">to</span> <span class="n">rois</span> <span class="n">anyway</span><span class="p">,</span> <span class="n">but</span> <span class="k">to</span> <span class="n">save</span> <span class="k">time</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">boxes</span>
+</code></pre></div>
+
+</details>
+<h3 id="transform_fpcoor_for_tf">transform_fpcoor_for_tf</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">transform_fpcoor_for_tf</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">:</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tensor_shape</span><span class="p">:</span><span class="nb">tuple</span><span class="p">,</span>
+    <span class="n">crop_shape</span><span class="p">:</span><span class="nb">tuple</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
+</code></pre></div>
+
+<p>The way tf.image.crop_and_resize works (with normalized box):
+Initial point (the value of output[0]): x0_box * (W_img - 1)
+Spacing: w_box * (W_img - 1) / (W_crop - 1)
+Use the above grid to bilinear sample.</p>
+<p>However, what we want is (with fpcoor box):
+Spacing: w_box / W_crop
+Initial point: x0_box + spacing/2 - 0.5
+(-0.5 because bilinear sample (in my definition) assumes floating point coordinate
+    (0.0, 0.0) is the same as pixel value (0, 0))</p>
+<p>This function transform fpcoor boxes to a format to be used by tf.image.crop_and_resize
+This function has been taken from tensorpack:
+(https://github.com/tensorpack/tensorpack/blob/master/examples/FasterRCNN/modeling/model_box.py)</p>
+<p>Arguments:</p>
+<ul>
+<li><em>normalized_boxes</em>:  A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]. These
+boxes have already been normalized in the feature space. The coordinates are not in
+the input image space.</li>
+<li><em>tensor_shape</em>: Height and width respectively</li>
+<li><em>crop_shape</em>:</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor of shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">transform_fpcoor_for_tf</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tensor_shape</span><span class="p">:</span> <span class="n">tuple</span><span class="p">,</span> <span class="n">crop_shape</span><span class="p">:</span> <span class="n">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
+
+    <span class="ss">&quot;&quot;&quot;The way tf.image.crop_and_resize works (with normalized box):</span>
+
+<span class="ss">    Initial point (the value of output[0]): x0_box * (W_img - 1)</span>
+
+<span class="ss">    Spacing: w_box * (W_img - 1) / (W_crop - 1)</span>
+
+<span class="ss">    Use the above grid to bilinear sample.</span>
+
+<span class="ss">    However, what we want is (with fpcoor box):</span>
+
+<span class="ss">    Spacing: w_box / W_crop</span>
+
+<span class="ss">    Initial point: x0_box + spacing/2 - 0.5</span>
+
+<span class="ss">    (-0.5 because bilinear sample (in my definition) assumes floating point coordinate</span>
+
+<span class="ss">        (0.0, 0.0) is the same as pixel value (0, 0))</span>
+
+<span class="ss">    This function transform fpcoor boxes to a format to be used by tf.image.crop_and_resize</span>
+
+<span class="ss">    This function has been taken from tensorpack:</span>
+
+<span class="ss">    (https://github.com/tensorpack/tensorpack/blob/master/examples/FasterRCNN/modeling/model_box.py)</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *normalized_boxes*:  A Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)]. These</span>
+
+<span class="ss">    boxes have already been normalized in the feature space. The coordinates are not in</span>
+
+<span class="ss">    the input image space.</span>
+
+<span class="ss">    - *tensor_shape*: Height and width respectively</span>
+
+<span class="ss">    - *crop_shape*:</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor of shape [N, ..., num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">spacing_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">crop_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">spacing_w</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">crop_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">tensor_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">tensor_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+
+                            <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">tensor_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">))</span>
+
+    <span class="n">ny0</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_min</span> <span class="o">+</span> <span class="n">spacing_h</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="n">tensor_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">nx0</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_min</span> <span class="o">+</span> <span class="n">spacing_w</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="n">tensor_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">nh</span> <span class="o">=</span> <span class="n">spacing_h</span> <span class="o">*</span> <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">crop_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="n">tensor_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">nw</span> <span class="o">=</span> <span class="n">spacing_w</span> <span class="o">*</span> <span class="n">tf</span><span class="p">.</span><span class="k">cast</span><span class="p">(</span><span class="n">crop_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="n">tensor_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ny0</span><span class="p">,</span> <span class="n">nx0</span><span class="p">,</span> <span class="n">ny0</span> <span class="o">+</span> <span class="n">nh</span><span class="p">,</span> <span class="n">nx0</span> <span class="o">+</span> <span class="n">nw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../box_coder/" title="Box Coder" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Box Coder
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../constants/" title="Constants" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Constants
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Powered by
+        <a href="http://timothycrosley.github.io/portray">portray.</a>
+        You too can
+        <a href="http://timothycrosley.github.io/portray">
+          portray</a>
+        your Python project well using automatic documentation.
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../assets/javascripts/vendor.2d1db4bd.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../../assets/javascripts/worker/search.5eca75d3.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1573 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="shortcut icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.14">
+    
+    
+      
+        <title>Box Coder - kerod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.d3202873.min.css">
+      
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ff0a5ce4.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#4cae4f">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="green" data-md-color-accent="lightgreen">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#module-kerodcorebox_coder" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../../../.." title="kerod" class="md-header-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            kerod
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Box Coder
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="kerod" class="md-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    kerod
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../CONTRIBUTING/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../docs/BENCHMARKS/" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      Reference
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Reference" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" type="checkbox" id="nav-4-1" checked>
+    
+    <label class="md-nav__link" for="nav-4-1">
+      Kerod
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Kerod" data-md-level="2">
+      <label class="md-nav__title" for="nav-4-1">
+        <span class="md-nav__icon md-icon"></span>
+        Kerod
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-2" type="checkbox" id="nav-4-1-2" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-2">
+      Core
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Core
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../anchor_generator/" title="Anchor Generator" class="md-nav__link">
+      Anchor Generator
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Box Coder
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" title="Box Coder" class="md-nav__link md-nav__link--active">
+      Box Coder
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    Variables
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decode_boxes_faster_rcnn" class="md-nav__link">
+    decode_boxes_faster_rcnn
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encode_boxes_faster_rcnn" class="md-nav__link">
+    encode_boxes_faster_rcnn
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../box_ops/" title="Box Ops" class="md-nav__link">
+      Box Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../constants/" title="Constants" class="md-nav__link">
+      Constants
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../learning_rate_schedule/" title="Learning Rate Schedule" class="md-nav__link">
+      Learning Rate Schedule
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../losses/" title="Losses" class="md-nav__link">
+      Losses
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../matcher/" title="Matcher" class="md-nav__link">
+      Matcher
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../sampling_ops/" title="Sampling Ops" class="md-nav__link">
+      Sampling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../similarity/" title="Similarity" class="md-nav__link">
+      Similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../standard_fields/" title="Standard Fields" class="md-nav__link">
+      Standard Fields
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../target_assigner/" title="Target Assigner" class="md-nav__link">
+      Target Assigner
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-3" type="checkbox" id="nav-4-1-3">
+    
+    <label class="md-nav__link" for="nav-4-1-3">
+      Dataset
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Dataset" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        Dataset
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/augmentation/" title="Augmentation" class="md-nav__link">
+      Augmentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/preprocessing/" title="Preprocessing" class="md-nav__link">
+      Preprocessing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4" type="checkbox" id="nav-4-1-4">
+    
+    <label class="md-nav__link" for="nav-4-1-4">
+      Model
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Model" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-4">
+        <span class="md-nav__icon md-icon"></span>
+        Model
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detr/" title="Detr" class="md-nav__link">
+      Detr
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/factory/" title="Factory" class="md-nav__link">
+      Factory
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/faster_rcnn/" title="Faster Rcnn" class="md-nav__link">
+      Faster Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-5" type="checkbox" id="nav-4-1-4-5">
+    
+    <label class="md-nav__link" for="nav-4-1-4-5">
+      Backbone
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Backbone" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-5">
+        <span class="md-nav__icon md-icon"></span>
+        Backbone
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/fpn/" title="Fpn" class="md-nav__link">
+      Fpn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/backbone/resnet/" title="Resnet" class="md-nav__link">
+      Resnet
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-6" type="checkbox" id="nav-4-1-4-6">
+    
+    <label class="md-nav__link" for="nav-4-1-4-6">
+      Detection
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Detection" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-6">
+        <span class="md-nav__icon md-icon"></span>
+        Detection
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/abstract_detection_head/" title="Abstract Detection Head" class="md-nav__link">
+      Abstract Detection Head
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/fast_rcnn/" title="Fast Rcnn" class="md-nav__link">
+      Fast Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/pooling_ops/" title="Pooling Ops" class="md-nav__link">
+      Pooling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/detection/rpn/" title="Rpn" class="md-nav__link">
+      Rpn
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-7" type="checkbox" id="nav-4-1-4-7">
+    
+    <label class="md-nav__link" for="nav-4-1-4-7">
+      Layers
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Layers" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-7">
+        <span class="md-nav__icon md-icon"></span>
+        Layers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/positional_encoding/" title="Positional Encoding" class="md-nav__link">
+      Positional Encoding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/layers/transformer/" title="Transformer" class="md-nav__link">
+      Transformer
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-8" type="checkbox" id="nav-4-1-4-8">
+    
+    <label class="md-nav__link" for="nav-4-1-4-8">
+      Post Processing
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Post Processing" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-8">
+        <span class="md-nav__icon md-icon"></span>
+        Post Processing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/non_maximum_suppression/" title="Non Maximum Suppression" class="md-nav__link">
+      Non Maximum Suppression
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../model/post_processing/post_processing_detr/" title="Post Processing Detr" class="md-nav__link">
+      Post Processing Detr
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" type="checkbox" id="nav-4-1-5">
+    
+    <label class="md-nav__link" for="nav-4-1-5">
+      Utils
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Utils" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-5">
+        <span class="md-nav__icon md-icon"></span>
+        Utils
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/drawing/" title="Drawing" class="md-nav__link">
+      Drawing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/ops/" title="Ops" class="md-nav__link">
+      Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../utils/training/" title="Training" class="md-nav__link">
+      Training
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    Variables
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decode_boxes_faster_rcnn" class="md-nav__link">
+    decode_boxes_faster_rcnn
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encode_boxes_faster_rcnn" class="md-nav__link">
+    encode_boxes_faster_rcnn
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/EmGarr/kerod/edit/master/reference/kerod/core/box_coder.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="module-kerodcorebox_coder">Module kerod.core.box_coder</h1>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+
+<span class="kn">from</span> <span class="nn">kerod.core</span> <span class="kn">import</span> <span class="n">box_ops</span>
+
+<span class="n">EPSILON</span> <span class="o">=</span> <span class="mf">1e-8</span>
+
+<span class="k">def</span> <span class="nf">encode_boxes_faster_rcnn</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">anchors</span><span class="p">,</span> <span class="n">scale_factors</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Encode a box collection with respect to anchor collection according to the</span>
+
+<span class="sd">    [Faster RCNN paper](http://arxiv.org/abs/1506.01497).</span>
+
+<span class="sd">    Faster RCNN box coder follows the coding schema described below:</span>
+
+<span class="sd">    t_y = (y - y_a) / h_a</span>
+
+<span class="sd">    t_x &amp; = (x - x_a) / w_a</span>
+
+<span class="sd">    t_h &amp; = log(h / h_a)</span>
+
+<span class="sd">    t_w &amp; = log(w / w_a)</span>
+
+<span class="sd">    where y, x h, w denote the box&#39;s center coordinates, width and height</span>
+
+<span class="sd">    respectively. Similarly,  y_a, x_a, h_a, w_a denote the anchor&#39;s center</span>
+
+<span class="sd">    coordinates, width and height. t_y, t_x, t_h and t_w denote the anchor-encoded</span>
+
+<span class="sd">    center, height and width respectively.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *boxes*: BoxList holding N boxes to be encoded.</span>
+
+<span class="sd">    - *anchors*: BoxList of anchors.</span>
+
+<span class="sd">    - *scale_factors*: List of 4 positive scalars to scale ty, tx, th and tw.</span>
+
+<span class="sd">        If set to None, does not perform scaling. For Faster RCNN,</span>
+
+<span class="sd">        the open-source implementation recommends using [10.0, 10.0, 5.0, 5.0].</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    A tensor representing N anchor-encoded boxes of the format [ty, tx, th, tw].</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert anchors to the center coordinate representation.</span>
+
+    <span class="n">anchors</span> <span class="o">=</span> <span class="n">box_ops</span><span class="o">.</span><span class="n">convert_to_center_coordinates</span><span class="p">(</span><span class="n">anchors</span><span class="p">)</span>
+
+    <span class="n">ycenter_a</span><span class="p">,</span> <span class="n">xcenter_a</span><span class="p">,</span> <span class="n">ha</span><span class="p">,</span> <span class="n">wa</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">anchors</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">box_ops</span><span class="o">.</span><span class="n">convert_to_center_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
+
+    <span class="n">ycenter</span><span class="p">,</span> <span class="n">xcenter</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Avoid NaN in division and log below.</span>
+
+    <span class="n">ha</span> <span class="o">+=</span> <span class="n">EPSILON</span>
+
+    <span class="n">wa</span> <span class="o">+=</span> <span class="n">EPSILON</span>
+
+    <span class="n">h</span> <span class="o">+=</span> <span class="n">EPSILON</span>
+
+    <span class="n">w</span> <span class="o">+=</span> <span class="n">EPSILON</span>
+
+    <span class="n">ty</span> <span class="o">=</span> <span class="p">(</span><span class="n">ycenter</span> <span class="o">-</span> <span class="n">ycenter_a</span><span class="p">)</span> <span class="o">/</span> <span class="n">ha</span>
+
+    <span class="n">tx</span> <span class="o">=</span> <span class="p">(</span><span class="n">xcenter</span> <span class="o">-</span> <span class="n">xcenter_a</span><span class="p">)</span> <span class="o">/</span> <span class="n">wa</span>
+
+    <span class="n">th</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">h</span> <span class="o">/</span> <span class="n">ha</span><span class="p">)</span>
+
+    <span class="n">tw</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">w</span> <span class="o">/</span> <span class="n">wa</span><span class="p">)</span>
+
+    <span class="c1"># Scales location targets as used in paper for joint training.</span>
+
+    <span class="k">if</span> <span class="n">scale_factors</span><span class="p">:</span>
+
+        <span class="n">scale_factors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">scale_factors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">anchors</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">ty</span> <span class="o">*=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">tx</span> <span class="o">*=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">th</span> <span class="o">*=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">tw</span> <span class="o">*=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ty</span><span class="p">,</span> <span class="n">tx</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">tw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">decode_boxes_faster_rcnn</span><span class="p">(</span><span class="n">rel_codes</span><span class="p">,</span> <span class="n">anchors</span><span class="p">,</span> <span class="n">scale_factors</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Decode relative codes to boxes according to the</span>
+
+<span class="sd">    [Faster RCNN paper](http://arxiv.org/abs/1506.01497).</span>
+
+<span class="sd">    Faster RCNN box decoder follows the coding schema described below:</span>
+
+<span class="sd">    ycent = t_y h_a + ycent_a</span>
+
+<span class="sd">    xcent= t_x w_a + xcent_a</span>
+
+<span class="sd">    h = exp(t_h) h_a</span>
+
+<span class="sd">    w = exp(t_w) w_a</span>
+
+<span class="sd">    where t_y, t_x, t_h, t_w denote the encoded box&#39;s center coordinates, width and height</span>
+
+<span class="sd">    respectively. Similarly, ycent_a, xcent_a, h_a and w_a denote the anchor&#39;s center</span>
+
+<span class="sd">    coordinates, width and height. ycent, xcent, h and w denote the anchor-encoded</span>
+
+<span class="sd">    center, height and width respectively.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *rel_codes*: a tensor representing N anchor-encoded boxes.</span>
+
+<span class="sd">    - *anchors*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)].</span>
+
+<span class="sd">    - *scale_factors*: List of 4 positive scalars to scale ty, tx, th and tw.</span>
+
+<span class="sd">        If set to None, does not perform scaling. For Faster RCNN,</span>
+
+<span class="sd">        the open-source implementation recommends using [10.0, 10.0, 5.0, 5.0].</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    - *boxes*: A Tensor of shape [N, ..., (y_max,x_max,y2,x2)].</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">anchors</span> <span class="o">=</span> <span class="n">box_ops</span><span class="o">.</span><span class="n">convert_to_center_coordinates</span><span class="p">(</span><span class="n">anchors</span><span class="p">)</span>
+
+    <span class="n">ycenter_a</span><span class="p">,</span> <span class="n">xcenter_a</span><span class="p">,</span> <span class="n">ha</span><span class="p">,</span> <span class="n">wa</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">anchors</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">ty</span><span class="p">,</span> <span class="n">tx</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">tw</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">rel_codes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">scale_factors</span><span class="p">:</span>
+
+        <span class="n">scale_factors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">scale_factors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">anchors</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">ty</span> <span class="o">/=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">tx</span> <span class="o">/=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">th</span> <span class="o">/=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">tw</span> <span class="o">/=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="n">ycenter</span> <span class="o">=</span> <span class="n">ty</span> <span class="o">*</span> <span class="n">ha</span> <span class="o">+</span> <span class="n">ycenter_a</span>
+
+    <span class="n">xcenter</span> <span class="o">=</span> <span class="n">tx</span> <span class="o">*</span> <span class="n">wa</span> <span class="o">+</span> <span class="n">xcenter_a</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">th</span><span class="p">)</span> <span class="o">*</span> <span class="n">ha</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">tw</span><span class="p">)</span> <span class="o">*</span> <span class="n">wa</span>
+
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">ycenter</span> <span class="o">-</span> <span class="n">h</span> <span class="o">/</span> <span class="mf">2.</span>
+
+    <span class="n">xmin</span> <span class="o">=</span> <span class="n">xcenter</span> <span class="o">-</span> <span class="n">w</span> <span class="o">/</span> <span class="mf">2.</span>
+
+    <span class="n">ymax</span> <span class="o">=</span> <span class="n">ycenter</span> <span class="o">+</span> <span class="n">h</span> <span class="o">/</span> <span class="mf">2.</span>
+
+    <span class="n">xmax</span> <span class="o">=</span> <span class="n">xcenter</span> <span class="o">+</span> <span class="n">w</span> <span class="o">/</span> <span class="mf">2.</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ymin</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">xmax</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h2 id="variables">Variables</h2>
+<div class="codehilite"><pre><span></span><code><span class="n">EPSILON</span>
+</code></pre></div>
+
+<h2 id="functions">Functions</h2>
+<h3 id="decode_boxes_faster_rcnn">decode_boxes_faster_rcnn</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">decode_boxes_faster_rcnn</span><span class="p">(</span>
+    <span class="n">rel_codes</span><span class="p">,</span>
+    <span class="n">anchors</span><span class="p">,</span>
+    <span class="n">scale_factors</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Decode relative codes to boxes according to the
+<a href="http://arxiv.org/abs/1506.01497">Faster RCNN paper</a>.</p>
+<p>Faster RCNN box decoder follows the coding schema described below:</p>
+<p>ycent = t_y h_a + ycent_a <br />
+xcent= t_x w_a + xcent_a<br />
+h = exp(t_h) h_a<br />
+w = exp(t_w) w_a </p>
+<p>where t_y, t_x, t_h, t_w denote the encoded box's center coordinates, width and height
+respectively. Similarly, ycent_a, xcent_a, h_a and w_a denote the anchor's center
+coordinates, width and height. ycent, xcent, h and w denote the anchor-encoded
+center, height and width respectively.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>rel_codes</em>: a tensor representing N anchor-encoded boxes.</li>
+<li><em>anchors</em>: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)].</li>
+<li><em>scale_factors</em>: List of 4 positive scalars to scale ty, tx, th and tw.
+    If set to None, does not perform scaling. For Faster RCNN,
+    the open-source implementation recommends using [10.0, 10.0, 5.0, 5.0].</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li><em>boxes</em>: A Tensor of shape [N, ..., (y_max,x_max,y2,x2)].</li>
+</ul>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">decode_boxes_faster_rcnn</span><span class="p">(</span><span class="n">rel_codes</span><span class="p">,</span> <span class="n">anchors</span><span class="p">,</span> <span class="n">scale_factors</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
+
+    <span class="ss">&quot;&quot;&quot;Decode relative codes to boxes according to the</span>
+
+<span class="ss">    [Faster RCNN paper](http://arxiv.org/abs/1506.01497).</span>
+
+<span class="ss">    Faster RCNN box decoder follows the coding schema described below:</span>
+
+<span class="ss">    ycent = t_y h_a + ycent_a</span>
+
+<span class="ss">    xcent= t_x w_a + xcent_a</span>
+
+<span class="ss">    h = exp(t_h) h_a</span>
+
+<span class="ss">    w = exp(t_w) w_a</span>
+
+<span class="ss">    where t_y, t_x, t_h, t_w denote the encoded box&#39;s center coordinates, width and height</span>
+
+<span class="ss">    respectively. Similarly, ycent_a, xcent_a, h_a and w_a denote the anchor&#39;s center</span>
+
+<span class="ss">    coordinates, width and height. ycent, xcent, h and w denote the anchor-encoded</span>
+
+<span class="ss">    center, height and width respectively.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *rel_codes*: a tensor representing N anchor-encoded boxes.</span>
+
+<span class="ss">    - *anchors*: Tensor of shape [N, ..., (y_min,x_min,y_max,x_max)].</span>
+
+<span class="ss">    - *scale_factors*: List of 4 positive scalars to scale ty, tx, th and tw.</span>
+
+<span class="ss">        If set to None, does not perform scaling. For Faster RCNN,</span>
+
+<span class="ss">        the open-source implementation recommends using [10.0, 10.0, 5.0, 5.0].</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    - *boxes*: A Tensor of shape [N, ..., (y_max,x_max,y2,x2)].</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="n">anchors</span> <span class="o">=</span> <span class="n">box_ops</span><span class="p">.</span><span class="n">convert_to_center_coordinates</span><span class="p">(</span><span class="n">anchors</span><span class="p">)</span>
+
+    <span class="n">ycenter_a</span><span class="p">,</span> <span class="n">xcenter_a</span><span class="p">,</span> <span class="n">ha</span><span class="p">,</span> <span class="n">wa</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">anchors</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">ty</span><span class="p">,</span> <span class="n">tx</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">tw</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">rel_codes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">scale_factors</span><span class="p">:</span>
+
+        <span class="n">scale_factors</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">scale_factors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">anchors</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">ty</span> <span class="o">/=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">tx</span> <span class="o">/=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">th</span> <span class="o">/=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">tw</span> <span class="o">/=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="n">ycenter</span> <span class="o">=</span> <span class="n">ty</span> <span class="o">*</span> <span class="n">ha</span> <span class="o">+</span> <span class="n">ycenter_a</span>
+
+    <span class="n">xcenter</span> <span class="o">=</span> <span class="n">tx</span> <span class="o">*</span> <span class="n">wa</span> <span class="o">+</span> <span class="n">xcenter_a</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">th</span><span class="p">)</span> <span class="o">*</span> <span class="n">ha</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">tw</span><span class="p">)</span> <span class="o">*</span> <span class="n">wa</span>
+
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">ycenter</span> <span class="o">-</span> <span class="n">h</span> <span class="o">/</span> <span class="mi">2</span><span class="p">.</span>
+
+    <span class="n">xmin</span> <span class="o">=</span> <span class="n">xcenter</span> <span class="o">-</span> <span class="n">w</span> <span class="o">/</span> <span class="mi">2</span><span class="p">.</span>
+
+    <span class="n">ymax</span> <span class="o">=</span> <span class="n">ycenter</span> <span class="o">+</span> <span class="n">h</span> <span class="o">/</span> <span class="mi">2</span><span class="p">.</span>
+
+    <span class="n">xmax</span> <span class="o">=</span> <span class="n">xcenter</span> <span class="o">+</span> <span class="n">w</span> <span class="o">/</span> <span class="mi">2</span><span class="p">.</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ymin</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">xmax</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h3 id="encode_boxes_faster_rcnn">encode_boxes_faster_rcnn</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">encode_boxes_faster_rcnn</span><span class="p">(</span>
+    <span class="n">boxes</span><span class="p">,</span>
+    <span class="n">anchors</span><span class="p">,</span>
+    <span class="n">scale_factors</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Encode a box collection with respect to anchor collection according to the
+<a href="http://arxiv.org/abs/1506.01497">Faster RCNN paper</a>.</p>
+<p>Faster RCNN box coder follows the coding schema described below:</p>
+<p>t_y = (y - y_a) / h_a<br />
+t_x &amp; = (x - x_a) / w_a <br />
+t_h &amp; = log(h / h_a)<br />
+t_w &amp; = log(w / w_a)  </p>
+<p>where y, x h, w denote the box's center coordinates, width and height
+respectively. Similarly,  y_a, x_a, h_a, w_a denote the anchor's center
+coordinates, width and height. t_y, t_x, t_h and t_w denote the anchor-encoded
+center, height and width respectively.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boxes</em>: BoxList holding N boxes to be encoded.</li>
+<li><em>anchors</em>: BoxList of anchors.</li>
+<li><em>scale_factors</em>: List of 4 positive scalars to scale ty, tx, th and tw.
+    If set to None, does not perform scaling. For Faster RCNN,
+    the open-source implementation recommends using [10.0, 10.0, 5.0, 5.0].</li>
+</ul>
+<p>Returns:</p>
+<p>A tensor representing N anchor-encoded boxes of the format [ty, tx, th, tw].</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">encode_boxes_faster_rcnn</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">anchors</span><span class="p">,</span> <span class="n">scale_factors</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
+
+    <span class="ss">&quot;&quot;&quot;Encode a box collection with respect to anchor collection according to the</span>
+
+<span class="ss">    [Faster RCNN paper](http://arxiv.org/abs/1506.01497).</span>
+
+<span class="ss">    Faster RCNN box coder follows the coding schema described below:</span>
+
+<span class="ss">    t_y = (y - y_a) / h_a</span>
+
+<span class="ss">    t_x &amp; = (x - x_a) / w_a</span>
+
+<span class="ss">    t_h &amp; = log(h / h_a)</span>
+
+<span class="ss">    t_w &amp; = log(w / w_a)</span>
+
+<span class="ss">    where y, x h, w denote the box&#39;s center coordinates, width and height</span>
+
+<span class="ss">    respectively. Similarly,  y_a, x_a, h_a, w_a denote the anchor&#39;s center</span>
+
+<span class="ss">    coordinates, width and height. t_y, t_x, t_h and t_w denote the anchor-encoded</span>
+
+<span class="ss">    center, height and width respectively.</span>
+
+<span class="ss">    Arguments:</span>
+
+<span class="ss">    - *boxes*: BoxList holding N boxes to be encoded.</span>
+
+<span class="ss">    - *anchors*: BoxList of anchors.</span>
+
+<span class="ss">    - *scale_factors*: List of 4 positive scalars to scale ty, tx, th and tw.</span>
+
+<span class="ss">        If set to None, does not perform scaling. For Faster RCNN,</span>
+
+<span class="ss">        the open-source implementation recommends using [10.0, 10.0, 5.0, 5.0].</span>
+
+<span class="ss">    Returns:</span>
+
+<span class="ss">    A tensor representing N anchor-encoded boxes of the format [ty, tx, th, tw].</span>
+
+<span class="ss">    &quot;&quot;&quot;</span>
+
+    <span class="o">#</span> <span class="k">Convert</span> <span class="n">anchors</span> <span class="k">to</span> <span class="n">the</span> <span class="n">center</span> <span class="n">coordinate</span> <span class="n">representation</span><span class="p">.</span>
+
+    <span class="n">anchors</span> <span class="o">=</span> <span class="n">box_ops</span><span class="p">.</span><span class="n">convert_to_center_coordinates</span><span class="p">(</span><span class="n">anchors</span><span class="p">)</span>
+
+    <span class="n">ycenter_a</span><span class="p">,</span> <span class="n">xcenter_a</span><span class="p">,</span> <span class="n">ha</span><span class="p">,</span> <span class="n">wa</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">anchors</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">box_ops</span><span class="p">.</span><span class="n">convert_to_center_coordinates</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
+
+    <span class="n">ycenter</span><span class="p">,</span> <span class="n">xcenter</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span> <span class="n">num_or_size_splits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="o">#</span> <span class="n">Avoid</span> <span class="n">NaN</span> <span class="k">in</span> <span class="n">division</span> <span class="k">and</span> <span class="n">log</span> <span class="n">below</span><span class="p">.</span>
+
+    <span class="n">ha</span> <span class="o">+=</span> <span class="n">EPSILON</span>
+
+    <span class="n">wa</span> <span class="o">+=</span> <span class="n">EPSILON</span>
+
+    <span class="n">h</span> <span class="o">+=</span> <span class="n">EPSILON</span>
+
+    <span class="n">w</span> <span class="o">+=</span> <span class="n">EPSILON</span>
+
+    <span class="n">ty</span> <span class="o">=</span> <span class="p">(</span><span class="n">ycenter</span> <span class="o">-</span> <span class="n">ycenter_a</span><span class="p">)</span> <span class="o">/</span> <span class="n">ha</span>
+
+    <span class="n">tx</span> <span class="o">=</span> <span class="p">(</span><span class="n">xcenter</span> <span class="o">-</span> <span class="n">xcenter_a</span><span class="p">)</span> <span class="o">/</span> <span class="n">wa</span>
+
+    <span class="n">th</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">h</span> <span class="o">/</span> <span class="n">ha</span><span class="p">)</span>
+
+    <span class="n">tw</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">w</span> <span class="o">/</span> <span class="n">wa</span><span class="p">)</span>
+
+    <span class="o">#</span> <span class="n">Scales</span> <span class="k">location</span> <span class="n">targets</span> <span class="k">as</span> <span class="n">used</span> <span class="k">in</span> <span class="n">paper</span> <span class="k">for</span> <span class="n">joint</span> <span class="n">training</span><span class="p">.</span>
+
+    <span class="k">if</span> <span class="n">scale_factors</span><span class="p">:</span>
+
+        <span class="n">scale_factors</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">scale_factors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">anchors</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">ty</span> <span class="o">*=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">tx</span> <span class="o">*=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">th</span> <span class="o">*=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">tw</span> <span class="o">*=</span> <span class="n">scale_factors</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ty</span><span class="p">,</span> <span class="n">tx</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">tw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../anchor_generator/" title="Anchor Generator" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Anchor Generator
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../box_ops/" title="Box Ops" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Box Ops
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Powered by
+        <a href="http://timothycrosley.github.io/portray">portray.</a>
+        You too can
+        <a href="http://timothycrosley.github.io/portray">
+          portray</a>
+        your Python project well using automatic documentation.
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../assets/javascripts/vendor.2d1db4bd.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../../assets/javascripts/worker/search.5eca75d3.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>

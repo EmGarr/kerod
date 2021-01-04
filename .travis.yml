@@ -1,0 +1,29 @@
+# Disable sudo to speed up the build
+sudo: false
+
+language: python
+
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+
+install:
+  - make install
+  # Install the codecov pip dependency
+  - pip install codecov pytest pytest-cov portray
+
+script:
+  - make tests 
+  - "portray as_html -m src/kerod  && rm -rf docs/ && mv site/* ./ && rm -rf site/"
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  on:
+    python: 3.6
+    branch: master
+# Push the results back to codecov
+after_success:
+  - codecov
