@@ -187,7 +187,7 @@ class TargetAssigner:
 
         - *matches*: a tensor of float32 and shape [batch_size, N], where matches[b, i] is a matched
                ground-truth index in [b, 0, M)
-        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates
+        - *match_labels*: a tensor of int32 and shape [batch_size, N], where match_labels[i] indicates
                 whether a prediction is a true (1) or false positive (0) or ignored (-1)
 
 
@@ -215,7 +215,7 @@ class TargetAssigner:
         - *groundtruth_weights*: a float tensor of shape [M] indicating the weight to
             assign to all anchors match to a particular groundtruth box.
 
-        - *match_labels*: a tensor of int8 and shape [batch_size, N], where match_labels[i] indicates
+        - *match_labels*: a tensor of int32 and shape [batch_size, N], where match_labels[i] indicates
                 whether a prediction is a true (1) or false positive (0) or ignored (-1)
 
         Returns:

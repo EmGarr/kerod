@@ -42,9 +42,7 @@ class FasterRcnnFPN(tf.keras.Model):
         self.fpn = FPN(kernel_regularizer=self.l2)
         self.rpn = RegionProposalNetwork(kernel_regularizer=self.l2)
         self.fast_rcnn = FastRCNN(self.num_classes + 1, kernel_regularizer=self.l2)
-        # FasterRcnn cannot handle batch of unknown shape in training.
-        # It will raise an error if you save.
-        # serving false allows to bypass the check
+        # See docstring self.export_for_serving for usage
         self._serving = False
 
     def call(self, inputs, training=None):
@@ -101,8 +99,9 @@ class FasterRcnnFPN(tf.keras.Model):
 
         if training and not self._serving:
             apply_kernel_regularization(self.l2, self.backbone)
-            loss_rpn = self.rpn.compute_loss(rpn_loc_pred_per_lvl, rpn_cls_pred_per_lvl,
-                                             anchors_per_lvl, inputs['ground_truths'])
+            # add_loss stores the rpn losses computation in self.losses
+            _ = self.rpn.compute_loss(rpn_loc_pred_per_lvl, rpn_cls_pred_per_lvl, anchors_per_lvl,
+                                      inputs['ground_truths'])
 
         num_boxes = 2000 if training else 1000
         rois = post_process_rpn(rpn_cls_pred_per_lvl,
@@ -123,8 +122,8 @@ class FasterRcnnFPN(tf.keras.Model):
         classification_pred, localization_pred = self.fast_rcnn([pyramid, rois])
 
         if training and not self._serving:
-            loss_fast_rcnn = self.fast_rcnn.compute_loss(y_true, weights, classification_pred,
-                                                         localization_pred)
+            # add_loss stores the fast_rcnn losses computation in self.losses
+            _ = self.fast_rcnn.compute_loss(y_true, weights, classification_pred, localization_pred)
 
         classification_pred = tf.nn.softmax(classification_pred)
 
@@ -140,8 +139,8 @@ class FasterRcnnFPN(tf.keras.Model):
         with tf.GradientTape() as tape:
             x['ground_truths'] = y
             y_pred = self(x, training=True)
-            # All the losses are computed in the call. It's weird but it those the job
-            # They are added automatically to self.losses
+            # All the losses are computed in the call. It can seems weird but it those
+            # the job in a clean way. They are automatically added to self.losses
             loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
         self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
 
@@ -151,14 +150,13 @@ class FasterRcnnFPN(tf.keras.Model):
         data = data_adapter.expand_1d(data)
         x, y, _ = data_adapter.unpack_x_y_sample_weight(data)
 
+        x['ground_truths'] = y
         # In our graph all the metrics are computed inside the call method
         # So we set training to True to benefit from those metrics
         # Of course there is no backpropagation at the test step
-        x['ground_truths'] = y
-
         y_pred = self(x, training=True)
 
-        loss = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
+        _ = self.compiled_loss(None, y_pred, None, regularization_losses=self.losses)
 
         return {m.name: m.result() for m in self.metrics}
 

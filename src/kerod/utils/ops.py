@@ -71,12 +71,14 @@ def get_full_indices(indices):
     """
     batch_size = tf.shape(indices)[0]
     num_elements = tf.shape(indices)[1]
-    # We need to create full indices like [[0, 0], [0, 1], [1, 2], [1, 1]]
-    my_range = tf.expand_dims(tf.range(0, batch_size), 1)  # will be [[0], [1]]
-    my_range_repeated = tf.tile(my_range, [1, num_elements])  # will be [[0, 0], [1, 1]]
-    # change shapes to [N, k, 1] and [N, k, 1], to concatenate into [N, k, 2]
+    batch_ids = tf.range(0, batch_size)
+    # Repeat the batch indice for every indices per batch
+    # [0, 1, ..., n] => [[0, ..., 0], [1, ..., 1], ..., [n, ..., n]]
+    batch_ids = tf.tile(batch_ids[:, None], [1, num_elements])
+    # [[a1, ..., au], ...,[n1, ..., nu]] =>
+    # [[[0, a1], ..., [0, au]], ..., [[n, n1], ..., [n, nu]]]
     full_indices = tf.concat(
-        [tf.expand_dims(my_range_repeated, 2),
-         tf.expand_dims(indices, 2)], axis=2
+        [batch_ids[..., None], indices[..., None]],
+         axis=-1
     )
     return full_indices

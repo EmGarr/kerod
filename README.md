@@ -111,9 +111,10 @@ To run a training you just need to write the following.
 import numpy as np
 from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
 from kerod.model import factory
+from kerod.model.factory import KerodModel
 
 num_classes = 20
-model = factory.build_model(num_classes)
+model = factory.build_model(num_classes, name=KerodModel.faster_rcnn_resnet50_pytorch)
 
 # Same format than COCO and Pascal VOC in tensorflow datasets
 inputs = {
@@ -135,11 +136,17 @@ model.fit(data, epochs=2, callbacks=[ModelCheckpoint('checkpoints')])
 
 results = model.predict(data, batch_size=1)
 
-# Please use this method for serving instead of the classical save 
-model.export_for_serving('saved_model')
+use_faster_rcnn = True
+if use_faster_rcnn:
+    model.export_for_serving('saved_model')
+else:
+    model.save('saved_model')
 reload_model = tf.keras.models.load_model('saved_model')
 for x, _ in data:
-    reload_model.serving_step(x[DatasetField.IMAGES], x[DatasetField.IMAGES_INFO])
+    if use_faster_rcnn:
+        reload_model.serving_step(x[DatasetField.IMAGES], x[DatasetField.IMAGES_INFO])
+    else:
+        reload_model.predict_step(x)
 ```
 
 ### Mixed Precision
@@ -218,7 +225,8 @@ response = requests.post(url, data=json.dumps(inputs), headers=headers)
 outputs = json.loads(response.text)['outputs']
 ```
 
-The outputs will have the following format:
+See the outputs of the predict_step of your.
+For FasterRCNN they will have a similar format:
 
 - *bbox*: A Tensor of shape [batch_size, max_detections, 4]
 containing the non-max suppressed boxes. The coordinates returned are
