@@ -44,6 +44,7 @@ def test_build_detr():
 
 
 def test_compute_loss_detr():
+    """The compute loss of DETR has been tested as well with the on from the official implementation. The losses are exactly the same."""
     num_classes = 2
     # shape [2, 2, 4]
     boxes_gt = tf.constant([[[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]],
@@ -73,7 +74,7 @@ def test_compute_loss_detr():
     }
 
     detr = DeTr(num_classes, None)
-    detr.transformer.decoder.num_layers = num_layers
+    detr.transformer_num_layers = num_layers
     loss = detr.compute_loss(ground_truths, y_pred, tf.constant([2., 2.]))
     # Since y_pred has been tiled we can know
     # the losses value by multiplying by the number of layers

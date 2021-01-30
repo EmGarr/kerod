@@ -10,7 +10,7 @@ def test_transformer():
     flatten_tensor = tf.random.uniform((2, 100, d_model))
     pos_embed = tf.random.uniform((2, 100, d_model))
     object_queries = tf.random.uniform((2, 20, d_model))
-    out_decoder, out_encoder = transformer.call((flatten_tensor, None, pos_embed, object_queries))
+    out_decoder, out_encoder = transformer.call(flatten_tensor, pos_embed, object_queries)
 
     # 20 matches the number of object queries
     assert out_decoder.shape == (2, 20, d_model)

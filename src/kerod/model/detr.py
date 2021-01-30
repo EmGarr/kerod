@@ -8,8 +8,7 @@ from kerod.core.similarity import DetrSimilarity
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
-from kerod.model.layers.positional_encoding import PositionEmbeddingSine
-from kerod.model.layers.transformer import Transformer
+from kerod.model.layers import PositionEmbeddingSine, Transformer
 from kerod.model.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
 from kerod.utils import item_assignment
@@ -25,41 +24,39 @@ class DeTr(tf.keras.Model):
     You can use it as follow:
 
     ```python
-    model = Detr(80)
+    model = DeTrResnet50Pytorch(80)
     base_lr = 0.1
     optimizer = tf.keras.optimizers.SGD(learning_rate=base_lr)
-    model_faster_rcnn.compile(optimizer=optimizer, loss=None)
-    model_faster_rcnn.fit(ds_train, validation_data=ds_test, epochs=11,)
+    model.compile(optimizer=optimizer, loss=None)
+    model.fit(ds_train, validation_data=ds_test, epochs=11,)
     ```
 
     Arguments:
+        num_classes: The number of classes of your dataset
+            (**do not include the background class** it is handle for you)
+        backbone: A vision model like ResNet50.
+        num_queries: number of object queries, ie detection slot.
+            This is the maximal number of objects
+            DETR can detect in a single image. For COCO, we recommend 100 queries.
 
-    - *num_classes*: The number of classes of your dataset
-    (**do not include the background class** it is handle for you)
-    - *num_queries*: number of object queries, ie detection slot. This is the maximal number of objects
-    DETR can detect in a single image. For COCO, we recommend 100 queries.
+    Call arguments:
+        inputs: Tuple
+            1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
+            2. image_informations: A 1D tensor of float32 and shape [(height, width),].
+                It contains the shape of the image without any padding.
+            3. images_padding_mask: A 3D tensor of int8 and shape [batch_size, None, None]
+                composed of 0 and 1 which allows to know where a padding has been applied.
+        training: Is automatically set to `True` in train mode
 
-    Inputs:
+    Call returns:
+        logits: A Tensor of shape [batch_size, h, num_classes + 1] class logits
+        boxes: A Tensor of shape [batch_size, h, 4]
 
-    - *inputs*: Tuple
-        1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
-        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
-        of the image without any padding.
-        3. images_padding_mask: A 3D tensor of int8 and shape [batch_size, None, None] composed of 0 and 1 which allows to know where a padding has been applied.
-
-
-    - *training*: Is automatically set to `True` in train mode
-
-    Outputs:
-
-    - *logits*: A Tensor of shape [batch_size, h, num_classes + 1] class logits
-    - *boxes*: A Tensor of shape [batch_size, h, 4]
-
-    where h is num_queries * transformer_decoder.num_layers if
+    where h is num_queries * transformer_decoder.transformer_num_layers if
     training is true and num_queries otherwise.
     """
 
-    def __init__(self, num_classes, backbone, num_queries=100, **kwargs):
+    def __init__(self, num_classes: int, backbone, num_queries=100, **kwargs):
         super().__init__(**kwargs)
 
         self.num_classes = num_classes
@@ -69,7 +66,11 @@ class DeTr(tf.keras.Model):
         self.backbone = backbone
         self.input_proj = tf.keras.layers.Conv2D(self.hidden_dim, 1)
         self.pos_embed = PositionEmbeddingSine(output_dim=self.hidden_dim)
-        self.transformer = Transformer(d_model=self.hidden_dim, num_heads=8, dim_feedforward=2048)
+        self.transformer_num_layers = 6
+        self.transformer = Transformer(num_layers=self.transformer_num_layers,
+                                       d_model=self.hidden_dim,
+                                       num_heads=8,
+                                       dim_feedforward=2048)
 
         self.bbox_embed = tf.keras.models.Sequential([
             tf.keras.layers.Dense(self.hidden_dim, activation='relu'),
@@ -138,7 +139,7 @@ class DeTr(tf.keras.Model):
         - *logits*: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
         - *boxes*: A Tensor of shape [batch_size, num_queries, 4]
 
-        where h is num_queries * transformer_decoder.num_layers if
+        where h is num_queries * transformer_decoder.transformer_num_layers if
         training is true and num_queries otherwise.
         """
         images = inputs[DatasetField.IMAGES]
@@ -167,7 +168,10 @@ class DeTr(tf.keras.Model):
         # Flatten the padding masks
         features_mask = tf.reshape(features_mask, (batch_size, -1))
 
-        decoder_out, _ = self.transformer((x, features_mask, pos_embed, query_embed),
+        decoder_out, _ = self.transformer(x,
+                                          pos_embed,
+                                          query_embed,
+                                          key_padding_mask=features_mask,
                                           training=training)
         boxes = self.bbox_embed(decoder_out)
         logits = self.class_embed(decoder_out)
@@ -208,12 +212,8 @@ class DeTr(tf.keras.Model):
             BoxField.NUM_BOXES:
                 ground_truths[BoxField.NUM_BOXES]
         }
-        boxes_per_lvl = tf.split(y_pred[BoxField.BOXES],
-                                 self.transformer.decoder.num_layers,
-                                 axis=1)
-        logits_per_lvl = tf.split(y_pred[BoxField.SCORES],
-                                  self.transformer.decoder.num_layers,
-                                  axis=1)
+        boxes_per_lvl = tf.split(y_pred[BoxField.BOXES], self.transformer_num_layers, axis=1)
+        logits_per_lvl = tf.split(y_pred[BoxField.SCORES], self.transformer_num_layers, axis=1)
 
         y_pred_per_lvl = [{
             BoxField.BOXES: boxes,
@@ -225,7 +225,7 @@ class DeTr(tf.keras.Model):
         # Compute the Giou, L1 and SCC at each layers of the transformer decoder
         for i, y_pred in enumerate(y_pred_per_lvl):
             # Logs the metrics for the last layer of the decoder
-            compute_metrics = i == self.transformer.decoder.num_layers - 1
+            compute_metrics = i == self.transformer_num_layers - 1
             loss += self._compute_loss(y_pred,
                                        ground_truths,
                                        num_boxes,

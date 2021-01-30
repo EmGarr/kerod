@@ -1,5 +1,5 @@
 import tensorflow as tf
-from kerod.model.layers.attentions import MultiHeadAttention
+from kerod.model.layers import MultiHeadAttention
 
 
 class EncoderLayer(tf.keras.layers.Layer):
@@ -7,25 +7,22 @@ class EncoderLayer(tf.keras.layers.Layer):
     [End-to-End Object Detection with Transformers](https://arxiv.org/abs/2005.12872)
 
     Arguments:
-
-    - *d_model*: The number of expected features in the encoder inputs
-    - *num_heads*: The number of heads in the multiheadattention models.
-    - *dim_feedforward*: The dim of the feedforward neuralnetworks in the EncoderLayer.
-    - *dropout_rate*: Float between 0 and 1. Fraction of the input units to drop.
-    The same rate is shared in all the layers using dropout in the transformer.
+        d_model: The number of expected features in the encoder inputs
+        num_heads: The number of heads in the multiheadattention models.
+            dim_feedforward: The dim of the feedforward neuralnetworks in the EncoderLayer.
+        dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
+            The same rate is shared in all the layers using dropout in the transformer.
 
     Inputs:
-
-    - *src*: A 3-D Tensor of float32 and shape [batch_size, M, dim]
-    the sequence to the encoder layer
-    - *pos_embed*: A 3-D Tensor of float32 and shape [batch_size, N, dim]
-    positional encoding of the encoder
-    - *mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
-    False means padding and True means pixel from the original image.
+        src: A 3-D Tensor of float32 and shape [batch_size, M, dim]
+            the sequence to the encoder layer
+        pos_embed: A 3-D Tensor of float32 and shape [batch_size, N, dim]
+            positional encoding of the encoder
+        key_padding_mask:  [Optional] A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
+            False means padding and True means pixel from the original image.
 
     Output:
-
-    A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+        A 3-D Tensor of float32 and shape [batch_size, M, d_model]
     """
 
     def __init__(self,
@@ -49,25 +46,25 @@ class EncoderLayer(tf.keras.layers.Layer):
         self.dropout1 = tf.keras.layers.Dropout(dropout_rate)
         self.dropout2 = tf.keras.layers.Dropout(dropout_rate)
 
-    def call(self, inputs, training=None):
-        """ Forward of the EncoderLayer
+    def call(self, src, pos_emb, key_padding_mask=None, training=None):
+        """Forward of the EncoderLayer
 
-        Arguments (inputs):
+        Args:
+            src: A 3-D Tensor of float32 and shape [batch_size, M, dim]
+                the sequence to the encoder layer
+            pos_embed: A 3-D Tensor of float32 and shape [batch_size, N, dim]
+                positional encoding of the encoder
+            key_padding_mask: [Optional] A 2-D bool Tensor of shape [batch_size, seq_len_enc]
+                where False means padding and True means pixel from the original image.
 
-        - *src*: A 3-D Tensor of float32 and shape [batch_size, M, dim]
-        the sequence to the encoder layer
-        - *pos_embed*: A 3-D Tensor of float32 and shape [batch_size, N, dim]
-        positional encoding of the encoder
-        - *mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
-        False means padding and True means pixel from the original image.
-
-        Return:
-        A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+        Returns:
+            A 3-D Tensor of float32 and shape [batch_size, M, d_model]
         """
-
-        src, pos_emb, mask = inputs
         x_pos_emb = src + pos_emb
-        attn_output = self.mha((src, x_pos_emb, x_pos_emb, mask),
+        attn_output = self.mha(value=src,
+                               key=x_pos_emb,
+                               query=x_pos_emb,
+                               key_padding_mask=key_padding_mask,
                                training=training)  # (batch_size, input_seq_len, d_model)
         attn_output = self.dropout1(attn_output, training=training)
         out1 = self.layernorm1(src + attn_output)  # (batch_size, input_seq_len, d_model)
@@ -84,26 +81,29 @@ class DecoderLayer(tf.keras.layers.Layer):
     [End-to-End Object Detection with Transformers](https://arxiv.org/abs/2005.12872)
 
     Arguments:
-
-    - *d_model*: The number of expected features in the encoder inputs
-    - *num_heads*: The number of heads in the multiheadattention models.
-    - *dim_feedforward*: The dim of the feedforward neuralnetworks in the EncoderLayer.
-    - *dropout_rate*: Float between 0 and 1. Fraction of the input units to drop.
-    The same rate is shared in all the layers using dropout in the transformer.
-
+        d_model: The number of expected features in the encoder inputs
+        num_heads: The number of heads in the multiheadattention models.
+        dim_feedforward: The dim of the feedforward neuralnetworks in the DecoderLayer.
+        dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
+            The same rate is shared in all the layers using dropout in the transformer.
 
     Inputs:
+        dec_out: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+            the sequence of the decoder
+        memory: A 3-D Tensor of float32 and shape [batch_size, N, d_model]
+            the sequence from the last layer of the encoder (memory)
+        pos_embed: A 3-D Tensor of float32 and shape [batch_size, N, d_model]
+            positional encoding of the encoder
+        object_queries: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+        key_padding_mask: A 2-D bool Tensor of shape [batch_size, seq_len].
+            The positions with the value of ``True`` will be ignored while
+            the position with the value of ``False`` will be unchanged.
+        coattn_mask:  A 4-D float tensor of shape [batch_size, num_heads, M, N, seq_len].
+            If provided, it will be added to the attention weight at
+            the coattention step (memory x self_attn).
 
-    - *tgt*: A 3-D Tensor of float32 and shape [batch_size, M, d_model] the sequence of the decoder
-    - *memory*: A 3-D Tensor of float32 and shape [batch_size, N, d_model] the sequence
-    from the last layer of the encoder (memory)
-    - *pos_embed*: A 3-D Tensor of float32 and shape [batch_size, N, d_model] positional encoding
-    of the encoder
-    - *object_queries*: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
-
-    Output:
-
-    A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+    Outputs:
+        A 3-D Tensor of float32 and shape [batch_size, M, d_model]
     """
 
     def __init__(self,
@@ -130,216 +130,92 @@ class DecoderLayer(tf.keras.layers.Layer):
         self.dropout2 = tf.keras.layers.Dropout(dropout_rate)
         self.dropout3 = tf.keras.layers.Dropout(dropout_rate)
 
-    def call(self, inputs, training=None):
+    def call(self,
+             dec_out,
+             memory,
+             pos_embed,
+             object_queries,
+             key_padding_mask=None,
+             coattn_mask=None,
+             training=None):
         """ Forward of the DecoderLayer
 
-        Arguments (inputs):
-
-        - *tgt*: A 3-D Tensor of float32 and shape [batch_size, M, d_model] the sequence of the decoder
-        - *memory*: A 3-D Tensor of float32 and shape [batch_size, N, d_model] the sequence
-        from the last layer of the encoder (memory)
-        - *pos_embed*: A 3-D Tensor of float32 and shape [batch_size, N, d_model] positional encoding
-        of the encoder
-        - *object_queries*: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+        Arguments:
+            dec_out: A 3-D Tensor of float32 and shape [batch_size, M, d_model] the sequence of the decoder
+            memory: A 3-D Tensor of float32 and shape [batch_size, N, d_model] the sequence
+                from the last layer of the encoder (memory)
+            pos_embed: A 3-D Tensor of float32 and shape [batch_size, N, d_model] positional encoding
+                of the encoder
+            object_queries: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+            key_padding_mask: A 2-D bool Tensor of shape [batch_size, seq_len]. the positions with the
+                value of ``True`` will be ignored while the position with the value of ``False`` will be unchanged.
+            coattn_mask:  A 4-D float tensor of shape [batch_size, num_heads, M, N, seq_len].
+                If provided, it will be added to the attention weight at the coattention step (memory x self_attn)
 
         Return:
-        A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+            A 3-D Tensor of float32 and shape [batch_size, M, d_model]
         """
-        tgt, memory, pos_embed, object_queries, mask = inputs
-
-        tgt_object_queries = tgt + object_queries
+        tgt_object_queries = dec_out + object_queries
         # (batch_size, M, d_model)
-        attn1 = self.mha1((tgt, tgt_object_queries, tgt_object_queries, None), training=training)
-        attn1 = self.dropout1(attn1, training=training)
-        out1 = self.layernorm1(attn1 + tgt)
+        self_attn = self.mha1(value=dec_out,
+                              key=tgt_object_queries,
+                              query=tgt_object_queries,
+                              training=training)
+        self_attn = self.dropout1(self_attn, training=training)
+        self_attn = self.layernorm1(self_attn + dec_out)
 
         # (batch_size, M, d_model)
-        attn2 = self.mha2((memory, memory + pos_embed, out1 + object_queries, mask),
-                          training=training)
-        attn2 = self.dropout2(attn2, training=training)
-        out2 = self.layernorm2(attn2 + out1)  # (batch_size, M, d_model)
+        co_attn = self.mha2(value=memory,
+                            key=memory + pos_embed,
+                            query=self_attn + object_queries,
+                            key_padding_mask=key_padding_mask,
+                            attn_mask=coattn_mask,
+                            training=training)
+        co_attn = self.dropout2(co_attn, training=training)
+        co_attn = self.layernorm2(co_attn + self_attn)  # (batch_size, M, d_model)
 
-        ffn_output = self.ffn(out2)  # (batch_size, M, d_model)
+        ffn_output = self.ffn(co_attn)  # (batch_size, M, d_model)
         ffn_output = self.dropout3(ffn_output, training=training)
-        out3 = self.layernorm3(ffn_output + out2)  # (batch_size, M, d_model)
+        out3 = self.layernorm3(ffn_output + co_attn)  # (batch_size, M, d_model)
         return out3
-
-
-class Encoder(tf.keras.layers.Layer):
-    """Will build a TransformerEncoder according to the paper
-    [End-to-End Object Detection with Transformers](https://arxiv.org/abs/2005.12872)
-    TransformerEncoder is a stack of N encoder layers.
-
-    Arguments:
-
-    - *num_layers*: the number of sub-layers in the encoder.
-    - *d_model*: The number of expected features in the encoder inputs
-    - *num_heads*: The number of heads in the multiheadattention models.
-    - *dim_feedforward*: The dim of the feedforward neuralnetworks in the EncoderLayer.
-    - *dropout_rate*: Float between 0 and 1. Fraction of the input units to drop.
-    The same rate is shared in all the layers using dropout in the transformer.
-
-    Inputs:
-
-    - *src*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model]
-    the sequence to the encoder.
-    - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model].
-    Positional spatial positional encoding matching the flatten_tensor.
-    - *mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
-    False means padding and True means pixel from the original image.
-
-    Output:
-
-    A 3-D Tensor of float32 and shape [batch_size, seq_len_enc, d_model]
-    """
-
-    def __init__(self,
-                 num_layers: int,
-                 d_model: int,
-                 num_heads: int,
-                 dim_feedforward: int,
-                 dropout_rate=0.1,
-                 **kwargs):
-        super().__init__(**kwargs)
-
-        self.d_model = d_model
-        self.enc_layers = [
-            EncoderLayer(d_model, num_heads, dim_feedforward, dropout_rate)
-            for _ in range(num_layers)
-        ]
-
-    def call(self, inputs, training=None):
-        """
-        Arguments (inputs):
-
-        - *src*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model]
-        the sequence to the encoder.
-        - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model].
-        Positional spatial positional encoding matching the flatten_tensor.
-        - *mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
-        False means padding and True means pixel from the original image.
-
-        Return:
-
-        A 3-D Tensor of float32 and shape [batch_size, seq_len_enc, d_model]
-        """
-        src, pos_embed, mask = inputs
-
-        for enc in self.enc_layers:
-            src = enc((src, pos_embed, mask), training=training)
-
-        return src  # (batch_size, input_seq_len, d_model)
-
-
-class Decoder(tf.keras.layers.Layer):
-    """Will build a TransformerDecoder according to the paper
-    [End-to-End Object Detection with Transformers](https://arxiv.org/abs/2005.12872)
-    TransformerDecoder is a stack of N decoder layers.
-
-    Arguments:
-
-    - *num_layers*: the number of sub-layers in the decoder.
-    - *d_model*: The number of expected features in the decoder inputs
-    - *num_heads*: The number of heads in the multiheadattention models.
-    - *dim_feedforward*: The dim of the feedforward neuralnetworks in the DecoderLayer
-    - *dropout_rate*: Float between 0 and 1. Fraction of the input units to drop.
-    The same rate is shared in all the layers using dropout in the transformer.
-
-    Inputs:
-
-    - *memory*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model].
-    the sequence from the last layer of the encoder.
-    - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model]. Positional spatial positional encoding matching the flatten_tensor.
-    - *object_queries*: A 3-D float32 Tensor of shape [batch_size, num_queries, d_model] small fixed number of learned positional embeddings input of the decoder.
-    - *memory_padding_mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where False means padding and True means pixel from the original image.
-
-    Output:
-
-    A 3-D Tensor of float32 and shape [batch_size, h , d_model]
-    where h is num_queries * num_layers if training is true and num_queries
-    if training is set to False.
-    """
-
-    def __init__(self, num_layers, d_model, num_heads, dim_feedforward, dropout_rate=0.1, **kwargs):
-
-        super().__init__(**kwargs)
-
-        self.d_model = d_model
-        self.num_layers = num_layers
-
-        self.layer_norm = tf.keras.layers.LayerNormalization(epsilon=1e-5)
-        self.dec_layers = [
-            DecoderLayer(d_model, num_heads, dim_feedforward, dropout_rate)
-            for _ in range(num_layers)
-        ]
-
-    def call(self, inputs, training=None):
-        """
-        Arguments (inputs):
-
-        - *memory*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model].
-        the sequence from the last layer of the encoder.
-        - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, seq_len_enc, d_model]. Positional spatial positional encoding matching the flatten_tensor.
-        - *object_queries*: A 3-D float32 Tensor of shape [batch_size, num_queries, d_model] small fixed number of learned positional embeddings input of the decoder.
-        - *memory_padding_mask*:  A 2-D bool Tensor of shape [batch_size, seq_len_enc] where False means padding and True means pixel from the original image.
-
-        Return:
-
-        A 3-D Tensor of float32 and shape [batch_size, h , d_model]
-        where h is num_queries * num_layers if training is true and num_queries
-        if training is set to False.
-        """
-        memory, pos_embed, object_queries, memory_padding_mask = inputs
-
-        # At the beginning we set target to 0
-        # In the first decoder layer Q and K will be equal
-        # to tgt + object_queries=object_queries
-        tgt = tf.zeros_like(object_queries)
-        layers_output = []
-        for layer in self.dec_layers:
-            tgt = layer((tgt, memory, pos_embed, object_queries, memory_padding_mask),
-                        training=training)
-            tgt = self.layer_norm(tgt)
-            if training:
-                layers_output.append(tgt)
-        if training:
-            return tf.concat(layers_output, axis=1)
-        return tgt
 
 
 class Transformer(tf.keras.Model):
     """Will build a Transformer according to the paper
-    [End-to-End Object Detection with Transformers](https://arxiv.org/abs/2005.12872)
+      [Fast Convergence of DETR with Spatially Modulated Co-Attention](https://arxiv.org/pdf/2101.07448.pdf).
 
-    Arguments:
+    Args:
+        num_layers: the number of sub-layers in the decoder and the encoder.
+        d_model: The number of expected features in the encoder/decoder inputs
+        num_heads: The number of heads in the multiheadattention models.
+        dim_feedforward: The dim of the feedforward neuralnetworks in
+            the EncoderLayer and DecoderLayer
+        dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
+            The same rate is shared in all the layers using dropout in the transformer.
 
-    - *num_layers*: the number of sub-layers in the decoder and the encoder.
-    - *d_model*: The number of expected features in the encoder/decoder inputs
-    - *num_heads*: The number of heads in the multiheadattention models.
-    - *dim_feedforward*: The dim of the feedforward neuralnetworks in the EncoderLayer and DecoderLayer
-    - *dropout_rate*: Float between 0 and 1. Fraction of the input units to drop.
-    The same rate is shared in all the layers using dropout in the transformer.
+    Call arguments:
+        flatten_tensor: A 3-D float32 Tensor of shape
+            [batch_size, H * W, d_model].
+            It represents the flatten output tensor of the backbone.
+        pos_embed: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].
+            Positional spatial positional encoding matching the flatten_tensor.
+        object_queries: A 3-D float32 Tensor of shape
+            [batch_size, num_object_queries, d_model] small fixed number of
+            learned positional embeddings input of the decoder.
+        key_padding_mask:  A 2-D bool Tensor of shape [batch_size, H * W]
+            where False means padding and True means pixels
+            from the original image.
+        coattn_mask:  A 4-D float tensor of shape
+            [batch_size, num_heads, H*W, num_object_queries, seq_len].
+            If provided, it will be added to the attention weight
+            at the coattention step (memory x self_attn)
 
-    Inputs:
+    Call Returns:
+        decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]
+            where h is num_object_queries * num_layers if training is true and
+            num_queries if training is set to False.
+        encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]
 
-    - *flatten_tensor*: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].
-    It represents the flatten output tensor of the backbone.
-    - *mask*:  A 2-D bool Tensor of shape [batch_size, H * W] where False means
-    padding and True means pixel from the original image.
-    - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].
-    Positional spatial positional encoding matching the flatten_tensor.
-    - *object_queries*: A 3-D float32 Tensor of shape [batch_size, num_object_queries, d_model]
-    small fixed number of learned positional embeddings input of the decoder.
-
-    Outputs:
-
-    - *decoder_output*: 3-D float32 Tensor of shape [batch_size, num_object_queries, d_model]
-    Due to the multi-head attention architecture in the transformer model,
-    the output sequence length of a transformer is same as the input
-    sequence (i.e. target) length of the decoder (num_object_queries).
-    - *encoder_output*: A 3-D Tensor of float32 and shape [batch_size, h , d_model]
-    where h is num_queries * num_layers if training is true and num_queries
-    if training is set to False.
     """
 
     def __init__(self,
@@ -352,36 +228,72 @@ class Transformer(tf.keras.Model):
 
         super().__init__(**kwargs)
 
-        self.encoder = Encoder(num_layers, d_model, num_heads, dim_feedforward, dropout_rate)
+        self.num_heads = num_heads
+        self.layer_norm = tf.keras.layers.LayerNormalization(epsilon=1e-5)
 
-        self.decoder = Decoder(num_layers, d_model, num_heads, dim_feedforward, dropout_rate)
+        self.enc_layers = [
+            EncoderLayer(d_model, num_heads, dim_feedforward, dropout_rate)
+            for _ in range(num_layers)
+        ]
 
-    def call(self, inputs, training=None):
+        self.dec_layers = [
+            DecoderLayer(d_model, num_heads, dim_feedforward, dropout_rate)
+            for _ in range(num_layers)
+        ]
+
+    def call(self,
+             flatten_tensor,
+             pos_embed,
+             object_queries,
+             key_padding_mask=None,
+             coattn_mask=None,
+             training=None):
         """
-        Arguments (inputs):
-
-        - *flatten_tensor*: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].
-        It represents the flatten output tensor of the backbone.
-        - *mask*:  A 2-D bool Tensor of shape [batch_size, H * W] where False means
-        padding and True means pixel from the original image.
-        - *pos_embed*: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].
-        Positional spatial positional encoding matching the flatten_tensor.
-        - *object_queries*: A 3-D float32 Tensor of shape [batch_size, num_object_queries, d_model]
-        small fixed number of learned positional embeddings input of the decoder.
-
+        Args:
+            flatten_tensor: A 3-D float32 Tensor of shape
+                [batch_size, H * W, d_model].
+                It represents the flatten output tensor of the backbone.
+            pos_embed: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].
+                Positional spatial positional encoding matching the flatten_tensor.
+            object_queries: A 3-D float32 Tensor of shape
+                [batch_size, num_object_queries, d_model] small fixed number of
+                learned positional embeddings input of the decoder.
+            key_padding_mask:  A 2-D bool Tensor of shape [batch_size, H * W]
+                where False means padding and True means pixels
+                from the original image.
+            coattn_mask:  A 4-D float tensor of shape
+                [batch_size, num_heads, H*W, num_object_queries, seq_len].
+                If provided, it will be added to the attention weight
+                at the coattention step (memory x self_attn)
         Returns:
-
-        - *decoder_output*: 3-D float32 Tensor of shape [batch_size, num_object_queries, d_model]
-        Due to the multi-head attention architecture in the transformer model,
-        the output sequence length of a transformer is same as the input
-        sequence (i.e. target) length of the decoder (num_object_queries).
-        - *encoder_output*: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]
+            decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]
+                where h is num_object_queries * num_layers if training is true and
+                num_queries if training is set to False.
+            encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]
         """
-        flatten_tensor, mask, pos_embed, object_queries = inputs
-        # (batch_size, inp_seq_len, d_model)
-        memory = self.encoder((flatten_tensor, pos_embed, mask), training=training)
+        memory = flatten_tensor
+        for enc in self.enc_layers:
+            # (batch_size, seq_len, d_model)
+            memory = enc(memory, pos_embed, key_padding_mask=key_padding_mask, training=training)
 
-        # dec_output.shape == (batch_size, tar_seq_len, d_model)
-        dec_output = self.decoder((memory, pos_embed, object_queries, mask), training=training)
+        # At the beginning we set target to 0
+        # In the first decoder layer Q and K will be equal
+        # to dec_out + object_queries=object_queries
+        dec_out = tf.zeros_like(object_queries)
+        layers_output = []
+        for layer in self.dec_layers:
+            dec_out = layer(dec_out,
+                            memory,
+                            pos_embed,
+                            object_queries,
+                            key_padding_mask=key_padding_mask,
+                            coattn_mask=coattn_mask,
+                            training=training)
+            dec_out = self.layer_norm(dec_out)
+            if training:
+                layers_output.append(dec_out)
 
-        return dec_output, memory
+        if training:
+            return tf.concat(layers_output, axis=1), memory
+
+        return dec_out, memory
