@@ -31,7 +31,8 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 
 - [x] [Feature Pyramidal Network](https://arxiv.org/abs/1612.03144) 
 - [x] DeTr from: [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers)
-- [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (Much of the pieces are already here just need to put everything together. It will arrive soon.). 
+- [x] Single scale SMCA: [Fast Convergence of DETR with Spatially Modulated Co-Attention](https://arxiv.org/pdf/2101.07448.pdf)
+- [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (Much of the pieces are already here just need to put everything together. It will arrive soon.)
 
 ## Try Kerod 
 

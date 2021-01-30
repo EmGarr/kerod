@@ -15,6 +15,19 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
     of y=0.62, x=0.73, height=0.33 and width=0.31.
 
     ![Spatial weight map](https://raw.githubusercontent.com/EmGarr/cv/master/ressources/spatial_weight_map.png)
+
+    Args:
+        beta: Modulate the bandwidth of the Gaussian-like distribution.
+
+    Call arguments:
+        height: The targeted height
+        width: The targeted width
+        ref_points: A tensor of shape [batch_size, N, heads, (y, x, h, w)] in [0, 1]
+
+    Returns:
+        weight_map: A 4D tensor of float 32 and shape
+            [batch_size, N, heads, height, width] representing
+            a weight map per reference points.
     """
 
     def __init__(self, beta=1.):
@@ -31,7 +44,7 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
         Returns:
             weight_map: A 4D tensor of float 32 and shape
                 [batch_size, N, heads, height, width] representing
-                a weight map per reference points..
+                a weight map per reference points.
         """
         x = tf.cast(tf.linspace(0, 1, width), self.dtype)
         y = tf.cast(tf.linspace(0, 1, height), self.dtype)
@@ -39,7 +52,19 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
 
         return self.gaussian_weight_map(x, y, ref_points)
 
-    def gaussian_weight_map(self, x, y, ref_points):
+    def gaussian_weight_map(self, x: tf.Tensor, y: tf.Tensor, ref_points: tf.Tensor) -> tf.Tensor:
+        """ From the x and y meshgrids and the reference points create the gaussian like weight map.
+
+        Args:
+            x: A 2-D tensor of float and shape [height, width] meshgrid
+            y: A 2-D tensor of float and shape [height, width] meshgrid
+            ref_points: A tensor of shape [batch_size, N, heads, (y, x, h, w)] in [0, 1]
+
+        Returns:
+            weight_map: A 4D tensor of float 32 and shape
+                [batch_size, N, heads, height, width] representing
+                a weight map per reference points.
+        """
         y_cent, x_cent, height, width = tf.split(ref_points, 4, axis=-1)
 
         # [batch_size, N, heads, 1] => [batch_size, N, heads, 1, 1]
