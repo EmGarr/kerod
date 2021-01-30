@@ -5,7 +5,6 @@ import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
-from kerod.core.anchor_generator import Anchors
 from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.losses import L1Loss
@@ -14,6 +13,7 @@ from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.standard_fields import BoxField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
+from kerod.model.layers import Anchors
 
 SAMPLING_SIZE = 256
 SAMPLING_POSITIVE_RATIO = 0.5
@@ -172,10 +172,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
         weights[BoxField.LABELS] = sample_idx * weights[BoxField.LABELS]
         weights[BoxField.BOXES] = sample_idx * weights[BoxField.BOXES]
 
-        y_pred = {
-            BoxField.LABELS: classification_pred,
-            BoxField.BOXES: localization_pred
-        }
+        y_pred = {BoxField.LABELS: classification_pred, BoxField.BOXES: localization_pred}
 
         return self.compute_losses(y_true, y_pred, weights)
 
