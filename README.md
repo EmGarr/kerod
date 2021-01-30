@@ -31,7 +31,8 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 
 - [x] [Feature Pyramidal Network](https://arxiv.org/abs/1612.03144) 
 - [x] DeTr from: [End to end object detection with transformers](https://ai.facebook.com/research/publications/end-to-end-object-detection-with-transformers)
-- [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (Much of the pieces are already here just need to put everything together. It will arrive soon.). 
+- [x] Single scale SMCA: [Fast Convergence of DETR with Spatially Modulated Co-Attention](https://arxiv.org/pdf/2101.07448.pdf)
+- [ ] [Mask-RCNN](https://arxiv.org/abs/1703.06870) (Much of the pieces are already here just need to put everything together. It will arrive soon.)
 
 ## Try Kerod 
 
@@ -48,6 +49,7 @@ You can find examples in the [notebooks folder](./notebooks). There are no runne
 | [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | COCO      |             |                    |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training.ipynb)                             |   |
 | [FasterRcnnFPNResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/faster_rcnn.py) | COCO      | 30 mAP on old code base. A bug has been removed since. I need 4 GPUs to rerun the training. | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/coco_training_multi_gpu.ipynb)                   |   |
 | [DetrResnet50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/detr.py) | COCO      | NEED 16 GPUS for 3 days | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/detr_coco_training_multi_gpu.ipynb)              |   |
+| [SMCAR50Pytorch](https://github.com/EmGarr/kerod/blob/master/src/kerod/model/smca_detr.py) | COCO      | NEED 8 GPUS for 1 days  | :heavy_check_mark: |                   | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Emgarr/kerod/blob/master/notebooks/smca_coco_training_multi_gpu.ipynb)          |   |
 
 Pytorch: means resnet implementation Pytorch style. In the residual block we have: conv (1x1) stride 1 -> conv (3x3) stride 2 instead of conv (1x1) stride 2 -> conv (3x3) stride 1 (Caffe, Keras implementations)
 

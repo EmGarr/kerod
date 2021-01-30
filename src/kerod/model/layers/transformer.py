@@ -52,7 +52,7 @@ class EncoderLayer(tf.keras.layers.Layer):
         Args:
             src: A 3-D Tensor of float32 and shape [batch_size, M, dim]
                 the sequence to the encoder layer
-            pos_embed: A 3-D Tensor of float32 and shape [batch_size, N, dim]
+            pos_embed: A 3-D Tensor of float32 and shape [batch_size, M, dim]
                 positional encoding of the encoder
             key_padding_mask: [Optional] A 2-D bool Tensor of shape [batch_size, seq_len_enc]
                 where False means padding and True means pixel from the original image.

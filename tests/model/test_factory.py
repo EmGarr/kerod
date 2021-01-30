@@ -1,14 +1,14 @@
 import os
-
 from functools import partial
-import numpy as np
-import tensorflow as tf
-from tensorflow.keras.callbacks import ModelCheckpoint
 
+import numpy as np
+import pytest
+import tensorflow as tf
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.dataset.preprocessing import (expand_dims_for_single_batch, preprocess)
 from kerod.model import factory
 from kerod.model.factory import KerodModel
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 
 def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
@@ -64,9 +64,10 @@ def test_build_fpn_resnet50_faster_rcnn_from_factory(tmpdir):
         reload_model.serving_step(x[DatasetField.IMAGES], x[DatasetField.IMAGES_INFO])
 
 
-def test_detr(tmpdir):
+@pytest.mark.parametrize("model_name", [KerodModel.smca_r50, KerodModel.detr_resnet50])
+def test_detr_like_architecture(model_name, tmpdir):
     num_classes = 20
-    model = factory.build_model(num_classes, name=KerodModel.detr_resnet50)
+    model = factory.build_model(num_classes, name=model_name)
 
     # Look at the trainable structure after the factory
     is_trainable = False
