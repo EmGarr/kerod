@@ -16,7 +16,7 @@ from kerod.model.post_processing.post_processing_detr import \
 from tensorflow.python.keras.engine import data_adapter
 
 
-class ReferencePoints(tf.keras.layers):
+class ReferencePoints(tf.keras.layers.Layer):
     """Reference points from the paper [Fast Convergence of DETR with Spatially Modulated Co-Attention](https://arxiv.org/pdf/2101.07448.pdf).
     Based on the object queries will create a set of reference points which will
     allow to create a spatial dynamical weight maps in order to modulate
@@ -38,7 +38,8 @@ class ReferencePoints(tf.keras.layers):
             The embedding of y and x without the sigmoid applied.
     """
 
-    def __init__(self, hidden_dim: int, num_heads: int):
+    def __init__(self, hidden_dim: int, num_heads: int, **kwargs):
+        super().__init__(**kwargs)
         self.num_heads = num_heads
         self.xy_embed = tf.keras.models.Sequential([
             tf.keras.layers.Dense(hidden_dim, activation='relu'),
@@ -46,7 +47,7 @@ class ReferencePoints(tf.keras.layers):
             tf.keras.layers.Dense(2)  # (y_cent, x_cent)
         ])
         # Each head will have its proper focus weight and width
-        self.yx_offset_hw_embed = tf.keras.layers.Dense(2 * num_heads)
+        self.yx_offset_hw_embed = tf.keras.layers.Dense(4 * num_heads)
 
     def call(self, object_queries):
         """
@@ -169,14 +170,10 @@ class SMCA(tf.keras.Model):
                                               lambda gt, pred: gt,
                                               negative_class_weight=1.0)
 
-        # Relative classification weight applied to the no-object category
-        # It down-weight the log-probability term of a no-object
-        # by a factor 10 to account for class imbalance
-        self.non_object_weight = tf.constant(0.1, dtype=self.compute_dtype)
-
         # Losses
         self.giou = tfa.losses.GIoULoss(reduction=tf.keras.losses.Reduction.NONE)
         self.l1 = L1Loss(reduction=tf.keras.losses.Reduction.NONE)
+        # TODO checkout the parameters of the focal_loss in the paper
         self.focal_loss = tfa.losses.SigmoidFocalCrossEntropy(
             reduction=tf.keras.losses.Reduction.NONE, from_logits=True)
 
@@ -233,6 +230,7 @@ class SMCA(tf.keras.Model):
         all_the_queries = tf.tile(self.all_the_queries[None], (batch_size, 1))
         # [batch_size, num_queries, self.hidden_dim]
         query_embed = self.query_embed(all_the_queries)
+        h_backbone_out, w_backbone_out = tf.shape(x)[1], tf.shape(x)[2]
         x = self.input_proj(x)
 
         # Flatten the position embedding and the spatial tensor
@@ -243,28 +241,32 @@ class SMCA(tf.keras.Model):
         # Flatten the padding masks
         features_mask = tf.reshape(features_mask, (batch_size, -1))
 
-        size_feature_masks = tf.shape(features_mask)[1]
         ref_points, ref_points_presigmoid = self.ref_points(query_embed)
 
         # dyn_weight_map_per_head = G in the paper
-        dyn_weight_map_per_head = self.dyn_weight_map(self.num_queries, size_feature_masks,
-                                                      ref_points)
-        dyn_weight_map_per_head = tf.math.log(dyn_weight_map_per_head)  # log G
+        dyn_weight_map_per_head = self.dyn_weight_map(h_backbone_out, w_backbone_out, ref_points)
+        dyn_weight_map_per_head = tf.math.log(dyn_weight_map_per_head + 10e-4)  # log G
 
         decoder_out, _ = self.transformer(x,
-                                          features_mask,
                                           pos_embed,
                                           query_embed,
-                                          co_attn=dyn_weight_map_per_head,
+                                          key_padding_mask=features_mask,
+                                          coattn_mask=dyn_weight_map_per_head,
                                           training=training)
 
         logits = self.class_embed(decoder_out)
         boxes = self.bbox_embed(decoder_out)
 
+        if training:
+            # In training all the outputs of the decoders are stacked together.
+            # We tile the reference_points to match those outputs
+            ref_points_presigmoid = tf.tile(ref_points_presigmoid,
+                                            (1, self.transformer_num_layers, 1))
+
         # Add initial center to constrain  the bounding boxes predictions
         offset = tf.concat(
             [ref_points_presigmoid,
-             tf.zeros((batch_size, self.num_queries, self.num_heads, 2))],
+             tf.zeros((batch_size, tf.shape(ref_points_presigmoid)[1], 2))],
             axis=-1)
         boxes = tf.nn.sigmoid(boxes + offset)
 
@@ -342,7 +344,12 @@ class SMCA(tf.keras.Model):
                      y_pred[BoxField.BOXES],
                      sample_weight=weights[BoxField.BOXES])
 
-        focal_loss = self.focal_loss(y_true[BoxField.LABELS],
+        cls_labels = tf.one_hot(
+            y_true[BoxField.LABELS],
+            depth=self.num_classes + 1,
+            dtype=tf.float32,
+        )
+        focal_loss = self.focal_loss(cls_labels,
                                      y_pred[BoxField.SCORES],
                                      sample_weight=weights[BoxField.LABELS])
 

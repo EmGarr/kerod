@@ -35,7 +35,8 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
             a weight map per reference points.
     """
 
-    def __init__(self, beta=1.):
+    def __init__(self, beta=1., **kwargs):
+        super().__init__(**kwargs)
         self._beta = tf.convert_to_tensor(beta)
 
     def call(self, height: int, width: int, ref_points: tf.Tensor):
@@ -57,18 +58,18 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
         x, y = tf.meshgrid(x, y)  # x and y have shape [height, width]
 
         ref_points = tf.transpose(ref_points, (0, 2, 1, 3))
-        y_cent, x_cent, height, width = tf.split(ref_points, 4, axis=-1)
+        y_cent, x_cent, h, w = tf.split(ref_points, 4, axis=-1)
 
         # [batch_size, heads, N,  1] => [batch_size,heads, N,  1, 1]
         y_cent, x_cent = y_cent[..., tf.newaxis], x_cent[..., tf.newaxis]
-        height, width = height[..., tf.newaxis], width[..., tf.newaxis]
+        h, w = h[..., tf.newaxis], w[..., tf.newaxis]
 
         # [height, width] => [1, 1, 1, height, width]
         y, x = y[tf.newaxis, tf.newaxis, tf.newaxis], x[tf.newaxis, tf.newaxis, tf.newaxis]
 
         # [batch_size, heads, N, height, width]
-        x_term = -(x - x_cent)**2 / (self._beta * width**2)
-        y_term = -(y - y_cent)**2 / (self._beta * height**2)
+        x_term = -(x - x_cent)**2 / (self._beta * w**2)
+        y_term = -(y - y_cent)**2 / (self._beta * h**2)
         weight_map = tf.math.exp(x_term + y_term)
 
         batch_size, num_heads = tf.shape(weight_map)[0], tf.shape(weight_map)[1]

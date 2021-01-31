@@ -1,8 +1,8 @@
-import pytest
 import numpy as np
+import pytest
 import tensorflow as tf
 from kerod.core.standard_fields import BoxField, DatasetField
-from kerod.model.smca_detr import SMCAR50Pytorch, SMCA
+from kerod.model.smca_detr import SMCA, ReferencePoints, SMCAR50Pytorch
 
 
 def test_reference_points():
@@ -77,11 +77,11 @@ def test_compute_loss_smca():
     }
 
     smca = SMCA(num_classes, None)
-    detr.transformer_num_layers = num_layers
+    smca.transformer_num_layers = num_layers
     loss = smca.compute_loss(ground_truths, y_pred, tf.constant([2., 2.]))
     # Since y_pred has been tiled we can know
     # the losses value by multiplying by the number of layers
     expected_giou = 1.31 * num_layers
     expected_l1 = 93.333336 * num_layers
-    expected_scc = 91.36464 * num_layers
+    expected_fl = 90.34658 * num_layers
     np.testing.assert_allclose(loss, expected_scc + expected_l1 + expected_giou)
