@@ -16,6 +16,11 @@ It aims to build a clear, reusable, tested, simple and documented codebase for t
 
 Many ideas have been based on [google object detection](https://github.com/tensorflow/models/tree/master/research/object_detection), [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) and [mmdetection](https://github.com/open-mmlab/mmdetection).
 
+## Warning
+
+- I need to fix the documentation build
+- I need to switch from travis to circle ci
+
 ## Features
 
 - As powerful and concise as Keras
