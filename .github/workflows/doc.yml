@@ -1,0 +1,41 @@
+name: Documentation 
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - name: Checkout ${{ matrix.python-version }}
+      uses: actions/checkout@v2.3.1 
+      with:
+        persist-credentials: false
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        make install
+        pip install portray
+
+    - name: Documentation 
+      run: |
+        portray as_html -m src/kerod  && rm -rf docs/ && mv site/* ./ && rm -rf site/
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages # The branch the action should deploy to.
+        FOLDER: ./ # The folder the action should deploy.
+        CLEAN: true # Automatically remove deleted files from the deploy branch

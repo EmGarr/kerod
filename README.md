@@ -2,8 +2,9 @@
 <p>KEROD - Object Detection for TensorFlow 2.X (FasterRCNN, DeTr)
 </h3>
 
-[![Build Status](https://travis-ci.com/EmGarr/kerod.svg?branch=master)](https://travis-ci.com/EmGarr/kerod)
+![Build](https://github.com/EmGarr/kerod/workflows/Test/badge.svg)
 [![codecov.io](https://codecov.io/gh/Emgarr/kerod/coverage.svg?branch=master)](https://codecov.io/gh/Emgarr/kerod/?branch=master)
+![Documentation](https://github.com/EmGarr/kerod/workflows/Documentation/badge.svg)
 _________________
 
 [Read Latest Documentation](https://emgarr.github.io/kerod/) - [Browse GitHub Code Repository](https://github.com/Emgarr/kerod)
@@ -19,7 +20,6 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 ## Warning
 
 - I need to fix the documentation build
-- I need to switch from travis to circle ci
 
 ## Features
 
