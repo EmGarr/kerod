@@ -9,7 +9,7 @@ def test_multihead_attention_no_mask():
         tf.random.uniform(shape) for shape in ((2, 4, 10), (2, 4, 10), (2, 10, 10))
     ]
     mha = MultiHeadAttention(d_model, 4)
-    assert mha((value, key, query, None)).shape == (2, 10, 16)
+    assert mha(value, key, query).shape == (2, 10, 16)
 
 
 def test_multihead_attention_with_mask():
@@ -20,4 +20,4 @@ def test_multihead_attention_with_mask():
 
     key_padding_mask = tf.ones((2, 4), tf.bool)
     mha = MultiHeadAttention(d_model, 4)
-    assert mha((value, key, query, key_padding_mask)).shape == (2, 10, 16)
+    assert mha(value, key, query, key_padding_mask=key_padding_mask).shape == (2, 10, 16)

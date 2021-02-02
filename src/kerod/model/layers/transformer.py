@@ -61,9 +61,9 @@ class EncoderLayer(tf.keras.layers.Layer):
             A 3-D Tensor of float32 and shape [batch_size, M, d_model]
         """
         x_pos_emb = src + pos_emb
-        attn_output = self.mha(value=src,
-                               key=x_pos_emb,
-                               query=x_pos_emb,
+        attn_output = self.mha(src,
+                               x_pos_emb,
+                               x_pos_emb,
                                key_padding_mask=key_padding_mask,
                                training=training)  # (batch_size, input_seq_len, d_model)
         attn_output = self.dropout1(attn_output, training=training)
@@ -157,17 +157,17 @@ class DecoderLayer(tf.keras.layers.Layer):
         """
         tgt_object_queries = dec_out + object_queries
         # (batch_size, M, d_model)
-        self_attn = self.mha1(value=dec_out,
-                              key=tgt_object_queries,
-                              query=tgt_object_queries,
+        self_attn = self.mha1(dec_out,
+                              tgt_object_queries,
+                              tgt_object_queries,
                               training=training)
         self_attn = self.dropout1(self_attn, training=training)
         self_attn = self.layernorm1(self_attn + dec_out)
 
         # (batch_size, M, d_model)
-        co_attn = self.mha2(value=memory,
-                            key=memory + pos_embed,
-                            query=self_attn + object_queries,
+        co_attn = self.mha2(memory,
+                            memory + pos_embed,
+                            self_attn + object_queries,
                             key_padding_mask=key_padding_mask,
                             attn_mask=coattn_mask,
                             training=training)

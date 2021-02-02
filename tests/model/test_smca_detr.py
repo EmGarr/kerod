@@ -80,4 +80,4 @@ def test_compute_loss_smca():
     expected_giou = 1.31 * num_layers
     expected_l1 = 93.333336 * num_layers
     expected_fl = 90.34658 * num_layers
-    np.testing.assert_allclose(loss, expected_scc + expected_l1 + expected_giou)
+    np.testing.assert_allclose(loss, expected_fl + expected_l1 + expected_giou)
