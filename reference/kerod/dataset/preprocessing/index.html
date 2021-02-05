@@ -1332,6 +1332,8 @@
 
     <span class="s s-Atom">image</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">][</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">if</span> <span class="s s-Atom">bgr</span> <span class="s s-Atom">else</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">]</span>
 
+    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">float32</span><span class="p">)</span>
+
     <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">]</span>
 
     <span class="s s-Atom">if</span> <span class="s s-Atom">horizontal_flip:</span>
@@ -1339,6 +1341,10 @@
         <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">aug</span><span class="p">.</span><span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">])</span>
 
     <span class="s s-Atom">if</span> <span class="s s-Atom">random_crop_size</span> <span class="o">is</span> <span class="o">not</span> <span class="nv">None</span><span class="s s-Atom">:</span>
+
+        <span class="s s-Atom">if</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="s s-Atom">random_crop_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="s s-Atom">or</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="s s-Atom">random_crop_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="s s-Atom">:</span>
+
+            <span class="s s-Atom">image</span> <span class="o">=</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="nf">max</span><span class="p">(</span><span class="s s-Atom">random_crop_size</span><span class="p">),</span> <span class="mf">1333.0</span><span class="p">)</span>
 
         <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="s s-Atom">aug</span><span class="p">.</span><span class="nf">random_random_crop</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">random_crop_size</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">)</span>
 
@@ -1770,6 +1776,8 @@ Mask of the image if a padding is performed we will know where the original imag
 
     <span class="s s-Atom">image</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">][</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">if</span> <span class="s s-Atom">bgr</span> <span class="s s-Atom">else</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">]</span>
 
+    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">float32</span><span class="p">)</span>
+
     <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">]</span>
 
     <span class="s s-Atom">if</span> <span class="s s-Atom">horizontal_flip:</span>
@@ -1777,6 +1785,10 @@ Mask of the image if a padding is performed we will know where the original imag
         <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">aug</span><span class="p">.</span><span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">])</span>
 
     <span class="s s-Atom">if</span> <span class="s s-Atom">random_crop_size</span> <span class="o">is</span> <span class="o">not</span> <span class="nv">None</span><span class="s s-Atom">:</span>
+
+        <span class="s s-Atom">if</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="s s-Atom">random_crop_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="s s-Atom">or</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="s s-Atom">random_crop_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="s s-Atom">:</span>
+
+            <span class="s s-Atom">image</span> <span class="o">=</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="nf">max</span><span class="p">(</span><span class="s s-Atom">random_crop_size</span><span class="p">),</span> <span class="mf">1333.0</span><span class="p">)</span>
 
         <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="s s-Atom">aug</span><span class="p">.</span><span class="nf">random_random_crop</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">random_crop_size</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">)</span>
 
