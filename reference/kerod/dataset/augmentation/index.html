@@ -501,8 +501,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#random_crop" class="md-nav__link">
+    random_crop
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#random_horizontal_flip" class="md-nav__link">
     random_horizontal_flip
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#random_random_crop" class="md-nav__link">
+    random_random_crop
   </a>
   
 </li>
@@ -539,6 +553,18 @@
   <li class="md-nav__item">
     <a href="../preprocessing/" title="Preprocessing" class="md-nav__link">
       Preprocessing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../utils/" title="Utils" class="md-nav__link">
+      Utils
     </a>
   </li>
 
@@ -1108,8 +1134,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#random_crop" class="md-nav__link">
+    random_crop
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#random_horizontal_flip" class="md-nav__link">
     random_horizontal_flip
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#random_random_crop" class="md-nav__link">
+    random_random_crop
   </a>
   
 </li>
@@ -1142,11 +1182,17 @@
                 <h1 id="module-keroddatasetaugmentation">Module kerod.dataset.augmentation</h1>
 <p>None</p>
 <p>None</p>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
 
 <span class="kn">from</span> <span class="nn">kerod.core</span> <span class="kn">import</span> <span class="n">box_ops</span>
 
-<span class="k">def</span> <span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="kn">from</span> <span class="nn">kerod.core.standard_fields</span> <span class="kn">import</span> <span class="n">BoxField</span>
+
+<span class="kn">from</span> <span class="nn">kerod.dataset.utils</span> <span class="kn">import</span> <span class="n">filter_bad_area</span>
+
+<span class="k">def</span> <span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;Randomly flips the image and detections horizontally.</span>
 
@@ -1154,9 +1200,9 @@
 
 <span class="sd">    Arguments:</span>
 
-<span class="sd">    - image: rank 3 float32 tensor with shape [height, width, channels].</span>
+<span class="sd">    - *image*: rank 3 float32 tensor with shape [height, width, channels].</span>
 
-<span class="sd">    - boxes: rank 2 float32 tensor with shape [N, 4]</span>
+<span class="sd">    - *boxes*: rank 2 float32 tensor with shape [N, 4]</span>
 
 <span class="sd">           containing the bounding boxes.</span>
 
@@ -1168,9 +1214,9 @@
 
 <span class="sd">    Returns:</span>
 
-<span class="sd">    - image: image which is the same shape as input image.</span>
+<span class="sd">    - *image*: image which is the same shape as input image.</span>
 
-<span class="sd">    - boxes: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].</span>
+<span class="sd">    - *boxes*: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].</span>
 
 <span class="sd">           Boxes are in normalized form meaning their coordinates vary</span>
 
@@ -1189,14 +1235,389 @@
             <span class="n">boxes</span> <span class="o">=</span> <span class="n">box_ops</span><span class="o">.</span><span class="n">flip_left_right</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">boxes</span>
+
+<span class="k">def</span> <span class="nf">_random_crop</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Randomly crops a tensor to a given size in a deterministic manner.</span>
+
+<span class="sd">    Slices a shape `size` portion out of `value` at a uniformly chosen offset.</span>
+
+<span class="sd">    Requires `value.shape &gt;= size`.</span>
+
+<span class="sd">    If a dimension should not be cropped, pass the full size of that dimension.</span>
+
+<span class="sd">    For example, RGB images can be cropped with</span>
+
+<span class="sd">    `size = [crop_height, crop_width, 3]`.</span>
+
+<span class="sd">    Guarantees the same results given the same `seed` independent of how many</span>
+
+<span class="sd">    times the function is called, and independent of global seed settings (e.g.</span>
+
+<span class="sd">    `tf.random.set_seed`).</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *value*: Input tensor to crop.</span>
+
+<span class="sd">    - *size*: 1-D tensor with size the rank of `value`.</span>
+
+<span class="sd">    - *seed*: A shape [2] Tensor, the seed to the random number generator. Must have</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    - *crop*: A cropped tensor of the same rank as `value` and shape `size`.</span>
+
+<span class="sd">    - *top_left_corner*: A 2-D tensor of int and shape [1, (y, x)]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s2">&quot;RandomCrop&quot;</span><span class="p">):</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
+
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="n">limit</span> <span class="o">=</span> <span class="n">shape</span> <span class="o">-</span> <span class="n">size</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>
+
+            <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">size</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="n">size</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span> <span class="o">%</span> <span class="n">limit</span>
+
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="n">offset</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                <span class="n">size</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                <span class="n">groundtruths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+
+                <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Randomly crops a tensor to a given size in a deterministic manner.</span>
+
+<span class="sd">    Slices a shape `size` portion out of `value` at a uniformly chosen offset.</span>
+
+<span class="sd">    Requires `value.shape &gt;= size`.</span>
+
+<span class="sd">    If a dimension should not be cropped, pass the full size of that dimension.</span>
+
+<span class="sd">    For example, RGB images can be cropped with</span>
+
+<span class="sd">    `size = [crop_height, crop_width, 3]`.</span>
+
+<span class="sd">    Guarantees the same results given the same `seed` independent of how many</span>
+
+<span class="sd">    times the function is called, and independent of global seed settings (e.g.</span>
+
+<span class="sd">    `tf.random.set_seed`).</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *image*: Input tensor to crop.</span>
+
+<span class="sd">    - *size*: 1-D tensor with size the rank of `value`.</span>
+
+<span class="sd">    - *groundtruths*: A dict with the following keys:</span>
+
+<span class="sd">        1. bbox: rank 2 float32 tensor with shape [N, 4]</span>
+
+<span class="sd">            containing the bounding boxes.</span>
+
+<span class="sd">            Boxes are in normalized form meaning their coordinates vary</span>
+
+<span class="sd">            between [0, 1].</span>
+
+<span class="sd">            Each row is in the form of [ymin, xmin, ymax, xmax].</span>
+
+<span class="sd">        2. label: A tensorf of shape [N, ]</span>
+
+<span class="sd">    - *seed*: A shape [2] Tensor, the seed to the random number generator.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    - *crop*: A cropped tensor of the same rank as `value` and shape `size`.</span>
+
+<span class="sd">    - *groundtruths*: Diction</span>
+
+<span class="sd">        1. bbox: 2-D float32 tensor containing the bounding boxes -&gt; [N_crop &lt;=N, 4].</span>
+
+<span class="sd">            If cropped, the boxes with no area or outside the crop or removed.</span>
+
+<span class="sd">        2. label: A tensor of shape [N_crop &lt;= N, ]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">groundtruths</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">]</span>
+
+    <span class="n">crop</span><span class="p">,</span> <span class="n">top_left_corner</span> <span class="o">=</span> <span class="n">_random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">image</span><span class="p">)[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">size</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">)[</span><span class="bp">None</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># scale the boxes to the size of the image</span>
+
+    <span class="n">boxes</span> <span class="o">*=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">top_left_corner</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">top_left_corner</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">top_left_corner</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">top_left_corner</span><span class="p">,</span> <span class="n">boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1"># Translate according to top_left_corner</span>
+
+    <span class="c1"># top_left_corner is now (y=0, x=0)</span>
+
+    <span class="n">cropped_boxes</span> <span class="o">=</span> <span class="n">boxes</span> <span class="o">-</span> <span class="n">top_left_corner</span>
+
+    <span class="c1"># MinClip to 0 and MaxClip to size all the coords outside the crop.</span>
+
+    <span class="n">cropped_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">cropped_boxes</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">boxes</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+    <span class="n">cropped_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">cropped_boxes</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="c1"># Renomarlized to have the boxes between 0 and 1</span>
+
+    <span class="n">cropped_boxes</span> <span class="o">=</span> <span class="n">cropped_boxes</span> <span class="o">/</span> <span class="n">size</span>
+
+    <span class="c1"># Copy groundtruths</span>
+
+    <span class="n">cropped_gt</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">groundtruths</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="n">cropped_gt</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">]</span> <span class="o">=</span> <span class="n">cropped_boxes</span>
+
+    <span class="k">return</span> <span class="n">crop</span><span class="p">,</span> <span class="n">filter_bad_area</span><span class="p">(</span><span class="n">cropped_gt</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">random_random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                       <span class="n">size</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                       <span class="n">groundtruths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+
+                       <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Will `randomly` perform a random crop of a tensor to a given size.</span>
+
+<span class="sd">    Slices a shape `size` portion out of `value` at a uniformly chosen offset.</span>
+
+<span class="sd">    Requires `value.shape &gt;= size`.</span>
+
+<span class="sd">    If a dimension should not be cropped, pass the full size of that dimension.</span>
+
+<span class="sd">    For example, RGB images can be cropped with</span>
+
+<span class="sd">    `size = [crop_height, crop_width, 3]`.</span>
+
+<span class="sd">    Guarantees the same results given the same `seed` independent of how many</span>
+
+<span class="sd">    times the function is called, and independent of global seed settings (e.g.</span>
+
+<span class="sd">    `tf.random.set_seed`).</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - *image*: Input tensor to crop or not.</span>
+
+<span class="sd">    - *size*: 1-D tensor with size the rank of `value`.</span>
+
+<span class="sd">    - *groundtruths*: A dict with the following keys:</span>
+
+<span class="sd">        1. bbox: rank 2 float32 tensor with shape [N, 4]</span>
+
+<span class="sd">            containing the bounding boxes.</span>
+
+<span class="sd">            Boxes are in normalized form meaning their coordinates vary</span>
+
+<span class="sd">            between [0, 1].</span>
+
+<span class="sd">            Each row is in the form of [ymin, xmin, ymax, xmax].</span>
+
+<span class="sd">        2. label: A tensorf of shape [N, ]</span>
+
+<span class="sd">    - *seed*: A shape [2] Tensor, the seed to the random number generator.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    - *image*: Either a cropped tensor or the same image of the same rank as</span>
+
+<span class="sd">        `value` and shape `size`.</span>
+
+<span class="sd">    - *boxes*: 2-D float32 tensor containing the bounding boxes -&gt; [N, 4].</span>
+
+<span class="sd">           Boxes are in normalized form, meaning their coordinates vary</span>
+
+<span class="sd">           between [0, 1]. If cropped, the boxes with no area or outside</span>
+
+<span class="sd">           the crop or removed.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s1">&#39;RandomRandomCrop&#39;</span><span class="p">):</span>
+
+        <span class="n">uniform_random</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">([],</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">uniform_random</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">5</span><span class="p">:</span>
+
+            <span class="n">image</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">groundtruths</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">targets</span>
 </code></pre></div>
 
 </details>
 <h2 id="functions">Functions</h2>
+<h3 id="random_crop">random_crop</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">random_crop</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">groundtruths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="s1">&#39;&gt;, &lt;class &#39;</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="s1">&#39;&gt;)</span>
+</code></pre></div>
+
+<p>Randomly crops a tensor to a given size in a deterministic manner.</p>
+<p>Slices a shape <code>size</code> portion out of <code>value</code> at a uniformly chosen offset.
+Requires <code>value.shape &gt;= size</code>.</p>
+<p>If a dimension should not be cropped, pass the full size of that dimension.
+For example, RGB images can be cropped with
+<code>size = [crop_height, crop_width, 3]</code>.</p>
+<p>Guarantees the same results given the same <code>seed</code> independent of how many
+times the function is called, and independent of global seed settings (e.g.
+<code>tf.random.set_seed</code>).</p>
+<p>Arguments:</p>
+<ul>
+<li><em>image</em>: Input tensor to crop.</li>
+<li><em>size</em>: 1-D tensor with size the rank of <code>value</code>.</li>
+<li><em>groundtruths</em>: A dict with the following keys:<ol>
+<li>bbox: rank 2 float32 tensor with shape [N, 4]
+    containing the bounding boxes.
+    Boxes are in normalized form meaning their coordinates vary
+    between [0, 1].
+    Each row is in the form of [ymin, xmin, ymax, xmax].</li>
+<li>label: A tensorf of shape [N, ]</li>
+</ol>
+</li>
+<li><em>seed</em>: A shape [2] Tensor, the seed to the random number generator.</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li><em>crop</em>: A cropped tensor of the same rank as <code>value</code> and shape <code>size</code>.</li>
+<li><em>groundtruths</em>: Diction<ol>
+<li>bbox: 2-D float32 tensor containing the bounding boxes -&gt; [N_crop &lt;=N, 4].
+    If cropped, the boxes with no area or outside the crop or removed.</li>
+<li>label: A tensor of shape [N_crop &lt;= N, ]</li>
+</ol>
+</li>
+</ul>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">random_crop</span><span class="p">(</span><span class="n">image</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                <span class="n">size</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                <span class="n">groundtruths</span><span class="o">:</span> <span class="n">Dict</span><span class="err">[</span><span class="n">str</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="err">]</span><span class="p">,</span>
+
+                <span class="n">seed</span><span class="o">=</span><span class="k">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span><span class="o">:</span>
+
+    <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Randomly crops a tensor to a given size in a deterministic manner.</span>
+
+<span class="s2">    Slices a shape `size` portion out of `value` at a uniformly chosen offset.</span>
+
+<span class="s2">    Requires `value.shape &gt;= size`.</span>
+
+<span class="s2">    If a dimension should not be cropped, pass the full size of that dimension.</span>
+
+<span class="s2">    For example, RGB images can be cropped with</span>
+
+<span class="s2">    `size = [crop_height, crop_width, 3]`.</span>
+
+<span class="s2">    Guarantees the same results given the same `seed` independent of how many</span>
+
+<span class="s2">    times the function is called, and independent of global seed settings (e.g.</span>
+
+<span class="s2">    `tf.random.set_seed`).</span>
+
+<span class="s2">    Arguments:</span>
+
+<span class="s2">    - *image*: Input tensor to crop.</span>
+
+<span class="s2">    - *size*: 1-D tensor with size the rank of `value`.</span>
+
+<span class="s2">    - *groundtruths*: A dict with the following keys:</span>
+
+<span class="s2">        1. bbox: rank 2 float32 tensor with shape [N, 4]</span>
+
+<span class="s2">            containing the bounding boxes.</span>
+
+<span class="s2">            Boxes are in normalized form meaning their coordinates vary</span>
+
+<span class="s2">            between [0, 1].</span>
+
+<span class="s2">            Each row is in the form of [ymin, xmin, ymax, xmax].</span>
+
+<span class="s2">        2. label: A tensorf of shape [N, ]</span>
+
+<span class="s2">    - *seed*: A shape [2] Tensor, the seed to the random number generator.</span>
+
+<span class="s2">    Returns:</span>
+
+<span class="s2">    - *crop*: A cropped tensor of the same rank as `value` and shape `size`.</span>
+
+<span class="s2">    - *groundtruths*: Diction</span>
+
+<span class="s2">        1. bbox: 2-D float32 tensor containing the bounding boxes -&gt; [N_crop &lt;=N, 4].</span>
+
+<span class="s2">            If cropped, the boxes with no area or outside the crop or removed.</span>
+
+<span class="s2">        2. label: A tensor of shape [N_crop &lt;= N, ]</span>
+
+<span class="s2">    </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">groundtruths</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="err">]</span>
+
+    <span class="n">crop</span><span class="p">,</span> <span class="n">top_left_corner</span> <span class="o">=</span> <span class="n">_random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="err">[</span><span class="o">:</span><span class="mi">2</span><span class="err">]</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">constant</span><span class="p">(</span><span class="n">size</span><span class="err">[</span><span class="o">:</span><span class="mi">2</span><span class="err">]</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span><span class="err">[</span><span class="k">None</span><span class="err">]</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># scale the boxes to the size of the image</span>
+
+    <span class="n">boxes</span> <span class="o">*=</span> <span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">shape</span><span class="err">[</span><span class="n">tf</span><span class="p">.</span><span class="n">newaxis</span><span class="err">]</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">top_left_corner</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">top_left_corner</span><span class="err">[</span><span class="n">tf</span><span class="p">.</span><span class="n">newaxis</span><span class="err">]</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">top_left_corner</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">top_left_corner</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1"># Translate according to top_left_corner</span>
+
+    <span class="c1"># top_left_corner is now (y=0, x=0)</span>
+
+    <span class="n">cropped_boxes</span> <span class="o">=</span> <span class="n">boxes</span> <span class="o">-</span> <span class="n">top_left_corner</span>
+
+    <span class="c1"># MinClip to 0 and MaxClip to size all the coords outside the crop.</span>
+
+    <span class="n">cropped_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">cropped_boxes</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">boxes</span><span class="p">.</span><span class="n">dtype</span><span class="p">))</span>
+
+    <span class="n">cropped_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">cropped_boxes</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="c1"># Renomarlized to have the boxes between 0 and 1</span>
+
+    <span class="n">cropped_boxes</span> <span class="o">=</span> <span class="n">cropped_boxes</span> <span class="o">/</span> <span class="n">size</span>
+
+    <span class="c1"># Copy groundtruths</span>
+
+    <span class="n">cropped_gt</span> <span class="o">=</span> <span class="err">{</span><span class="k">key</span><span class="o">:</span> <span class="n">val</span> <span class="k">for</span> <span class="k">key</span><span class="p">,</span> <span class="n">val</span> <span class="k">in</span> <span class="n">groundtruths</span><span class="p">.</span><span class="n">items</span><span class="p">()</span><span class="err">}</span>
+
+    <span class="n">cropped_gt</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="err">]</span> <span class="o">=</span> <span class="n">cropped_boxes</span>
+
+    <span class="k">return</span> <span class="n">crop</span><span class="p">,</span> <span class="n">filter_bad_area</span><span class="p">(</span><span class="n">cropped_gt</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
 <h3 id="random_horizontal_flip">random_horizontal_flip</h3>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">random_horizontal_flip</span><span class="p">(</span>
-    <span class="n">image</span><span class="p">,</span>
-    <span class="n">boxes</span><span class="p">,</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">boxes</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -1205,8 +1626,8 @@
 <p>The probability of flipping the image is 50%.</p>
 <p>Arguments:</p>
 <ul>
-<li>image: rank 3 float32 tensor with shape [height, width, channels].</li>
-<li>boxes: rank 2 float32 tensor with shape [N, 4]
+<li><em>image</em>: rank 3 float32 tensor with shape [height, width, channels].</li>
+<li><em>boxes</em>: rank 2 float32 tensor with shape [N, 4]
        containing the bounding boxes.
        Boxes are in normalized form meaning their coordinates vary
        between [0, 1].
@@ -1214,12 +1635,12 @@
 </ul>
 <p>Returns:</p>
 <ul>
-<li>image: image which is the same shape as input image.</li>
-<li>boxes: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].
+<li><em>image</em>: image which is the same shape as input image.</li>
+<li><em>boxes</em>: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].
        Boxes are in normalized form meaning their coordinates vary
        between [0, 1].</li>
 </ul>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">random_horizontal_flip</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="nb">seed</span><span class="o">=</span><span class="n">None</span><span class="p">):</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">random_horizontal_flip</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">seed</span><span class="o">=</span><span class="n">None</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;Randomly flips the image and detections horizontally.</span>
 
@@ -1227,9 +1648,9 @@
 
 <span class="sd">    Arguments:</span>
 
-<span class="sd">    - image: rank 3 float32 tensor with shape [height, width, channels].</span>
+<span class="sd">    - *image*: rank 3 float32 tensor with shape [height, width, channels].</span>
 
-<span class="sd">    - boxes: rank 2 float32 tensor with shape [N, 4]</span>
+<span class="sd">    - *boxes*: rank 2 float32 tensor with shape [N, 4]</span>
 
 <span class="sd">           containing the bounding boxes.</span>
 
@@ -1241,9 +1662,9 @@
 
 <span class="sd">    Returns:</span>
 
-<span class="sd">    - image: image which is the same shape as input image.</span>
+<span class="sd">    - *image*: image which is the same shape as input image.</span>
 
-<span class="sd">    - boxes: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].</span>
+<span class="sd">    - *boxes*: rank 2 float32 tensor containing the bounding boxes -&gt; [N, 4].</span>
 
 <span class="sd">           Boxes are in normalized form meaning their coordinates vary</span>
 
@@ -1262,6 +1683,124 @@
             <span class="n">boxes</span> <span class="o">=</span> <span class="n">box_ops</span><span class="o">.</span><span class="n">flip_left_right</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">boxes</span>
+</code></pre></div>
+
+</details>
+<h3 id="random_random_crop">random_random_crop</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">random_random_crop</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">groundtruths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="s1">&#39;&gt;, &lt;class &#39;</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="s1">&#39;&gt;)</span>
+</code></pre></div>
+
+<p>Will <code>randomly</code> perform a random crop of a tensor to a given size.</p>
+<p>Slices a shape <code>size</code> portion out of <code>value</code> at a uniformly chosen offset.
+Requires <code>value.shape &gt;= size</code>.</p>
+<p>If a dimension should not be cropped, pass the full size of that dimension.
+For example, RGB images can be cropped with
+<code>size = [crop_height, crop_width, 3]</code>.</p>
+<p>Guarantees the same results given the same <code>seed</code> independent of how many
+times the function is called, and independent of global seed settings (e.g.
+<code>tf.random.set_seed</code>).</p>
+<p>Arguments:</p>
+<ul>
+<li><em>image</em>: Input tensor to crop or not.</li>
+<li><em>size</em>: 1-D tensor with size the rank of <code>value</code>.</li>
+<li><em>groundtruths</em>: A dict with the following keys:<ol>
+<li>bbox: rank 2 float32 tensor with shape [N, 4]
+    containing the bounding boxes.
+    Boxes are in normalized form meaning their coordinates vary
+    between [0, 1].
+    Each row is in the form of [ymin, xmin, ymax, xmax].</li>
+<li>label: A tensorf of shape [N, ]</li>
+</ol>
+</li>
+<li><em>seed</em>: A shape [2] Tensor, the seed to the random number generator.</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li><em>image</em>: Either a cropped tensor or the same image of the same rank as
+    <code>value</code> and shape <code>size</code>.</li>
+<li><em>boxes</em>: 2-D float32 tensor containing the bounding boxes -&gt; [N, 4].
+       Boxes are in normalized form, meaning their coordinates vary
+       between [0, 1]. If cropped, the boxes with no area or outside
+       the crop or removed.</li>
+</ul>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">random_random_crop</span><span class="p">(</span><span class="n">image</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                       <span class="n">size</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+
+                       <span class="n">groundtruths</span><span class="o">:</span> <span class="n">Dict</span><span class="err">[</span><span class="n">str</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="err">]</span><span class="p">,</span>
+
+                       <span class="n">seed</span><span class="o">=</span><span class="k">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span><span class="o">:</span>
+
+    <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Will `randomly` perform a random crop of a tensor to a given size.</span>
+
+<span class="s2">    Slices a shape `size` portion out of `value` at a uniformly chosen offset.</span>
+
+<span class="s2">    Requires `value.shape &gt;= size`.</span>
+
+<span class="s2">    If a dimension should not be cropped, pass the full size of that dimension.</span>
+
+<span class="s2">    For example, RGB images can be cropped with</span>
+
+<span class="s2">    `size = [crop_height, crop_width, 3]`.</span>
+
+<span class="s2">    Guarantees the same results given the same `seed` independent of how many</span>
+
+<span class="s2">    times the function is called, and independent of global seed settings (e.g.</span>
+
+<span class="s2">    `tf.random.set_seed`).</span>
+
+<span class="s2">    Arguments:</span>
+
+<span class="s2">    - *image*: Input tensor to crop or not.</span>
+
+<span class="s2">    - *size*: 1-D tensor with size the rank of `value`.</span>
+
+<span class="s2">    - *groundtruths*: A dict with the following keys:</span>
+
+<span class="s2">        1. bbox: rank 2 float32 tensor with shape [N, 4]</span>
+
+<span class="s2">            containing the bounding boxes.</span>
+
+<span class="s2">            Boxes are in normalized form meaning their coordinates vary</span>
+
+<span class="s2">            between [0, 1].</span>
+
+<span class="s2">            Each row is in the form of [ymin, xmin, ymax, xmax].</span>
+
+<span class="s2">        2. label: A tensorf of shape [N, ]</span>
+
+<span class="s2">    - *seed*: A shape [2] Tensor, the seed to the random number generator.</span>
+
+<span class="s2">    Returns:</span>
+
+<span class="s2">    - *image*: Either a cropped tensor or the same image of the same rank as</span>
+
+<span class="s2">        `value` and shape `size`.</span>
+
+<span class="s2">    - *boxes*: 2-D float32 tensor containing the bounding boxes -&gt; [N, 4].</span>
+
+<span class="s2">           Boxes are in normalized form, meaning their coordinates vary</span>
+
+<span class="s2">           between [0, 1]. If cropped, the boxes with no area or outside</span>
+
+<span class="s2">           the crop or removed.</span>
+
+<span class="s2">    </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s1">&#39;RandomRandomCrop&#39;</span><span class="p">)</span><span class="o">:</span>
+
+        <span class="n">uniform_random</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="k">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="err">[]</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">uniform_random</span> <span class="o">&gt;</span> <span class="mf">.5</span><span class="o">:</span>
+
+            <span class="n">image</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">groundtruths</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">targets</span>
 </code></pre></div>
 
 </details>

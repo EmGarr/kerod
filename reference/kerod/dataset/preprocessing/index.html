@@ -532,29 +532,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#filter_bad_area" class="md-nav__link">
-    filter_bad_area
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#filter_crowded_boxes" class="md-nav__link">
-    filter_crowded_boxes
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#preprocess" class="md-nav__link">
     preprocess
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocess_coco_example" class="md-nav__link">
-    preprocess_coco_example
   </a>
   
 </li>
@@ -575,6 +554,18 @@
   
 </nav>
     
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../utils/" title="Utils" class="md-nav__link">
+      Utils
+    </a>
   </li>
 
         
@@ -1150,29 +1141,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#filter_bad_area" class="md-nav__link">
-    filter_bad_area
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#filter_crowded_boxes" class="md-nav__link">
-    filter_crowded_boxes
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#preprocess" class="md-nav__link">
     preprocess
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocess_coco_example" class="md-nav__link">
-    preprocess_coco_example
   </a>
   
 </li>
@@ -1216,11 +1186,11 @@
 
 <span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">core</span> <span class="s s-Atom">import</span> <span class="s s-Atom">constants</span>
 
-<span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">core</span><span class="p">.</span><span class="s s-Atom">box_ops</span> <span class="s s-Atom">import</span> <span class="s s-Atom">compute_area</span>
-
 <span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">core</span><span class="p">.</span><span class="s s-Atom">standard_fields</span> <span class="s s-Atom">import</span> <span class="nv">BoxField</span><span class="p">,</span> <span class="nv">DatasetField</span>
 
-<span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">dataset</span><span class="p">.</span><span class="s s-Atom">augmentation</span> <span class="s s-Atom">import</span> <span class="s s-Atom">random_horizontal_flip</span>
+<span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">dataset</span><span class="p">.</span><span class="s s-Atom">utils</span> <span class="s s-Atom">import</span> <span class="s s-Atom">filter_crowded_boxes</span><span class="p">,</span> <span class="s s-Atom">filter_bad_area</span>
+
+<span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">dataset</span> <span class="s s-Atom">import</span> <span class="s s-Atom">augmentation</span> <span class="s s-Atom">as</span> <span class="s s-Atom">aug</span>
 
 <span class="s s-Atom">def</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">short_edge_length</span><span class="p">,</span> <span class="s s-Atom">max_dimension</span><span class="p">)</span><span class="s s-Atom">:</span>
 
@@ -1284,167 +1254,7 @@
 
                            <span class="s s-Atom">method</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">image</span><span class="p">.</span><span class="nv">ResizeMethod</span><span class="p">.</span><span class="nv">BILINEAR</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="s s-Atom">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">bgr</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">padded_mask</span><span class="o">=</span><span class="nv">False</span><span class="p">)</span><span class="s s-Atom">:</span>
-
-    <span class="s2">&quot;&quot;&quot;This operations performs a classical preprocessing operations for localization datasets:</span>
-
-<span class="s2">    - COCO</span>
-
-<span class="s2">    - Pascal Voc</span>
-
-<span class="s2">    You can download easily those dataset using [tensorflow dataset](https://www.tensorflow.org/datasets/catalog/overview).</span>
-
-<span class="s2">    Arguments:</span>
-
-<span class="s2">    - *inputs*: It can be either a [FeaturesDict](https://www.tensorflow.org/datasets/api_docs/python/tfds/features/FeaturesDict) or a dict.</span>
-
-<span class="s2">    but it should have the following structures.</span>
-
-<span class="s2">    ```python</span>
-
-<span class="s2">    inputs = FeaturesDict({</span>
-
-<span class="s2">        &#39;image&#39;: Image(shape=(None, None, 3), dtype=tf.uint8),</span>
-
-<span class="s2">        &#39;objects&#39;: Sequence({</span>
-
-<span class="s2">            &#39;area&#39;: Tensor(shape=(), dtype=tf.int64), # area</span>
-
-<span class="s2">            &#39;bbox&#39;: BBoxFeature(shape=(4,), dtype=tf.float32), # The values are between 0 and 1</span>
-
-<span class="s2">            &#39;label&#39;: ClassLabel(shape=(), dtype=tf.int64, num_classes=80),</span>
-
-<span class="s2">        }),</span>
-
-<span class="s2">    })</span>
-
-<span class="s2">    ```</span>
-
-<span class="s2">    - *bgr*: Convert your input image to BGR (od.model.faster_rcnn.FasterRcnnFPNResnet50 needs it).</span>
-
-<span class="s2">    If you have open your image with `tf.image.decode_image` will open an image in RGB. However,</span>
-
-<span class="s2">    OpenCV will open it in BGR by default.</span>
-
-<span class="s2">    - *padded_mask*: If set to true return a mask of 1 of the image. When padded</span>
-
-<span class="s2">    we will know which parts is from the original image.</span>
-
-<span class="s2">    Returns:</span>
-
-<span class="s2">    - *inputs*:</span>
-
-<span class="s2">        1. images: A 3D tensor of float32 and shape [None, None, 3]</span>
-
-<span class="s2">        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape</span>
-
-<span class="s2">        of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.</span>
-
-<span class="s2">        The models needs those information in order to clip the boxes to the proper dimension.</span>
-
-<span class="s2">        3. images_padding_mask: If padded_mask set to true return a 2D tensor of int8 and shape [None, None, 3].</span>
-
-<span class="s2">        Mask of the image if a padding is performed we will know where the original image was.</span>
-
-<span class="s2">    - *ground_truths*:</span>
-
-<span class="s2">        1. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape</span>
-
-<span class="s2">        2. BoxField.LABELS: A tensor of shape [num_boxes, ]</span>
-
-<span class="s2">        3. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training</span>
-
-<span class="s2">    &quot;&quot;&quot;</span>
-
-    <span class="s s-Atom">if</span> <span class="nn">bgr</span><span class="p">:</span>
-
-        <span class="s s-Atom">images</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">][</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="nn">else</span><span class="p">:</span>
-
-        <span class="s s-Atom">images</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">]</span>
-
-    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">images</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">1333.0</span><span class="p">)</span>
-
-    <span class="s s-Atom">image_information</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">],</span> <span class="s s-Atom">dtype</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">float32</span><span class="p">)</span>
-
-    <span class="s s-Atom">boxes</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">]</span> <span class="o">*</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">tile</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">expand_dims</span><span class="p">(</span><span class="s s-Atom">image_information</span><span class="p">,</span> <span class="s s-Atom">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-
-                                                        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
-
-    <span class="s s-Atom">x</span> <span class="o">=</span> <span class="p">{</span><span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES</span><span class="s s-Atom">:</span> <span class="s s-Atom">image</span><span class="p">,</span> <span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES_INFO</span><span class="s s-Atom">:</span> <span class="s s-Atom">image_information</span><span class="p">}</span>
-
-    <span class="s s-Atom">if</span> <span class="s s-Atom">padded_mask:</span>
-
-        <span class="s s-Atom">x</span><span class="p">[</span><span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES_PMASK</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">ones</span><span class="p">((</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
-
-                                               <span class="s s-Atom">dtype</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">int8</span><span class="p">)</span>
-
-    <span class="s s-Atom">ground_truths</span> <span class="o">=</span> <span class="p">{</span>
-
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">boxes</span><span class="p">,</span>
-
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">],</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">int32</span><span class="p">),</span>
-
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">NUM_BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]),</span>
-
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">WEIGHTS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">fill</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">)</span>
-
-    <span class="p">}</span>
-
-    <span class="s s-Atom">return</span> <span class="s s-Atom">x</span><span class="p">,</span> <span class="s s-Atom">ground_truths</span>
-
-<span class="s s-Atom">def</span> <span class="nf">filter_crowded_boxes</span><span class="p">(</span><span class="nn">boxes</span><span class="p">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nv">Tensor</span><span class="p">,</span> <span class="nn">labels</span><span class="p">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nv">Tensor</span><span class="p">,</span> <span class="nn">crowd</span><span class="p">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nv">Tensor</span><span class="p">)</span> <span class="s s-Atom">-&gt;</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nv">Tensor</span><span class="s s-Atom">:</span>
-
-    <span class="s2">&quot;&quot;&quot;Coco has boxes flagged as crowded which are not used during the training.</span>
-
-<span class="s2">    This function will discard them.</span>
-
-<span class="s2">    Arguments:</span>
-
-<span class="s2">    - *boxes*: A tensor of shape [num_boxes, (y1, x1, y2, x2)]</span>
-
-<span class="s2">    - *labels*: A tensor of shape [num_boxes, ]</span>
-
-<span class="s2">    - *crowd*: Boolean tensor which indicates if the boxes is crowded are not. Crowded means that the boxes</span>
-
-<span class="s2">    contains multiple entities which are to difficult to localize one by one. `True` is for crowded box.</span>
-
-<span class="s2">    Returns:</span>
-
-<span class="s2">    - *boxes*: A tensor of shape [N &lt;= num_boxes, (y1, x1, y2, x2)]</span>
-
-<span class="s2">    - *labels*: A tensor of shape [N &lt;= num_boxes, ]</span>
-
-<span class="s2">    &quot;&quot;&quot;</span>
-
-    <span class="s s-Atom">ind_uncrowded_boxes</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">equal</span><span class="p">(</span><span class="s s-Atom">crowd</span><span class="p">,</span> <span class="nv">False</span><span class="p">))</span>
-
-    <span class="s s-Atom">return</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">gather_nd</span><span class="p">(</span><span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">ind_uncrowded_boxes</span><span class="p">),</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">gather_nd</span><span class="p">(</span><span class="s s-Atom">labels</span><span class="p">,</span> <span class="s s-Atom">ind_uncrowded_boxes</span><span class="p">)</span>
-
-<span class="s s-Atom">def</span> <span class="nf">filter_bad_area</span><span class="p">(</span><span class="nn">boxes</span><span class="p">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nv">Tensor</span><span class="p">,</span> <span class="nn">labels</span><span class="p">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nv">Tensor</span><span class="p">)</span> <span class="s s-Atom">-&gt;</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nv">Tensor</span><span class="s s-Atom">:</span>
-
-    <span class="s2">&quot;&quot;&quot;Remove all the boxes that have an area less or equal to 0.</span>
-
-<span class="s2">    Arguments:</span>
-
-<span class="s2">    - *boxes*: A tensor of shape [num_boxes, (y1, x1, y2, x2)]</span>
-
-<span class="s2">    - *labels*: A tensor of shape [num_boxes, ]</span>
-
-<span class="s2">    Returns:</span>
-
-<span class="s2">    - *boxes*: A tensor of shape [N &lt;= num_boxes, (y1, x1, y2, x2)]</span>
-
-<span class="s2">    - *labels*: A tensor of shape [N &lt;= num_boxes, ]</span>
-
-<span class="s2">    &quot;&quot;&quot;</span>
-
-    <span class="s s-Atom">area</span> <span class="o">=</span> <span class="nf">compute_area</span><span class="p">(</span><span class="s s-Atom">boxes</span><span class="p">)</span>
-
-    <span class="s s-Atom">return</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">gather_nd</span><span class="p">(</span><span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s s-Atom">area</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)),</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">gather_nd</span><span class="p">(</span><span class="s s-Atom">labels</span><span class="p">,</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s s-Atom">area</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
-
-<span class="s s-Atom">def</span> <span class="nf">preprocess_coco_example</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">bgr</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">horizontal_flip</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">padded_mask</span><span class="o">=</span><span class="nv">False</span><span class="p">)</span><span class="s s-Atom">:</span>
+<span class="s s-Atom">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">bgr</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">horizontal_flip</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">random_crop_size</span><span class="o">=</span><span class="nv">None</span><span class="p">,</span> <span class="s s-Atom">padded_mask</span><span class="o">=</span><span class="nv">False</span><span class="p">)</span><span class="s s-Atom">:</span>
 
     <span class="s2">&quot;&quot;&quot;This operations performs a classical preprocessing operations for localization datasets:</span>
 
@@ -1488,6 +1298,8 @@
 
 <span class="s2">    - *horizontal_flip*: Activate the random horizontal flip.</span>
 
+<span class="s2">    - *random_crop_size*:  TODO</span>
+
 <span class="s2">    - *padded_mask*: If set to true return a mask of 1 of the image. When padded</span>
 
 <span class="s2">    we will know which parts is from the original image.</span>
@@ -1496,7 +1308,7 @@
 
 <span class="s2">    - *inputs*:</span>
 
-<span class="s2">        1. images: A 3D tensor of float32 and shape [None, None, 3]</span>
+<span class="s2">        1. image: A 3D tensor of float32 and shape [None, None, 3]</span>
 
 <span class="s2">        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape</span>
 
@@ -1518,29 +1330,27 @@
 
 <span class="s2">    &quot;&quot;&quot;</span>
 
-    <span class="s s-Atom">if</span> <span class="nn">bgr</span><span class="p">:</span>
+    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">][</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">if</span> <span class="s s-Atom">bgr</span> <span class="s s-Atom">else</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">]</span>
 
-        <span class="s s-Atom">images</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">][</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="nn">else</span><span class="p">:</span>
-
-        <span class="s s-Atom">images</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">]</span>
-
-    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">images</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">1333.0</span><span class="p">)</span>
-
-    <span class="s s-Atom">image_information</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">],</span> <span class="s s-Atom">dtype</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">float32</span><span class="p">)</span>
-
-    <span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">],</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]</span>
-
-    <span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span> <span class="o">=</span> <span class="nf">filter_crowded_boxes</span><span class="p">(</span><span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="s s-Atom">&#39;is_crowd&#39;</span><span class="p">])</span>
-
-    <span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span> <span class="o">=</span> <span class="nf">filter_bad_area</span><span class="p">(</span><span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span><span class="p">)</span>
+    <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">]</span>
 
     <span class="s s-Atom">if</span> <span class="s s-Atom">horizontal_flip:</span>
 
-        <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">boxes</span> <span class="o">=</span> <span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">boxes</span><span class="p">)</span>
+        <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">aug</span><span class="p">.</span><span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">])</span>
 
-    <span class="s s-Atom">boxes</span> <span class="s s-Atom">*=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">tile</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">expand_dims</span><span class="p">(</span><span class="s s-Atom">image_information</span><span class="p">,</span> <span class="s s-Atom">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="s s-Atom">if</span> <span class="s s-Atom">random_crop_size</span> <span class="o">is</span> <span class="o">not</span> <span class="nv">None</span><span class="s s-Atom">:</span>
+
+        <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="s s-Atom">aug</span><span class="p">.</span><span class="nf">random_random_crop</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">random_crop_size</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">)</span>
+
+    <span class="s s-Atom">if</span> <span class="s s-Atom">&#39;is_crowd&#39;</span> <span class="s s-Atom">in</span> <span class="nn">targets</span><span class="p">:</span>
+
+        <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="nf">filter_crowded_boxes</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">)</span>
+
+    <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="nf">filter_bad_area</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">)</span>
+
+    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">1333.0</span><span class="p">)</span>
+
+    <span class="s s-Atom">image_information</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">],</span> <span class="s s-Atom">dtype</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">float32</span><span class="p">)</span>
 
     <span class="s s-Atom">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES</span><span class="s s-Atom">:</span> <span class="s s-Atom">image</span><span class="p">,</span> <span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES_INFO</span><span class="s s-Atom">:</span> <span class="s s-Atom">image_information</span><span class="p">}</span>
 
@@ -1552,13 +1362,13 @@
 
     <span class="s s-Atom">ground_truths</span> <span class="o">=</span> <span class="p">{</span>
 
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">boxes</span><span class="p">,</span>
+        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">]</span> <span class="o">*</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">tile</span><span class="p">(</span><span class="s s-Atom">image_information</span><span class="p">[</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">newaxis</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span>
 
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">labels</span><span class="p">,</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">int32</span><span class="p">),</span>
+        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">],</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">int32</span><span class="p">),</span>
 
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">NUM_BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">labels</span><span class="p">),</span>
+        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">NUM_BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]),</span>
 
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">WEIGHTS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">fill</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">labels</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">WEIGHTS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">fill</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">)</span>
 
     <span class="p">}</span>
 
@@ -1820,275 +1630,12 @@ The models needs those information in order to clip the boxes to the proper dime
 </code></pre></div>
 
 </details>
-<h3 id="filter_bad_area">filter_bad_area</h3>
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">filter_bad_area</span><span class="p">(</span>
-    <span class="n">boxes</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
-</code></pre></div>
-
-<p>Remove all the boxes that have an area less or equal to 0.</p>
-<p>Arguments:</p>
-<ul>
-<li><em>boxes</em>: A tensor of shape [num_boxes, (y1, x1, y2, x2)]</li>
-<li><em>labels</em>: A tensor of shape [num_boxes, ]</li>
-</ul>
-<p>Returns:</p>
-<ul>
-<li><em>boxes</em>: A tensor of shape [N &lt;= num_boxes, (y1, x1, y2, x2)]</li>
-<li><em>labels</em>: A tensor of shape [N &lt;= num_boxes, ]</li>
-</ul>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">filter_bad_area</span><span class="p">(</span><span class="n">boxes</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">:</span>
-
-    <span class="ss">&quot;&quot;&quot;Remove all the boxes that have an area less or equal to 0.</span>
-
-<span class="ss">    Arguments:</span>
-
-<span class="ss">    - *boxes*: A tensor of shape [num_boxes, (y1, x1, y2, x2)]</span>
-
-<span class="ss">    - *labels*: A tensor of shape [num_boxes, ]</span>
-
-<span class="ss">    Returns:</span>
-
-<span class="ss">    - *boxes*: A tensor of shape [N &lt;= num_boxes, (y1, x1, y2, x2)]</span>
-
-<span class="ss">    - *labels*: A tensor of shape [N &lt;= num_boxes, ]</span>
-
-<span class="ss">    &quot;&quot;&quot;</span>
-
-    <span class="n">area</span> <span class="o">=</span> <span class="n">compute_area</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="k">where</span><span class="p">(</span><span class="n">area</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="k">where</span><span class="p">(</span><span class="n">area</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
-</code></pre></div>
-
-</details>
-<h3 id="filter_crowded_boxes">filter_crowded_boxes</h3>
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">filter_crowded_boxes</span><span class="p">(</span>
-    <span class="n">boxes</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">crowd</span><span class="p">:</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tensorflow</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">Tensor</span>
-</code></pre></div>
-
-<p>Coco has boxes flagged as crowded which are not used during the training.</p>
-<p>This function will discard them.</p>
-<p>Arguments:</p>
-<ul>
-<li><em>boxes</em>: A tensor of shape [num_boxes, (y1, x1, y2, x2)]</li>
-<li><em>labels</em>: A tensor of shape [num_boxes, ]</li>
-<li><em>crowd</em>: Boolean tensor which indicates if the boxes is crowded are not. Crowded means that the boxes
-contains multiple entities which are to difficult to localize one by one. <code>True</code> is for crowded box. </li>
-</ul>
-<p>Returns:</p>
-<ul>
-<li><em>boxes</em>: A tensor of shape [N &lt;= num_boxes, (y1, x1, y2, x2)]</li>
-<li><em>labels</em>: A tensor of shape [N &lt;= num_boxes, ]</li>
-</ul>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">filter_crowded_boxes</span><span class="p">(</span><span class="n">boxes</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">labels</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">crowd</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="o">:</span>
-
-    <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Coco has boxes flagged as crowded which are not used during the training.</span>
-
-<span class="s2">    This function will discard them.</span>
-
-<span class="s2">    Arguments:</span>
-
-<span class="s2">    - *boxes*: A tensor of shape [num_boxes, (y1, x1, y2, x2)]</span>
-
-<span class="s2">    - *labels*: A tensor of shape [num_boxes, ]</span>
-
-<span class="s2">    - *crowd*: Boolean tensor which indicates if the boxes is crowded are not. Crowded means that the boxes</span>
-
-<span class="s2">    contains multiple entities which are to difficult to localize one by one. `True` is for crowded box.</span>
-
-<span class="s2">    Returns:</span>
-
-<span class="s2">    - *boxes*: A tensor of shape [N &lt;= num_boxes, (y1, x1, y2, x2)]</span>
-
-<span class="s2">    - *labels*: A tensor of shape [N &lt;= num_boxes, ]</span>
-
-<span class="s2">    </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
-
-    <span class="n">ind_uncrowded_boxes</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="k">where</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">crowd</span><span class="p">,</span> <span class="no">False</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">ind_uncrowded_boxes</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">ind_uncrowded_boxes</span><span class="p">)</span>
-</code></pre></div>
-
-</details>
 <h3 id="preprocess">preprocess</h3>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span>
     <span class="n">inputs</span><span class="p">,</span>
     <span class="n">bgr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">padded_mask</span><span class="o">=</span><span class="kc">False</span>
-<span class="p">)</span>
-</code></pre></div>
-
-<p>This operations performs a classical preprocessing operations for localization datasets:</p>
-<ul>
-<li>COCO</li>
-<li>Pascal Voc</li>
-</ul>
-<p>You can download easily those dataset using <a href="https://www.tensorflow.org/datasets/catalog/overview">tensorflow dataset</a>.</p>
-<p>Arguments:</p>
-<ul>
-<li><em>inputs</em>: It can be either a <a href="https://www.tensorflow.org/datasets/api_docs/python/tfds/features/FeaturesDict">FeaturesDict</a> or a dict.
-but it should have the following structures.</li>
-</ul>
-<div class="codehilite"><pre><span></span><code><span class="n">inputs</span> <span class="o">=</span> <span class="n">FeaturesDict</span><span class="p">({</span>
-    <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">Image</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span>
-    <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">({</span>
-        <span class="s1">&#39;area&#39;</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span> <span class="c1"># area</span>
-        <span class="s1">&#39;bbox&#39;</span><span class="p">:</span> <span class="n">BBoxFeature</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="c1"># The values are between 0 and 1</span>
-        <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">ClassLabel</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">80</span><span class="p">),</span>
-    <span class="p">}),</span>
-<span class="p">})</span>
-</code></pre></div>
-
-<ul>
-<li>
-<p><em>bgr</em>: Convert your input image to BGR (od.model.faster_rcnn.FasterRcnnFPNResnet50 needs it).
-If you have open your image with <code>tf.image.decode_image</code> will open an image in RGB. However,
-OpenCV will open it in BGR by default.</p>
-</li>
-<li>
-<p><em>padded_mask</em>: If set to true return a mask of 1 of the image. When padded
-we will know which parts is from the original image.</p>
-</li>
-</ul>
-<p>Returns:</p>
-<ul>
-<li><em>inputs</em>:<ol>
-<li>images: A 3D tensor of float32 and shape [None, None, 3]</li>
-<li>image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
-of the image without any padding. It can be usefull if it followed by a <code>padded_batch</code> operations.
-The models needs those information in order to clip the boxes to the proper dimension.</li>
-<li>images_padding_mask: If padded_mask set to true return a 2D tensor of int8 and shape [None, None, 3].
-Mask of the image if a padding is performed we will know where the original image was.</li>
-</ol>
-</li>
-<li><em>ground_truths</em>:<ol>
-<li>BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape</li>
-<li>BoxField.LABELS: A tensor of shape [num_boxes, ]</li>
-<li>BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training</li>
-</ol>
-</li>
-</ul>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="s s-Atom">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">bgr</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">padded_mask</span><span class="o">=</span><span class="nv">False</span><span class="p">)</span><span class="s s-Atom">:</span>
-
-    <span class="s2">&quot;&quot;&quot;This operations performs a classical preprocessing operations for localization datasets:</span>
-
-<span class="s2">    - COCO</span>
-
-<span class="s2">    - Pascal Voc</span>
-
-<span class="s2">    You can download easily those dataset using [tensorflow dataset](https://www.tensorflow.org/datasets/catalog/overview).</span>
-
-<span class="s2">    Arguments:</span>
-
-<span class="s2">    - *inputs*: It can be either a [FeaturesDict](https://www.tensorflow.org/datasets/api_docs/python/tfds/features/FeaturesDict) or a dict.</span>
-
-<span class="s2">    but it should have the following structures.</span>
-
-<span class="s2">    ```python</span>
-
-<span class="s2">    inputs = FeaturesDict({</span>
-
-<span class="s2">        &#39;image&#39;: Image(shape=(None, None, 3), dtype=tf.uint8),</span>
-
-<span class="s2">        &#39;objects&#39;: Sequence({</span>
-
-<span class="s2">            &#39;area&#39;: Tensor(shape=(), dtype=tf.int64), # area</span>
-
-<span class="s2">            &#39;bbox&#39;: BBoxFeature(shape=(4,), dtype=tf.float32), # The values are between 0 and 1</span>
-
-<span class="s2">            &#39;label&#39;: ClassLabel(shape=(), dtype=tf.int64, num_classes=80),</span>
-
-<span class="s2">        }),</span>
-
-<span class="s2">    })</span>
-
-<span class="s2">    ```</span>
-
-<span class="s2">    - *bgr*: Convert your input image to BGR (od.model.faster_rcnn.FasterRcnnFPNResnet50 needs it).</span>
-
-<span class="s2">    If you have open your image with `tf.image.decode_image` will open an image in RGB. However,</span>
-
-<span class="s2">    OpenCV will open it in BGR by default.</span>
-
-<span class="s2">    - *padded_mask*: If set to true return a mask of 1 of the image. When padded</span>
-
-<span class="s2">    we will know which parts is from the original image.</span>
-
-<span class="s2">    Returns:</span>
-
-<span class="s2">    - *inputs*:</span>
-
-<span class="s2">        1. images: A 3D tensor of float32 and shape [None, None, 3]</span>
-
-<span class="s2">        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape</span>
-
-<span class="s2">        of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.</span>
-
-<span class="s2">        The models needs those information in order to clip the boxes to the proper dimension.</span>
-
-<span class="s2">        3. images_padding_mask: If padded_mask set to true return a 2D tensor of int8 and shape [None, None, 3].</span>
-
-<span class="s2">        Mask of the image if a padding is performed we will know where the original image was.</span>
-
-<span class="s2">    - *ground_truths*:</span>
-
-<span class="s2">        1. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape</span>
-
-<span class="s2">        2. BoxField.LABELS: A tensor of shape [num_boxes, ]</span>
-
-<span class="s2">        3. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training</span>
-
-<span class="s2">    &quot;&quot;&quot;</span>
-
-    <span class="s s-Atom">if</span> <span class="nn">bgr</span><span class="p">:</span>
-
-        <span class="s s-Atom">images</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">][</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="nn">else</span><span class="p">:</span>
-
-        <span class="s s-Atom">images</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">]</span>
-
-    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">images</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">1333.0</span><span class="p">)</span>
-
-    <span class="s s-Atom">image_information</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">],</span> <span class="s s-Atom">dtype</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">float32</span><span class="p">)</span>
-
-    <span class="s s-Atom">boxes</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">]</span> <span class="o">*</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">tile</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">expand_dims</span><span class="p">(</span><span class="s s-Atom">image_information</span><span class="p">,</span> <span class="s s-Atom">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-
-                                                        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
-
-    <span class="s s-Atom">x</span> <span class="o">=</span> <span class="p">{</span><span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES</span><span class="s s-Atom">:</span> <span class="s s-Atom">image</span><span class="p">,</span> <span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES_INFO</span><span class="s s-Atom">:</span> <span class="s s-Atom">image_information</span><span class="p">}</span>
-
-    <span class="s s-Atom">if</span> <span class="s s-Atom">padded_mask:</span>
-
-        <span class="s s-Atom">x</span><span class="p">[</span><span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES_PMASK</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">ones</span><span class="p">((</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
-
-                                               <span class="s s-Atom">dtype</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">int8</span><span class="p">)</span>
-
-    <span class="s s-Atom">ground_truths</span> <span class="o">=</span> <span class="p">{</span>
-
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">boxes</span><span class="p">,</span>
-
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">],</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">int32</span><span class="p">),</span>
-
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">NUM_BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]),</span>
-
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">WEIGHTS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">fill</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">)</span>
-
-    <span class="p">}</span>
-
-    <span class="s s-Atom">return</span> <span class="s s-Atom">x</span><span class="p">,</span> <span class="s s-Atom">ground_truths</span>
-</code></pre></div>
-
-</details>
-<h3 id="preprocess_coco_example">preprocess_coco_example</h3>
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">preprocess_coco_example</span><span class="p">(</span>
-    <span class="n">inputs</span><span class="p">,</span>
-    <span class="n">bgr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">horizontal_flip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">random_crop_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">padded_mask</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -2123,13 +1670,14 @@ OpenCV will open it in BGR by default.</p>
 <li>
 <p><em>horizontal_flip</em>: Activate the random horizontal flip.</p>
 </li>
+<li><em>random_crop_size</em>:  TODO</li>
 <li><em>padded_mask</em>: If set to true return a mask of 1 of the image. When padded
 we will know which parts is from the original image.</li>
 </ul>
 <p>Returns:</p>
 <ul>
 <li><em>inputs</em>:<ol>
-<li>images: A 3D tensor of float32 and shape [None, None, 3]</li>
+<li>image: A 3D tensor of float32 and shape [None, None, 3]</li>
 <li>image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
 of the image without any padding. It can be usefull if it followed by a <code>padded_batch</code> operations.
 The models needs those information in order to clip the boxes to the proper dimension.</li>
@@ -2144,7 +1692,7 @@ Mask of the image if a padding is performed we will know where the original imag
 </ol>
 </li>
 </ul>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="s s-Atom">def</span> <span class="nf">preprocess_coco_example</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">bgr</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">horizontal_flip</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">padded_mask</span><span class="o">=</span><span class="nv">False</span><span class="p">)</span><span class="s s-Atom">:</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="s s-Atom">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">bgr</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">horizontal_flip</span><span class="o">=</span><span class="nv">True</span><span class="p">,</span> <span class="s s-Atom">random_crop_size</span><span class="o">=</span><span class="nv">None</span><span class="p">,</span> <span class="s s-Atom">padded_mask</span><span class="o">=</span><span class="nv">False</span><span class="p">)</span><span class="s s-Atom">:</span>
 
     <span class="s2">&quot;&quot;&quot;This operations performs a classical preprocessing operations for localization datasets:</span>
 
@@ -2188,6 +1736,8 @@ Mask of the image if a padding is performed we will know where the original imag
 
 <span class="s2">    - *horizontal_flip*: Activate the random horizontal flip.</span>
 
+<span class="s2">    - *random_crop_size*:  TODO</span>
+
 <span class="s2">    - *padded_mask*: If set to true return a mask of 1 of the image. When padded</span>
 
 <span class="s2">    we will know which parts is from the original image.</span>
@@ -2196,7 +1746,7 @@ Mask of the image if a padding is performed we will know where the original imag
 
 <span class="s2">    - *inputs*:</span>
 
-<span class="s2">        1. images: A 3D tensor of float32 and shape [None, None, 3]</span>
+<span class="s2">        1. image: A 3D tensor of float32 and shape [None, None, 3]</span>
 
 <span class="s2">        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape</span>
 
@@ -2218,29 +1768,27 @@ Mask of the image if a padding is performed we will know where the original imag
 
 <span class="s2">    &quot;&quot;&quot;</span>
 
-    <span class="s s-Atom">if</span> <span class="nn">bgr</span><span class="p">:</span>
+    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">][</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">if</span> <span class="s s-Atom">bgr</span> <span class="s s-Atom">else</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">]</span>
 
-        <span class="s s-Atom">images</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">][</span><span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">:</span><span class="p">,</span> <span class="s s-Atom">::-</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="nn">else</span><span class="p">:</span>
-
-        <span class="s s-Atom">images</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;image&#39;</span><span class="p">]</span>
-
-    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">images</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">1333.0</span><span class="p">)</span>
-
-    <span class="s s-Atom">image_information</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">],</span> <span class="s s-Atom">dtype</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">float32</span><span class="p">)</span>
-
-    <span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">],</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]</span>
-
-    <span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span> <span class="o">=</span> <span class="nf">filter_crowded_boxes</span><span class="p">(</span><span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">][</span><span class="s s-Atom">&#39;is_crowd&#39;</span><span class="p">])</span>
-
-    <span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span> <span class="o">=</span> <span class="nf">filter_bad_area</span><span class="p">(</span><span class="s s-Atom">boxes</span><span class="p">,</span> <span class="s s-Atom">labels</span><span class="p">)</span>
+    <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">[</span><span class="s s-Atom">&#39;objects&#39;</span><span class="p">]</span>
 
     <span class="s s-Atom">if</span> <span class="s s-Atom">horizontal_flip:</span>
 
-        <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">boxes</span> <span class="o">=</span> <span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">boxes</span><span class="p">)</span>
+        <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">aug</span><span class="p">.</span><span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">])</span>
 
-    <span class="s s-Atom">boxes</span> <span class="s s-Atom">*=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">tile</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">expand_dims</span><span class="p">(</span><span class="s s-Atom">image_information</span><span class="p">,</span> <span class="s s-Atom">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="s s-Atom">if</span> <span class="s s-Atom">random_crop_size</span> <span class="o">is</span> <span class="o">not</span> <span class="nv">None</span><span class="s s-Atom">:</span>
+
+        <span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="s s-Atom">aug</span><span class="p">.</span><span class="nf">random_random_crop</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="s s-Atom">random_crop_size</span><span class="p">,</span> <span class="s s-Atom">targets</span><span class="p">)</span>
+
+    <span class="s s-Atom">if</span> <span class="s s-Atom">&#39;is_crowd&#39;</span> <span class="s s-Atom">in</span> <span class="nn">targets</span><span class="p">:</span>
+
+        <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="nf">filter_crowded_boxes</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">)</span>
+
+    <span class="s s-Atom">targets</span> <span class="o">=</span> <span class="nf">filter_bad_area</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">)</span>
+
+    <span class="s s-Atom">image</span> <span class="o">=</span> <span class="nf">resize_to_min_dim</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">1333.0</span><span class="p">)</span>
+
+    <span class="s s-Atom">image_information</span> <span class="o">=</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">image</span><span class="p">)[</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">],</span> <span class="s s-Atom">dtype</span><span class="o">=</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">float32</span><span class="p">)</span>
 
     <span class="s s-Atom">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES</span><span class="s s-Atom">:</span> <span class="s s-Atom">image</span><span class="p">,</span> <span class="nv">DatasetField</span><span class="p">.</span><span class="nv">IMAGES_INFO</span><span class="s s-Atom">:</span> <span class="s s-Atom">image_information</span><span class="p">}</span>
 
@@ -2252,13 +1800,13 @@ Mask of the image if a padding is performed we will know where the original imag
 
     <span class="s s-Atom">ground_truths</span> <span class="o">=</span> <span class="p">{</span>
 
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">boxes</span><span class="p">,</span>
+        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">BOXES</span><span class="p">]</span> <span class="o">*</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">tile</span><span class="p">(</span><span class="s s-Atom">image_information</span><span class="p">[</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">newaxis</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span>
 
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">labels</span><span class="p">,</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">int32</span><span class="p">),</span>
+        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">],</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="s s-Atom">int32</span><span class="p">),</span>
 
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">NUM_BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">labels</span><span class="p">),</span>
+        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">NUM_BOXES</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]),</span>
 
-        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">WEIGHTS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">fill</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">labels</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="nv">BoxField</span><span class="p">.</span><span class="nv">WEIGHTS</span><span class="s s-Atom">:</span> <span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">fill</span><span class="p">(</span><span class="s s-Atom">tf</span><span class="p">.</span><span class="nf">shape</span><span class="p">(</span><span class="s s-Atom">targets</span><span class="p">[</span><span class="nv">BoxField</span><span class="p">.</span><span class="nv">LABELS</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">)</span>
 
     <span class="p">}</span>
 
@@ -2385,13 +1933,13 @@ to compute the resizing ratio.</li>
           </a>
         
         
-          <a href="../../model/detr/" title="Detr" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../utils/" title="Utils" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Detr
+                Utils
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

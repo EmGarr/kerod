@@ -606,6 +606,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../dataset/utils/" title="Utils" class="md-nav__link">
+      Utils
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -1646,7 +1658,7 @@
 
 <span class="sd">    - *boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
 
-<span class="sd">    - *window*: A tensor of shape [batch_size, h, w]</span>
+<span class="sd">    - *window*: A tensor of shape [batch_size, (h, w)]</span>
 
 <span class="sd">    Returns:</span>
 
@@ -1704,7 +1716,7 @@
 <p>Arguments:</p>
 <ul>
 <li><em>boxes</em>: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</li>
-<li><em>window</em>: A tensor of shape [batch_size, h, w]</li>
+<li><em>window</em>: A tensor of shape [batch_size, (h, w)]</li>
 </ul>
 <p>Returns:</p>
 <p>A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</p>
@@ -1716,7 +1728,7 @@
 
 <span class="ss">    - *boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
 
-<span class="ss">    - *window*: A tensor of shape [batch_size, h, w]</span>
+<span class="ss">    - *window*: A tensor of shape [batch_size, (h, w)]</span>
 
 <span class="ss">    Returns:</span>
 

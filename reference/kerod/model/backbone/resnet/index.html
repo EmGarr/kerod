@@ -490,6 +490,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/utils/" title="Utils" class="md-nav__link">
+      Utils
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -1603,11 +1615,11 @@
 
 <span class="sd">    import tensorflow_datasets as tfds</span>
 
-<span class="sd">    from kerod.preprocessing import preprocess_coco_example</span>
+<span class="sd">    from kerod.preprocessing import preprocess</span>
 
 <span class="sd">    ds_train, ds_info = tfds.load(name=&quot;coco/2017&quot;, split=&quot;train&quot;, shuffle_files=True, with_info=True)</span>
 
-<span class="sd">    ds_train = ds_train.map(functools.partial(preprocess_coco_example, bgr=True),</span>
+<span class="sd">    ds_train = ds_train.map(functools.partial(preprocess, bgr=True),</span>
 
 <span class="sd">    num_parallel_calls=tf.data.experimental.AUTOTUNE)</span>
 
@@ -2236,10 +2248,10 @@ followed by a 3x3 stride-2 convolutional layer.</p>
 <p><strong>Warning</strong>: Do not forget to use <code>bgr</code> instead of <code>rgb</code>.</p>
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">tensorflow_datasets</span> <span class="k">as</span> <span class="nn">tfds</span>
-<span class="kn">from</span> <span class="nn">kerod.preprocessing</span> <span class="kn">import</span> <span class="n">preprocess_coco_example</span>
+<span class="kn">from</span> <span class="nn">kerod.preprocessing</span> <span class="kn">import</span> <span class="n">preprocess</span>
 
 <span class="n">ds_train</span><span class="p">,</span> <span class="n">ds_info</span> <span class="o">=</span> <span class="n">tfds</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;coco/2017&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">shuffle_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ds_train</span> <span class="o">=</span> <span class="n">ds_train</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">preprocess_coco_example</span><span class="p">,</span> <span class="n">bgr</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="n">ds_train</span> <span class="o">=</span> <span class="n">ds_train</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">preprocess</span><span class="p">,</span> <span class="n">bgr</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
 <span class="n">num_parallel_calls</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">AUTOTUNE</span><span class="p">)</span>
 </code></pre></div>
 
@@ -2259,11 +2271,11 @@ followed by a 3x3 stride-2 convolutional layer.</p>
 
 <span class="sd">    import tensorflow_datasets as tfds</span>
 
-<span class="sd">    from kerod.preprocessing import preprocess_coco_example</span>
+<span class="sd">    from kerod.preprocessing import preprocess</span>
 
 <span class="sd">    ds_train, ds_info = tfds.load(name=&quot;coco/2017&quot;, split=&quot;train&quot;, shuffle_files=True, with_info=True)</span>
 
-<span class="sd">    ds_train = ds_train.map(functools.partial(preprocess_coco_example, bgr=True),</span>
+<span class="sd">    ds_train = ds_train.map(functools.partial(preprocess, bgr=True),</span>
 
 <span class="sd">    num_parallel_calls=tf.data.experimental.AUTOTUNE)</span>
 
