@@ -215,10 +215,10 @@ def ResNet50PytorchStyle(weights='imagenet', input_tensor=None, input_shape=None
     ```python
     import functools
     import tensorflow_datasets as tfds
-    from kerod.preprocessing import preprocess_coco_example
+    from kerod.preprocessing import preprocess
 
     ds_train, ds_info = tfds.load(name="coco/2017", split="train", shuffle_files=True, with_info=True)
-    ds_train = ds_train.map(functools.partial(preprocess_coco_example, bgr=True),
+    ds_train = ds_train.map(functools.partial(preprocess, bgr=True),
     num_parallel_calls=tf.data.experimental.AUTOTUNE)
     ```
     """

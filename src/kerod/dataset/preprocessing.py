@@ -1,9 +1,9 @@
 import tensorflow as tf
 
 from kerod.core import constants
-from kerod.core.box_ops import compute_area
 from kerod.core.standard_fields import BoxField, DatasetField
-from kerod.dataset.augmentation import random_horizontal_flip
+from kerod.dataset.utils import filter_crowded_boxes, filter_bad_area
+from kerod.dataset import augmentation as aug
 
 
 def resize_to_min_dim(image, short_edge_length, max_dimension):
@@ -46,113 +46,7 @@ def resize_to_min_dim(image, short_edge_length, max_dimension):
                            method=tf.image.ResizeMethod.BILINEAR)[0]
 
 
-def preprocess(inputs, bgr=True, padded_mask=False):
-    """This operations performs a classical preprocessing operations for localization datasets:
-
-    - COCO
-    - Pascal Voc
-
-    You can download easily those dataset using [tensorflow dataset](https://www.tensorflow.org/datasets/catalog/overview).
-
-    Arguments:
-
-    - *inputs*: It can be either a [FeaturesDict](https://www.tensorflow.org/datasets/api_docs/python/tfds/features/FeaturesDict) or a dict.
-    but it should have the following structures.
-
-    ```python
-    inputs = FeaturesDict({
-        'image': Image(shape=(None, None, 3), dtype=tf.uint8),
-        'objects': Sequence({
-            'area': Tensor(shape=(), dtype=tf.int64), # area
-            'bbox': BBoxFeature(shape=(4,), dtype=tf.float32), # The values are between 0 and 1
-            'label': ClassLabel(shape=(), dtype=tf.int64, num_classes=80),
-        }),
-    })
-    ```
-
-    - *bgr*: Convert your input image to BGR (od.model.faster_rcnn.FasterRcnnFPNResnet50 needs it).
-    If you have open your image with `tf.image.decode_image` will open an image in RGB. However,
-    OpenCV will open it in BGR by default.
-
-    - *padded_mask*: If set to true return a mask of 1 of the image. When padded
-    we will know which parts is from the original image.
-
-
-    Returns:
-
-    - *inputs*:
-        1. images: A 3D tensor of float32 and shape [None, None, 3]
-        2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
-        of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.
-        The models needs those information in order to clip the boxes to the proper dimension.
-        3. images_padding_mask: If padded_mask set to true return a 2D tensor of int8 and shape [None, None, 3].
-        Mask of the image if a padding is performed we will know where the original image was.
-    - *ground_truths*:
-        1. BoxField.BOXES: A tensor of shape [num_boxes, (y1, x1, y2, x2)] and resized to the image shape
-        2. BoxField.LABELS: A tensor of shape [num_boxes, ]
-        3. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
-    """
-    if bgr:
-        images = inputs['image'][:, :, ::-1]
-    else:
-        images = inputs['image']
-    image = resize_to_min_dim(images, 800.0, 1333.0)
-    image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
-    boxes = inputs['objects'][BoxField.BOXES] * tf.tile(tf.expand_dims(image_information, axis=0),
-                                                        [1, 2])
-    x = {DatasetField.IMAGES: image, DatasetField.IMAGES_INFO: image_information}
-    if padded_mask:
-        x[DatasetField.IMAGES_PMASK] = tf.ones((tf.shape(image)[0], tf.shape(image)[1]),
-                                               dtype=tf.int8)
-
-    ground_truths = {
-        BoxField.BOXES: boxes,
-        BoxField.LABELS: tf.cast(inputs['objects'][BoxField.LABELS], tf.int32),
-        BoxField.NUM_BOXES: tf.shape(inputs['objects'][BoxField.LABELS]),
-        BoxField.WEIGHTS: tf.fill(tf.shape(inputs['objects'][BoxField.LABELS]), 1.0)
-    }
-    return x, ground_truths
-
-
-def filter_crowded_boxes(boxes: tf.Tensor, labels: tf.Tensor, crowd: tf.Tensor) -> tf.Tensor:
-    """Coco has boxes flagged as crowded which are not used during the training.
-    This function will discard them.
-
-    Arguments:
-
-    - *boxes*: A tensor of shape [num_boxes, (y1, x1, y2, x2)]
-    - *labels*: A tensor of shape [num_boxes, ]
-    - *crowd*: Boolean tensor which indicates if the boxes is crowded are not. Crowded means that the boxes
-    contains multiple entities which are to difficult to localize one by one. `True` is for crowded box. 
-
-    Returns:
-
-    - *boxes*: A tensor of shape [N <= num_boxes, (y1, x1, y2, x2)]
-    - *labels*: A tensor of shape [N <= num_boxes, ]
-    """
-    ind_uncrowded_boxes = tf.where(tf.equal(crowd, False))
-    return tf.gather_nd(boxes, ind_uncrowded_boxes), tf.gather_nd(labels, ind_uncrowded_boxes)
-
-
-def filter_bad_area(boxes: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
-    """Remove all the boxes that have an area less or equal to 0.
-
-    Arguments:
-
-    - *boxes*: A tensor of shape [num_boxes, (y1, x1, y2, x2)]
-    - *labels*: A tensor of shape [num_boxes, ]
-
-    Returns:
-
-    - *boxes*: A tensor of shape [N <= num_boxes, (y1, x1, y2, x2)]
-    - *labels*: A tensor of shape [N <= num_boxes, ]
-
-    """
-    area = compute_area(boxes)
-    return tf.gather_nd(boxes, tf.where(area > 0)), tf.gather_nd(labels, tf.where(area > 0))
-
-
-def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True, padded_mask=False):
+def preprocess(inputs, bgr=True, horizontal_flip=True, random_crop_size=None, padded_mask=False):
     """This operations performs a classical preprocessing operations for localization datasets:
 
     - COCO
@@ -180,13 +74,14 @@ def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True, padded_mask=
     OpenCV will open it in BGR by default.
 
     - *horizontal_flip*: Activate the random horizontal flip.
+    - *random_crop_size*: 1-D tensor with size the rank of `image` (e.g: (400, 600, 0)).
     - *padded_mask*: If set to true return a mask of 1 of the image. When padded
     we will know which parts is from the original image.
 
     Returns:
 
     - *inputs*:
-        1. images: A 3D tensor of float32 and shape [None, None, 3]
+        1. image: A 3D tensor of float32 and shape [None, None, 3]
         2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
         of the image without any padding. It can be usefull if it followed by a `padded_batch` operations.
         The models needs those information in order to clip the boxes to the proper dimension.
@@ -197,30 +92,35 @@ def preprocess_coco_example(inputs, bgr=True, horizontal_flip=True, padded_mask=
         2. BoxField.LABELS: A tensor of shape [num_boxes, ]
         3. BoxField.NUM_BOXES: A tensor of shape (). It is usefull to unpad the data in case of a batched training
     """
-    if bgr:
-        images = inputs['image'][:, :, ::-1]
-    else:
-        images = inputs['image']
 
-    image = resize_to_min_dim(images, 800.0, 1333.0)
-    image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
+    image = inputs['image'][:, :, ::-1] if bgr else inputs['image']
 
-    boxes, labels = inputs['objects'][BoxField.BOXES], inputs['objects'][BoxField.LABELS]
-    boxes, labels = filter_crowded_boxes(boxes, labels, inputs['objects']['is_crowd'])
-    boxes, labels = filter_bad_area(boxes, labels)
+    targets = inputs['objects']
+
     if horizontal_flip:
-        image, boxes = random_horizontal_flip(image, boxes)
-    boxes *= tf.tile(tf.expand_dims(image_information, axis=0), [1, 2])
+        image, targets[BoxField.BOXES] = aug.random_horizontal_flip(image, targets[BoxField.BOXES])
+
+    if random_crop_size is not None:
+        image, targets = aug.random_random_crop(image, random_crop_size, targets)
+
+    if 'is_crowd' in targets:
+        targets = filter_crowded_boxes(targets)
+
+    targets = filter_bad_area(targets)
+
+    image = resize_to_min_dim(image, 800.0, 1333.0)
+    image_information = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
 
     inputs = {DatasetField.IMAGES: image, DatasetField.IMAGES_INFO: image_information}
     if padded_mask:
         inputs[DatasetField.IMAGES_PMASK] = tf.ones((tf.shape(image)[0], tf.shape(image)[1]),
                                                     dtype=tf.int8)
+
     ground_truths = {
-        BoxField.BOXES: boxes,
-        BoxField.LABELS: tf.cast(labels, tf.int32),
-        BoxField.NUM_BOXES: tf.shape(labels),
-        BoxField.WEIGHTS: tf.fill(tf.shape(labels), 1.0)
+        BoxField.BOXES: targets[BoxField.BOXES] * tf.tile(image_information[tf.newaxis], [1, 2]),
+        BoxField.LABELS: tf.cast(targets[BoxField.LABELS], tf.int32),
+        BoxField.NUM_BOXES: tf.shape(targets[BoxField.LABELS]),
+        BoxField.WEIGHTS: tf.fill(tf.shape(targets[BoxField.LABELS]), 1.0)
     }
     return inputs, ground_truths
 

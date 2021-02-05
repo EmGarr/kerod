@@ -263,7 +263,7 @@ def clip_boxes(boxes: tf.Tensor, window: tf.Tensor) -> tf.Tensor:
     Arguments:
 
     - *boxes*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
-    - *window*: A tensor of shape [batch_size, h, w]
+    - *window*: A tensor of shape [batch_size, (h, w)]
 
     Returns:
 
