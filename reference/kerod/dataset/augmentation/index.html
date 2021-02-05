@@ -1460,9 +1460,9 @@
 
         <span class="k">if</span> <span class="n">uniform_random</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">5</span><span class="p">:</span>
 
-            <span class="n">image</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">groundtruths</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+            <span class="n">image</span><span class="p">,</span> <span class="n">groundtruths</span> <span class="o">=</span> <span class="n">random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">groundtruths</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">targets</span>
+    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">groundtruths</span>
 </code></pre></div>
 
 </details>
@@ -1798,9 +1798,9 @@ times the function is called, and independent of global seed settings (e.g.
 
         <span class="k">if</span> <span class="n">uniform_random</span> <span class="o">&gt;</span> <span class="mf">.5</span><span class="o">:</span>
 
-            <span class="n">image</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">groundtruths</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+            <span class="n">image</span><span class="p">,</span> <span class="n">groundtruths</span> <span class="o">=</span> <span class="n">random_crop</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">groundtruths</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">targets</span>
+    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">groundtruths</span>
 </code></pre></div>
 
 </details>
