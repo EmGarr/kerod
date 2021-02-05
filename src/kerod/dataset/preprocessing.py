@@ -94,6 +94,7 @@ def preprocess(inputs, bgr=True, horizontal_flip=True, random_crop_size=None, pa
     """
 
     image = inputs['image'][:, :, ::-1] if bgr else inputs['image']
+    image = tf.cast(image, tf.float32)
 
     targets = inputs['objects']
 
@@ -101,6 +102,8 @@ def preprocess(inputs, bgr=True, horizontal_flip=True, random_crop_size=None, pa
         image, targets[BoxField.BOXES] = aug.random_horizontal_flip(image, targets[BoxField.BOXES])
 
     if random_crop_size is not None:
+        if tf.shape(image)[0] < random_crop_size[0] or tf.shape(image)[1] < random_crop_size[1]:
+            image = resize_to_min_dim(image, max(random_crop_size), 1333.0)
         image, targets = aug.random_random_crop(image, random_crop_size, targets)
 
     if 'is_crowd' in targets:
