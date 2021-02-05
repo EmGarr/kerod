@@ -175,5 +175,5 @@ def random_random_crop(image: tf.Tensor,
     with tf.name_scope('RandomRandomCrop'):
         uniform_random = tf.random.uniform([], 0, 1.0, seed=seed)
         if uniform_random > .5:
-            image, targets = random_crop(image, size, groundtruths, seed=seed)
-    return image, targets
+            image, groundtruths = random_crop(image, size, groundtruths, seed=seed)
+    return image, groundtruths
