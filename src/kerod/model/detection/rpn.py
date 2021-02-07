@@ -14,7 +14,9 @@ from kerod.core.standard_fields import BoxField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 from kerod.model.layers import Anchors
+from kerod.utils.documentation import remove_unwanted_doc
 
+__pdoc__ = {}
 SAMPLING_SIZE = 256
 SAMPLING_POSITIVE_RATIO = 0.5
 
@@ -24,8 +26,7 @@ class RegionProposalNetwork(AbstractDetectionHead):
     use the parameters from [Feature Pyramidal Networks for Object Detection](https://arxiv.org/abs/1612.03144).
 
     Arguments:
-
-    - *anchor_ratios*: The ratios are the different shapes that you want to apply on your anchors.
+        anchor_ratios: The ratios are the different shapes that you want to apply on your anchors.
             e.g: (0.5, 1, 2)
     """
 
@@ -69,12 +70,10 @@ class RegionProposalNetwork(AbstractDetectionHead):
         """Predictions for the classification and the regression
 
         Arguments:
-
-        - *inputs*: A tensor of  shape [batch_size, width, height, channel]
+            inputs: A tensor of  shape [batch_size, width, height, channel]
 
         Returns:
-
-        A tuple of tensors of shape ([batch_size, num_anchors, 2], [batch_size, num_anchors, 4])
+            A tuple of tensors of shape ([batch_size, num_anchors, 2], [batch_size, num_anchors, 4])
         """
 
         batch_size = tf.shape(inputs)[0]
@@ -87,15 +86,13 @@ class RegionProposalNetwork(AbstractDetectionHead):
     def call(self, inputs: List[tf.Tensor]):
         """Create the computation graph for the rpn inference
 
-        Argument:
-
-        *inputs*: A List of tensors the output of the pyramid
+        Arguments:
+            inputs: A List of tensors the output of the pyramid
 
         Returns:
-        
-        - *localization_pred*: A list of logits 3-D tensor of shape [batch_size, num_anchors, 4]
-        - *classification_pred*: A lost of logits 3-D tensor of shape [batch_size, num_anchors, 2]
-        - *anchors*: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
+            localization_pred: A list of logits 3-D tensor of shape [batch_size, num_anchors, 4]
+            classification_pred: A lost of logits 3-D tensor of shape [batch_size, num_anchors, 2]
+            anchors: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]
         """
         anchors = [anchors(tensor) for tensor, anchors in zip(inputs, self._anchors)]
 
@@ -109,11 +106,12 @@ class RegionProposalNetwork(AbstractDetectionHead):
         """Compute the loss
 
         Arguments:
+            localization_pred: A list of tensors of shape [batch_size, num_anchors, 4].
+            classification_pred: A list of tensors of shape [batch_size, num_anchors, 2]
+            anchors: A list of tensors of shape [num_anchors, (y_min, x_min, y_max, x_max)]
+            ground_truths: A dict with BoxField as key and a tensor as value.
 
-        - *localization_pred*: A list of tensors of shape [batch_size, num_anchors, 4].
-        - *classification_pred*: A list of tensors of shape [batch_size, num_anchors, 2]
-        - *anchors*: A list of tensors of shape [num_anchors, (y_min, x_min, y_max, x_max)]
-        - *ground_truths*: A dict with BoxField as key and a tensor as value.
+        where ground_truths looks like the following:
 
         ```python
         ground_truths = {
@@ -123,17 +121,14 @@ class RegionProposalNetwork(AbstractDetectionHead):
                 tf.constant([[1, 0], [1, 0]], tf.float32),
             BoxField.WEIGHTS:
                 tf.constant([[1, 0], [1, 1]], tf.float32),
-            BoxField.NUM_BOXES:
+            BoxField.NUM_BOXES: # `NUM_BOXES` allows to remove the padding created by tf.Data.
                 tf.constant([[2], [1]], tf.int32)
         }
         ```
 
-        where `NUM_BOXES` allows to remove the padding created by tf.Data.
-
         Returns:
-
-        - *classification_loss*: A scalar in tf.float32
-        - *localization_loss*: A scalar in tf.float32
+            classification_loss: A scalar in tf.float32
+            localization_loss: A scalar in tf.float32
         """
         localization_pred = tf.concat(localization_pred, 1)
         classification_pred = tf.concat(classification_pred, 1)
@@ -186,16 +181,14 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
     """Useful metrics that allows to track how behave the training of the rpn head.
 
     Arguments:
-
-    - *y_true*: A tensor vector with shape [batch_size, num_anchors] where 0 = background and
-    1 = foreground.
-    - *y_pred*: A tensor of shape [batch_size, num_anchors, 2],
-    representing the classification logits.
-    - *weights*: A tensor of shape [batch_size, num_anchors] where weights should
+        y_true: A tensor vector with shape [batch_size, num_anchors] where 0 = background and
+            1 = foreground.
+        y_pred: A tensor of shape [batch_size, num_anchors, 2],
+            representing the classification logits.
+        weights: A tensor of shape [batch_size, num_anchors] where weights should
 
     Returns:
-
-    - *recall*: Among all the boxes that we had to find how much did we found.
+        recall: Among all the boxes that we had to find how much did we found.
     """
     # Force the cast to avoid type issue when the mixed precision is activated
     y_true, y_pred, weights = tf.cast(y_true, tf.float32), tf.cast(y_pred, tf.float32), tf.cast(
@@ -213,3 +206,6 @@ def compute_rpn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor, weights: tf.Tensor
     num_pos_foreground_prediction = tf.math.count_nonzero(tf.gather_nd(correct, fg_inds))
     recall = tf.truediv(num_pos_foreground_prediction, num_valid_anchor, name='recall')
     return recall
+
+
+remove_unwanted_doc(RegionProposalNetwork, __pdoc__)

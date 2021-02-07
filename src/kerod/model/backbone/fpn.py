@@ -1,6 +1,9 @@
 import tensorflow as tf
+from kerod.utils.documentation import remove_unwanted_doc
 from tensorflow.keras import layers
 from tensorflow.keras.initializers import VarianceScaling
+
+__pdoc__ = {}
 
 
 class FPN(layers.Layer):
@@ -35,12 +38,10 @@ class FPN(layers.Layer):
         """Over your backbone feature build a FPN (inspired from tensorpack)
 
         Arguments:
+            inputs: A list of tensors of shape [N, height, widht, channels]
 
-        - *inputs*: A list of tensors of shape [N, height, widht, channels]
-        
         Returns:
-
-        A list of tensors of shape [N + 1, height, width, channels]
+            A list of tensors of shape [N + 1, height, width, channels]
         """
 
         lateral_connection_2345 = [
@@ -68,3 +69,6 @@ class FPN(layers.Layer):
         base_config = super().get_config()
         base_config['dim'] = self._dim
         return base_config
+
+
+remove_unwanted_doc(FPN, __pdoc__)

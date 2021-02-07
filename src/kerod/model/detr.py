@@ -12,9 +12,12 @@ from kerod.model.layers import PositionEmbeddingSine, Transformer
 from kerod.model.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
 from kerod.utils import item_assignment
+from kerod.utils.documentation import remove_unwanted_doc
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.python.keras.engine import data_adapter
 from tensorflow_addons.losses.giou_loss import GIoULoss
+
+__pdoc__ = {}
 
 
 class DeTr(tf.keras.Model):
@@ -124,20 +127,18 @@ class DeTr(tf.keras.Model):
         """Perform an inference in training.
 
         Arguments:
-
-        - *inputs*: Tuple
-            1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
-            2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
-            of the image without any padding.
-            3. images_padding_mask: A 3D tensor of int8 and shape [batch_size, None, None] composed of 0 and 1 which allows to know where a padding has been applied.
-
-
-        - *training*: Is automatically set to `True` in train mode
+            inputs: Tuple
+                1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
+                2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
+                of the image without any padding.
+                3. images_padding_mask: A 3D tensor of int8 and shape
+                    [batch_size, None, None] composed of 0 and 1 which
+                    allows to know where a padding has been applied.
+            training: Is automatically set to `True` in train mode
 
         Returns:
-
-        - *logits*: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
-        - *boxes*: A Tensor of shape [batch_size, num_queries, 4]
+            logits: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
+            boxes: A Tensor of shape [batch_size, num_queries, 4]
 
         where h is num_queries * transformer_decoder.transformer_num_layers if
         training is true and num_queries otherwise.
@@ -190,14 +191,13 @@ class DeTr(tf.keras.Model):
         """Apply the GIoU, L1 and SCC to each layers of the transformer decoder
 
         Arguments:
-
-        - *ground_truths*:
-           see output kerod.dataset.preprocessing for the doc
-        - *y_pred*: A dict
-            - *scores: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
-            - *bbox*: A Tensor of shape [batch_size, num_queries, 4]
-        - *input_shape*: [height, width] of the input tensor. It is the shape of the images will all the
-        padding included. It is used to normalize the ground_truths boxes.
+            ground_truths: see output kerod.dataset.preprocessing for the doc
+            y_pred: A dict
+                - *scores: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
+                - *bbox*: A Tensor of shape [batch_size, num_queries, 4]
+            input_shape: [height, width] of the input tensor.
+                It is the shape of the images will all the padding included.
+                It is used to normalize the ground_truths boxes.
         """
         normalized_boxes = ground_truths[BoxField.BOXES] / tf.tile(input_shape[None], [1, 2])
         centered_normalized_boxes = convert_to_center_coordinates(normalized_boxes)
@@ -322,13 +322,12 @@ class DeTr(tf.keras.Model):
         Part 4. Experiments of Object Detection with Transformers
 
         Returns:
-
-        - *boxes*: A Tensor of shape [batch_size, self.num_queries, (y1,x1,y2,x2)]
-        containing the boxes with the coordinates between 0 and 1.
-        - *scores*: A Tensor of shape [batch_size, self.num_queries] containing
-        the score of the boxes.
-        - *classes*: A Tensor of shape [batch_size, self.num_queries]
-        containing the class of the boxes [0, num_classes).
+            boxes: A Tensor of shape [batch_size, self.num_queries, (y1,x1,y2,x2)]
+                containing the boxes with the coordinates between 0 and 1.
+            scores: A Tensor of shape [batch_size, self.num_queries] containing
+                the score of the boxes.
+            classes: A Tensor of shape [batch_size, self.num_queries]
+                containing the class of the boxes [0, num_classes).
         """
         data = data_adapter.expand_1d(data)
         x, _, _ = data_adapter.unpack_x_y_sample_weight(data)
@@ -360,14 +359,12 @@ def compute_detr_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
     """Useful metrics that allows to track how behave the training.
 
     Arguments:
-
-    - *y_true*: A one-hot encoded vector with shape [batch_size, num_object_queries, num_classes]
-    - *y_pred*: A tensor with shape [batch_size, num_object_queries, num_classes],
-    representing the classification logits.
+        y_true: A one-hot encoded vector with shape [batch_size, num_object_queries, num_classes]
+        y_pred: A tensor with shape [batch_size, num_object_queries, num_classes],
+            representing the classification logits.
 
     Returns:
-
-    - *recall*: Among all the boxes that we had to find how much did we found.
+        recall: Among all the boxes that we had to find how much did we found.
     """
     #Even if the softmax has not been applyed the argmax can be usefull
     prediction = tf.argmax(y_pred, axis=-1, name='label_prediction', output_type=tf.int32)
@@ -377,3 +374,8 @@ def compute_detr_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
 
     recall = tf.reduce_mean(tf.gather_nd(correct, fg_inds), name='recall')
     return recall
+
+
+remove_unwanted_doc(DeTr, __pdoc__)
+remove_unwanted_doc(DeTrResnet50, __pdoc__)
+remove_unwanted_doc(DeTrResnet50Pytorch, __pdoc__)

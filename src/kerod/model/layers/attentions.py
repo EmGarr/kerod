@@ -1,4 +1,7 @@
 import tensorflow as tf
+from kerod.utils.documentation import remove_unwanted_doc
+
+__pdoc__ = {}
 
 
 class MultiHeadAttention(tf.keras.layers.Layer):
@@ -105,3 +108,6 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         # (batch_size, seq_len_q, d_model)
         concat_attention = tf.reshape(scaled_attention, (batch_size, -1, self.d_model))
         return self.dense(concat_attention)
+
+
+remove_unwanted_doc(MultiHeadAttention, __pdoc__)

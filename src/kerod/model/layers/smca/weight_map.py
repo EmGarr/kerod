@@ -1,4 +1,7 @@
 import tensorflow as tf
+from kerod.utils.documentation import remove_unwanted_doc
+
+__pdoc__ = {}
 
 
 class DynamicalWeightMaps(tf.keras.layers.Layer):
@@ -79,3 +82,6 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
         config = super().get_config()
         config['beta'] = self._beta
         return config
+
+
+remove_unwanted_doc(DynamicalWeightMaps, __pdoc__)

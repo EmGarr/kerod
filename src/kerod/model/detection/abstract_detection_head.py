@@ -2,9 +2,11 @@ from typing import Dict
 
 import tensorflow as tf
 import tensorflow.keras.layers as KL
+from kerod.core.standard_fields import BoxField
+from kerod.utils.documentation import remove_unwanted_doc
 from tensorflow.keras import initializers
 
-from kerod.core.standard_fields import BoxField
+__pdoc__ = {}
 
 
 class AbstractDetectionHead(KL.Layer):
@@ -13,30 +15,30 @@ class AbstractDetectionHead(KL.Layer):
 
     Arguments:
 
-    - *num_classes*: Number of classes of the classification head (e.g: Your n classes +
-        the background class)
-    - *classification_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
-        This object should have a reduction value to None and the parameter from_y_pred to True.
-    - *localization_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
-        This object should have a reduction value to None and the parameter from_y_pred to True.
-    - *segmentation_loss*: An object tf.keras.losses usually CategoricalCrossentropy.
-        This object should have a reduction value to None and the parameter from_y_pred to True.
-    - *classification_loss_weight*: A float 32 representing the weight of the loss in the
-        total loss.
-    - *localization_loss_weight*: A float 32 representing the weight of the loss in the
-        total loss.
-    - *segmentation_loss_weight*: A float 32 representing the weight of the loss in the
-        total loss.
-    - *multiples*: How many time will you replicate the output of the head.
-        For a rpn multiples can be the number of anchors.
-        For a fast_rcnn multiples is 1 we just want the number of classes
-    - *kernel_initializer_classification_head*: Initializer for the `kernel` weights matrix of
-    the classification head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
-    - *kernel_initializer_box_prediction_head*: Initializer for the `kernel` weights matrix of
-        the box prediction head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
-    - *kernel_regularizer*: Regularizer function applied to the kernel weights matrix
-    ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
-    - *use_mask*: Boolean define if the segmentation_head will be used.
+        num_classes: Number of classes of the classification head (e.g: Your n classes +
+            the background class)
+        classification_loss: An object tf.keras.losses usually CategoricalCrossentropy.
+            This object should have a reduction value to None and the parameter from_y_pred to True.
+        localization_loss: An object tf.keras.losses usually CategoricalCrossentropy.
+            This object should have a reduction value to None and the parameter from_y_pred to True.
+        segmentation_loss: An object tf.keras.losses usually CategoricalCrossentropy.
+            This object should have a reduction value to None and the parameter from_y_pred to True.
+        classification_loss_weight: A float 32 representing the weight of the loss in the
+            total loss.
+        localization_loss_weight: A float 32 representing the weight of the loss in the
+            total loss.
+        segmentation_loss_weight: A float 32 representing the weight of the loss in the
+            total loss.
+        multiples: How many time will you replicate the output of the head.
+            For a rpn multiples can be the number of anchors.
+            For a fast_rcnn multiples is 1 we just want the number of classes
+        kernel_initializer_classification_head: Initializer for the `kernel` weights matrix of
+            the classification head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
+        kernel_initializer_box_prediction_head: Initializer for the `kernel` weights matrix of
+            the box prediction head (see [initializers](https://www.tensorflow.org/api_docs/python/tf/keras/initializers)).
+        kernel_regularizer: Regularizer function applied to the kernel weights matrix
+            ([see keras.regularizers](https://www.tensorflow.org/api_docs/python/tf/keras/regularizers)).
+        use_mask: Boolean define if the segmentation_head will be used.
     """
 
     def __init__(self,
@@ -115,12 +117,11 @@ class AbstractDetectionHead(KL.Layer):
 
         Arguments:
 
-        - *inputs*: A tensor of  shape [N, H, W, C]
-                num_convs:
+            inputs: A tensor of  shape [N, H, W, C]
 
         Returns:
 
-        A tensor and shape [N, H*2, W*2, num_classes - 1]
+            A tensor and shape [N, H*2, W*2, num_classes - 1]
         """
 
         x = inputs
@@ -133,7 +134,7 @@ class AbstractDetectionHead(KL.Layer):
 
         Arguments:
 
-        - *inputs*: A tensor of shape [batch_size, H, W, C]
+            inputs: A tensor of shape [batch_size, H, W, C]
         """
         classification_head = self._conv_classification_head(inputs)
 
@@ -147,15 +148,13 @@ class AbstractDetectionHead(KL.Layer):
         Each dictionary is composed of the same key (classification, localization, segmentation)
 
         Arguments:
-
-        - *y_pred*: A dict of tensors of shape [N, nb_boxes, num_output].
-        - *y_true*: A dict of tensors of shape [N, nb_boxes, num_output].
-        - *weights*: A dict of tensors ofshape [N, nb_boxes, num_output].
+            y_pred: A dict of tensors of shape [N, nb_boxes, num_output].
+            y_true: A dict of tensors of shape [N, nb_boxes, num_output].
+            weights: A dict of tensors ofshape [N, nb_boxes, num_output].
                 This tensor is composed of one hot vectors.
 
         Returns:
-
-        A dict of different losses
+            A dict of different losses
         """
 
         def _compute_loss(loss, loss_weight, target):
@@ -209,3 +208,6 @@ class AbstractDetectionHead(KL.Layer):
         if self._use_mask:
             base_config['segmentation_loss_weight'] = self._segmentation_loss_weight
         return base_config
+
+
+remove_unwanted_doc(AbstractDetectionHead, __pdoc__)

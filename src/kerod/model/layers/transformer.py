@@ -1,5 +1,8 @@
 import tensorflow as tf
 from kerod.model.layers import MultiHeadAttention
+from kerod.utils.documentation import remove_unwanted_doc
+
+__pdoc__ = {}
 
 
 class EncoderLayer(tf.keras.layers.Layer):
@@ -13,7 +16,7 @@ class EncoderLayer(tf.keras.layers.Layer):
         dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
             The same rate is shared in all the layers using dropout in the transformer.
 
-    Inputs:
+    Call arguments:
         src: A 3-D Tensor of float32 and shape [batch_size, M, dim]
             the sequence to the encoder layer
         pos_embed: A 3-D Tensor of float32 and shape [batch_size, N, dim]
@@ -21,7 +24,7 @@ class EncoderLayer(tf.keras.layers.Layer):
         key_padding_mask:  [Optional] A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
             False means padding and True means pixel from the original image.
 
-    Output:
+    Call returns:
         A 3-D Tensor of float32 and shape [batch_size, M, d_model]
     """
 
@@ -87,7 +90,7 @@ class DecoderLayer(tf.keras.layers.Layer):
         dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
             The same rate is shared in all the layers using dropout in the transformer.
 
-    Inputs:
+    Call arguments:
         dec_out: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
             the sequence of the decoder
         memory: A 3-D Tensor of float32 and shape [batch_size, N, d_model]
@@ -102,7 +105,7 @@ class DecoderLayer(tf.keras.layers.Layer):
             If provided, it will be added to the attention weight at
             the coattention step (memory x self_attn).
 
-    Outputs:
+    Call returns:
         A 3-D Tensor of float32 and shape [batch_size, M, d_model]
     """
 
@@ -152,15 +155,12 @@ class DecoderLayer(tf.keras.layers.Layer):
             coattn_mask:  A 4-D float tensor of shape [batch_size, num_heads, M, N, seq_len].
                 If provided, it will be added to the attention weight at the coattention step (memory x self_attn)
 
-        Return:
+        Returns:
             A 3-D Tensor of float32 and shape [batch_size, M, d_model]
         """
         tgt_object_queries = dec_out + object_queries
         # (batch_size, M, d_model)
-        self_attn = self.mha1(dec_out,
-                              tgt_object_queries,
-                              tgt_object_queries,
-                              training=training)
+        self_attn = self.mha1(dec_out, tgt_object_queries, tgt_object_queries, training=training)
         self_attn = self.dropout1(self_attn, training=training)
         self_attn = self.layernorm1(self_attn + dec_out)
 
@@ -180,7 +180,7 @@ class DecoderLayer(tf.keras.layers.Layer):
         return out3
 
 
-class Transformer(tf.keras.Model):
+class Transformer(tf.keras.layers.Layer):
     """Will build a Transformer according to the paper
       [Fast Convergence of DETR with Spatially Modulated Co-Attention](https://arxiv.org/pdf/2101.07448.pdf).
 
@@ -210,7 +210,7 @@ class Transformer(tf.keras.Model):
             If provided, it will be added to the attention weight
             at the coattention step (memory x self_attn)
 
-    Call Returns:
+    Call returns:
         decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]
             where h is num_object_queries * num_layers if training is true and
             num_queries if training is set to False.
@@ -265,6 +265,7 @@ class Transformer(tf.keras.Model):
                 [batch_size, num_heads, H*W, num_object_queries, seq_len].
                 If provided, it will be added to the attention weight
                 at the coattention step (memory x self_attn)
+
         Returns:
             decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]
                 where h is num_object_queries * num_layers if training is true and
@@ -297,3 +298,8 @@ class Transformer(tf.keras.Model):
             return tf.concat(layers_output, axis=1), memory
 
         return dec_out, memory
+
+
+remove_unwanted_doc(EncoderLayer, __pdoc__)
+remove_unwanted_doc(DecoderLayer, __pdoc__)
+remove_unwanted_doc(Transformer, __pdoc__)

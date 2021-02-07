@@ -1,7 +1,6 @@
 # Copyright 2015 The TensorFlow Authors and Modified by Emilien Garreau. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
+# Licensed under the Apache License, Version 2.0 (the "License"); # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
@@ -80,7 +79,8 @@ def ResNet(stack_fn: Callable,
     """Instantiates the ResNet, ResNetV2, and ResNeXt architecture.
 
     Reference paper:
-    - [Deep Residual Learning for Image Recognition]
+
+    [Deep Residual Learning for Image Recognition]
         (https://arxiv.org/abs/1512.03385) (CVPR 2015)
     Optionally loads weights pre-trained on ImageNet.
     Note that the data format convention used by the model is
@@ -89,37 +89,34 @@ def ResNet(stack_fn: Callable,
     Please see `applications.resnet.preprocess_input` for an example.
 
     Arguments:
+        stack_fn: a function that returns output tensor for the
+            stacked residual blocks.
+        preprocessing_func: a function that returns the corresponding preprocessing of the network.
+        preact: whether to use pre-activation or not
+            (True for ResNetV2, False for ResNet and ResNeXt).
+        use_bias: whether to use biases for convolutional layers or not
+            (True for ResNet and ResNetV2, False for ResNeXt).
+        model_name: string, model name.
+        include_top: whether to include the fully-connected
+            layer at the top of the network.
+        weights: one of `None` (random initialization),
+            'imagenet' (pre-training on ImageNet),
+            or the path to the weights file to be loaded.
+        input_tensor: optional Keras tensor
+            (i.e. output of `layers.Input()`)
+            to use as image input for the model.
+        input_shape: optional shape tuple, only to be specified
+            if `include_top` is False (otherwise the input shape
+            has to be `(224, 224, 3)` (with `channels_last` data format)
+            or `(3, 224, 224)` (with `channels_first` data format).
+            It should have exactly 3 inputs channels.
+        kwargs: For backwards compatibility only.
 
-    - *stack_fn*: a function that returns output tensor for the
-        stacked residual blocks.
-    - *preprocessing_func*: a function that returns the corresponding preprocessing of the network.
-    - *preact*: whether to use pre-activation or not
-        (True for ResNetV2, False for ResNet and ResNeXt).
-    - *use_bias*: whether to use biases for convolutional layers or not
-        (True for ResNet and ResNetV2, False for ResNeXt).
-    - *model_name*: string, model name.
-    - *include_top*: whether to include the fully-connected
-        layer at the top of the network.
-    - *weights*: one of `None` (random initialization),
-        'imagenet' (pre-training on ImageNet),
-        or the path to the weights file to be loaded.
-    - *input_tensor*: optional Keras tensor
-        (i.e. output of `layers.Input()`)
-        to use as image input for the model.
-    - *input_shape*: optional shape tuple, only to be specified
-        if `include_top` is False (otherwise the input shape
-        has to be `(224, 224, 3)` (with `channels_last` data format)
-        or `(3, 224, 224)` (with `channels_first` data format).
-        It should have exactly 3 inputs channels.
-    - **kwargs: For backwards compatibility only.
-
-    Return:
-
-    A `keras.Model` instance.
+    Returns:
+        A `keras.Model` instance.
 
     Raises:
-
-    *ValueError*: in case of invalid argument for `weights`, or invalid input shape.
+        *ValueError*: in case of invalid argument for `weights`, or invalid input shape.
     """
     if kwargs:
         raise ValueError('Unknown argument(s): %s' % (kwargs,))
@@ -248,10 +245,9 @@ def Group(inputs: tf.Tensor, filters: int, blocks: int, strides: int, name=None)
     """A set of stacked residual blocks with the pytorch style
 
     Arguments:
-
-    - *filters*: integer, filters of the bottleneck layer in a block.
-    - *blocks*: number of blocks in the stacked blocks.
-    - *strides*: Stride of the second conv layer in the first block.
+        filters: integer, filters of the bottleneck layer in a block.
+        blocks: number of blocks in the stacked blocks.
+        strides: Stride of the second conv layer in the first block.
     """
 
     x = Block(inputs, filters, strides, use_conv_shortcut=True, name=f'{name}/block0')
@@ -264,14 +260,12 @@ def Block(inputs: tf.Tensor, filters: int, strides: int = 1, use_conv_shortcut=T
     """A residual block with the pytorch_style
 
     Arguments:
-
-
-    - *inputs*: The inputs tensor
-    - *filters*: integer, filters of the bottleneck layer.
-    - *strides*: default 1, stride of the second convolution layer. In the official Keras
-    implementation the stride is performed on the first convolution. This is different in
-    the pytorch implementation.
-    - *use_conv_shortcut*: Use convolution shortcut if True, otherwise identity shortcut.
+        inputs: The inputs tensor
+        filters: integer, filters of the bottleneck layer.
+        strides: default 1, stride of the second convolution layer. In the official Keras
+            implementation the stride is performed on the first convolution. This is different in
+            the pytorch implementation.
+        use_conv_shortcut: Use convolution shortcut if True, otherwise identity shortcut.
     """
 
     bn_axis = 3 if backend.image_data_format() == 'channels_last' else 1
@@ -315,3 +309,5 @@ def Block(inputs: tf.Tensor, filters: int, strides: int = 1, use_conv_shortcut=T
     x = layers.BatchNormalization(axis=bn_axis, name=f'{name}/conv3/bn')(x)
     x = layers.Add()([shortcut, x])
     return layers.Activation('relu', name=f'{name}/last_relu')(x)
+
+

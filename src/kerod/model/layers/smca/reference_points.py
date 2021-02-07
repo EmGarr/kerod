@@ -1,8 +1,12 @@
 import tensorflow as tf
+from kerod.utils.documentation import remove_unwanted_doc
+
+__pdoc__ = {}
 
 
 class SMCAReferencePoints(tf.keras.layers.Layer):
     """Multi head reference points from the paper [Fast Convergence of DETR with Spatially Modulated Co-Attention](https://arxiv.org/pdf/2101.07448.pdf).
+
     Based on the object queries will create a set of reference points which will
     allow to create a [spatial dynamical weight maps](./weight_map.py) in order to modulate
     the co-attention inside the transformer
@@ -12,6 +16,7 @@ class SMCAReferencePoints(tf.keras.layers.Layer):
         num_heads: Positive integer, each head starts from a head-shared center
             and then predicts a head-specific center offset
             and head specific scales.
+
     Call arguments:
         object_queries: A 3-D float32 Tensor of shape
             [batch_size, num_object_queries, d_model] small fixed number of
@@ -64,3 +69,6 @@ class SMCAReferencePoints(tf.keras.layers.Layer):
 
         yxhw = tf.concat([yx, tf.zeros((batch_size, num_queries, self.num_heads, 2))], axis=-1)
         return yxhw + yx_offset_hw, yx_pre_sigmoid
+
+
+remove_unwanted_doc(SMCAReferencePoints, __pdoc__)

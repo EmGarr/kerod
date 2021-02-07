@@ -19,7 +19,6 @@ Many ideas have been based on [google object detection](https://github.com/tenso
 
 ## Warning
 
-- I need to fix the documentation build
 - Currently DETR like architecture cannot be saved using `model.save(path)`. I need to investigate. Please use: `model.save_weights(path)`.
 
 ## Features

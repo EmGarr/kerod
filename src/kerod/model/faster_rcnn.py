@@ -1,16 +1,15 @@
 import tensorflow as tf
-
-from tensorflow.python.keras.engine import data_adapter
-
-from kerod.utils.training import apply_kernel_regularization
-from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
+from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.model.backbone.fpn import FPN
+from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
 from kerod.model.detection.fast_rcnn import FastRCNN
 from kerod.model.detection.rpn import RegionProposalNetwork
-from kerod.model.post_processing import post_process_fast_rcnn_boxes
-from kerod.core.standard_fields import DatasetField, BoxField
+from kerod.model.post_processing import (post_process_fast_rcnn_boxes, post_process_rpn)
+from kerod.utils.documentation import remove_unwanted_doc
+from kerod.utils.training import apply_kernel_regularization
+from tensorflow.python.keras.engine import data_adapter
 
-from kerod.model.post_processing import post_process_rpn
+__pdoc__ = {}
 
 
 class FasterRcnnFPN(tf.keras.Model):
@@ -27,9 +26,9 @@ class FasterRcnnFPN(tf.keras.Model):
     ```
 
     Arguments:
-
-    - *num_classes*: The number of classes of your dataset
-    (**do not include the background class** it is handle for you)
+        num_classes: The number of classes of your dataset
+            (**do not include the background class** it is handle for you)
+        backbone: A tensorflow Model.
     """
 
     def __init__(self, num_classes, backbone, **kwargs):
@@ -49,44 +48,40 @@ class FasterRcnnFPN(tf.keras.Model):
         """Perform an inference in training.
 
         Arguments:
+            inputs: A list with the following schema:
+                1. *features*:
+                1.1 *images*: A Tensor of shape [batch_size, height, width, 3]
+                1.2 *image_informations*: A float32 Tensor of shape [batch_size, 2] where
+                    the last dimension represents the original height and width of the images
+                (without the padding).
 
-        - *inputs*: A list with the following schema:
+                2. *ground_truths*: If the training is true, a dict with
+                    ```python
+                    ground_truths = {
+                        BoxField.BOXES:
+                            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
+                        BoxField.LABELS:
+                            tf.constant([[2,1], [2, 0]], tf.int32),
+                        BoxField.WEIGHTS:
+                            tf.constant([[1, 0], [1, 1]], tf.float32),
+                        BoxField.NUM_BOXES:
+                            tf.constant([2, 1], tf.int32)
+                    }
+                    ```
 
-        1. *features*:
-        1.1 *images*: A Tensor of shape [batch_size, height, width, 3]
-        1.2 *image_informations*: A float32 Tensor of shape [batch_size, 2] where
-        the last dimension represents the original height and width of the images
-        (without the padding).
-
-        2.. *ground_truths*: If the training is true, a dict with
-
-        ```python
-        ground_truths = {
-            BoxField.BOXES:
-                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
-            BoxField.LABELS:
-                tf.constant([[2,1], [2, 0]], tf.int32),
-            BoxField.WEIGHTS:
-                tf.constant([[1, 0], [1, 1]], tf.float32),
-            BoxField.NUM_BOXES:
-                tf.constant([2, 1], tf.int32)
-        }
-        ```
-
-        - *training*: Is automatically set to `True` in train and test mode
-        (normally test should be at false). Why? Through the call we the losses and the metrics
-        of the rpn and fast_rcnn. They are automatically added with `add_loss` and `add_metrics`.
-        In test we want to benefit from those and therefore we compute them. It is an inheritance
-        from tensorflow 2.0 and 2.1 and I'll think to move them in a more traditional way inside the
-        train_step and test_step. However for now this method benefit of the encapsulation of
-        the `self.compiled_loss` method.
+            training: Is automatically set to `True` in train and test mode
+                (normally test should be at false). Why? Through the call we the losses and the metrics
+                of the rpn and fast_rcnn. They are automatically added with `add_loss` and `add_metrics`.
+                In test we want to benefit from those and therefore we compute them. It is an inheritance
+                from tensorflow 2.0 and 2.1 and I'll think to move them in a more traditional way inside the
+                train_step and test_step. However for now this method benefit of the encapsulation of
+                the `self.compiled_loss` method.
 
         Returns:
-
-        - *classification_pred*: A Tensor of shape [batch_size, num_boxes, num_classes] representig
-        the class probability.
-        - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
-        - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
+            classification_pred: A Tensor of shape [batch_size, num_boxes, num_classes] representig
+                the class probability.
+            localization_pred: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
+            anchors: A Tensor of shape [batch_size, num_boxes, 4]
         """
         images = inputs[DatasetField.IMAGES]
         images_information = inputs[DatasetField.IMAGES_INFO]
@@ -234,3 +229,8 @@ class FasterRcnnFPNResnet50Pytorch(FasterRcnnFPN):
     def __init__(self, num_classes, **kwargs):
         resnet = ResNet50PytorchStyle(input_shape=[None, None, 3], weights='imagenet')
         super().__init__(num_classes, resnet, **kwargs)
+
+
+remove_unwanted_doc(FasterRcnnFPN, __pdoc__)
+remove_unwanted_doc(FasterRcnnFPNResnet50Caffe, __pdoc__)
+remove_unwanted_doc(FasterRcnnFPNResnet50Pytorch, __pdoc__)

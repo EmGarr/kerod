@@ -14,7 +14,10 @@ from kerod.model.layers import (DynamicalWeightMaps, PositionEmbeddingSine, Tran
                                 SMCAReferencePoints)
 from kerod.model.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
+from kerod.utils.documentation import remove_unwanted_doc
 from tensorflow.python.keras.engine import data_adapter
+
+__pdoc__ = {}
 
 
 class SMCA(tf.keras.Model):
@@ -132,20 +135,18 @@ class SMCA(tf.keras.Model):
         """Perform an inference in training.
 
         Arguments:
-
-        - *inputs*: Tuple
-            1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
-            2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
-            of the image without any padding.
-            3. images_padding_mask: A 3D tensor of int8 and shape [batch_size, None, None] composed of 0 and 1 which allows to know where a padding has been applied.
-
-
-        - *training*: Is automatically set to `True` in train mode
+            inputs: Tuple
+                1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
+                2. image_informations: A 1D tensor of float32 and shape [(height, width),].
+                    It contains the shape of the image without any padding.
+                3. images_padding_mask: A 3D tensor of int8 and shape
+                    [batch_size, None, None] composed of 0 and 1 which allows
+                    to know where a padding has been applied.
+            training: Is automatically set to `True` in train mode
 
         Returns:
-
-        - *logits*: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
-        - *boxes*: A Tensor of shape [batch_size, num_queries, 4]
+            logits: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
+            boxes: A Tensor of shape [batch_size, num_queries, 4]
 
         where h is num_queries * transformer_decoder.num_layers if
         training is true and num_queries otherwise.
@@ -381,3 +382,8 @@ class SMCAR50Pytorch(SMCA):
     def __init__(self, num_classes, num_queries=100, **kwargs):
         resnet = ResNet50PytorchStyle(input_shape=[None, None, 3], weights='imagenet')
         super().__init__(num_classes, resnet, num_queries=num_queries, **kwargs)
+
+
+remove_unwanted_doc(SMCA, __pdoc__)
+remove_unwanted_doc(SMCAR50, __pdoc__)
+remove_unwanted_doc(SMCAR50Pytorch, __pdoc__)

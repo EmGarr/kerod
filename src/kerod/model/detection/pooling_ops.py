@@ -10,11 +10,9 @@ def _crop_and_resize(tensor, boxes, box_indices, crop_size: int):
     Aligned version of tf.image.crop_and_resize, following our definition of floating point boxes.
 
     Arguments:
-
-    - *tensor*: A 4-D tensor of shape [batch, image_height, image_width, depth].
+        tensor: A 4-D tensor of shape [batch, image_height, image_width, depth].
             Both image_height and image_width need to be positive.
-
-    - *boxes*: A 2-D tensor of shape [num_boxes, 4].
+        boxes: A 2-D tensor of shape [num_boxes, 4].
             The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is
             specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is
             mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of
@@ -23,15 +21,12 @@ def _crop_and_resize(tensor, boxes, box_indices, crop_size: int):
             original image. The width dimension is treated similarly. Normalized coordinates outside the
             [0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input
             image values.
-
-    - *box_indices*: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).
+        box_indices: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).
             The value of box_ind[i] specifies the image that the i-th box refers to.
-
-    - *crop_size*: An int representing the ouput size of the crop.
+        crop_size: An int representing the ouput size of the crop.
 
     Returns:
-
-    A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].
+        A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].
     """
     boxes = tf.stop_gradient(boxes)
 
@@ -55,11 +50,9 @@ def roi_align(inputs, boxes, box_indices, image_shape, crop_size: int):
     """RoI align like operation from the paper Mask-RCNN.
 
     Arguments:
-
-    - *inputs*: A 4-D tensor of shape [batch, height, tensor_width, depth].
+        inputs: A 4-D tensor of shape [batch, height, tensor_width, depth].
             Both image_height and image_width need to be positive.
-
-    - *boxes*: A 2-D tensor of shape [num_boxes, 4].
+        boxes: A 2-D tensor of shape [num_boxes, 4].
             The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is
             specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is
             mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of
@@ -68,16 +61,13 @@ def roi_align(inputs, boxes, box_indices, image_shape, crop_size: int):
             original image. The width dimension is treated similarly. Normalized coordinates outside the
             [0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input
             image values.
-
-    - *box_indices*: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).
+        box_indices: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).
             The value of box_ind[i] specifies the image that the i-th box refers to.
-    - *image_shape*: A tuple with the height and the width of the original image input image
-
-    - *crop_size*: An int representing the ouput size of the crop.
+        image_shape: A tuple with the height and the width of the original image input image
+        crop_size: An int representing the ouput size of the crop.
 
     Returns:
-
-    A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].
+        A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].
     """
     normalized_boxes = normalize_box_coordinates(boxes, image_shape[0], image_shape[1])
     # Normalized the boxes to the input tensor_shape

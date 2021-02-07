@@ -3,18 +3,21 @@ from typing import Dict
 
 import tensorflow as tf
 import tensorflow.keras.layers as KL
-from tensorflow.keras import initializers
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
-
-from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.losses import L1Loss
+from kerod.core.matcher import Matcher
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.similarity import IoUSimilarity
 from kerod.core.standard_fields import BoxField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
 from kerod.model.detection.pooling_ops import multilevel_roi_align
+from kerod.utils.documentation import remove_unwanted_doc
+from tensorflow.keras import initializers
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+
+__pdoc__ = {}
+
 
 
 class FastRCNN(AbstractDetectionHead):
@@ -22,9 +25,8 @@ class FastRCNN(AbstractDetectionHead):
     are from [Feature Pyramidal Networks for Object Detection](https://arxiv.org/abs/1612.03144).
 
     Arguments:
-
-    - *num_classes*: The number of classes that predict the classification head (N+1) where N
-    is the number of classes of your dataset and 1 is the background.
+        num_classes: The number of classes that predict the classification head (N+1) where N
+            is the number of classes of your dataset and 1 is the background.
     """
 
     def __init__(self, num_classes, **kwargs):
@@ -58,12 +60,12 @@ class FastRCNN(AbstractDetectionHead):
         """Build the computational graph of the fast RCNN HEAD.
 
         Arguments:
+            inputs: A list with the following schema:
+                1. *pyramid*: A List of tensors the output of the pyramid
+                2. *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+                3. *ground_truths*: If the training is true, a dict with
 
-        *inputs*: A list with the following schema:
-
-        1. *pyramid*: A List of tensors the output of the pyramid
-        2. *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
-        3. *ground_truths*: If the training is true, a dict with
+        Where ground_truths is:
 
         ```python
         ground_truths = {
@@ -80,13 +82,11 @@ class FastRCNN(AbstractDetectionHead):
 
         where `NUM_BOXES` allows to remove the padding created by tf.Data.
 
-        - *training*: Boolean
 
         Returns:
-
-        - *classification_pred*: A logit Tensor of shape [batch_size, num_boxes, num_classes]
-        - *localization_pred*: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
-        - *anchors*: A Tensor of shape [batch_size, num_boxes, 4]
+            classification_pred: A logit Tensor of shape [batch_size, num_boxes, num_classes]
+            localization_pred: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
+            anchors: A Tensor of shape [batch_size, num_boxes, 4]
 
         Raw predictions from the FastRCNN head you can post_process them using:
 
@@ -130,9 +130,16 @@ class FastRCNN(AbstractDetectionHead):
         to analyse the anchors that you sampled with this method.
 
         Arguments:
+            anchors: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
+            ground_truths: A dict with the following format:
 
-        - *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
-        - *ground_truths*: A dict with the following format:
+            sampling_size: Desired sampling size. If None, keeps all positive samples and
+                randomly selects negative samples so that the positive sample fraction
+            matches positive_fraction.
+            sampling_positive_ratio: Desired fraction of positive examples (scalar in [0,1])
+                in the batch.
+
+        where ground_truths is:
 
         ```python
         ground_truths = {
@@ -142,35 +149,26 @@ class FastRCNN(AbstractDetectionHead):
                 tf.constant([[8, 0], [1, 0]], tf.float32),
             BoxField.WEIGHTS:
                 tf.constant([[1, 0], [1, 1]], tf.float32),
-            BoxField.NUM_BOXES:
+            BoxField.NUM_BOXES: #  `NUM_BOXES` allows to remove the padding created by tf.Data.
                 tf.constant([[2], [1]], tf.int32)
         }
         ```
-        where `NUM_BOXES` allows to remove the padding created by tf.Data.
-
-        - *sampling_size*: Desired sampling size. If None, keeps all positive samples and
-        randomly selects negative samples so that the positive sample fraction
-        matches positive_fraction.
-        - *sampling_positive_ratio*: Desired fraction of positive examples (scalar in [0,1])
-        in the batch.
 
         Returns:
+            y_true: A dict with :
+                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,
+                    num_classes],
+                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,
+                    box_code_dimension]
 
-        - *y_true*: A dict with :
-            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,
-            num_classes],
-            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,
-            box_code_dimension]
-
-        - *weights*: A dict with:
-            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,
-            num_classes],
-            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],
+            weights: A dict with:
+                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,
+                num_classes],
+                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],
 
         Raises:
-
-        - *ValueError*: If the batch_size is None.
-        - *ValueError*: If the batch_size between your ground_truths and the anchors does not match.
+            ValueError: If the batch_size is None.
+            ValueError: If the batch_size between your ground_truths and the anchors does not match.
         """
 
         ground_truths = {
@@ -223,22 +221,20 @@ class FastRCNN(AbstractDetectionHead):
         """Compute the loss of the FastRCNN
 
         Arguments:
-
-        - *y_true*: A dict with :
-            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors, num_classes]
-            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors, 4]
-        - *weights*: A dict with:
-            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors, num_classes]
-            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors]
-        - *classification_pred*: A tensor and shape
-        [batch_size, num_anchors, num_classes]
-        - *localization_pred*: A tensor and shape
-        [batch_size, num_anchors, (num_classes - 1) * 4]
+            y_true: A dict with :
+                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors, num_classes]
+                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors, 4]
+            weights: A dict with:
+                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors, num_classes]
+                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors]
+            classification_pred: A tensor and shape
+                [batch_size, num_anchors, num_classes]
+            localization_pred: A tensor and shape
+                [batch_size, num_anchors, (num_classes - 1) * 4]
 
         Returns:
-
-        - *classification_loss*: A scalar
-        - *localization_loss*: A scalar
+            classification_loss: A scalar
+            localization_loss: A scalar
         """
         y_true_classification = tf.cast(y_true[BoxField.LABELS], tf.int32)
         accuracy, fg_accuracy, false_negative = compute_fast_rcnn_metrics(
@@ -271,17 +267,16 @@ def compute_fast_rcnn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
     """Useful metrics that allows to track how behave the training of the fast rcnn head.
 
     Arguments:
-
-    - *y_true*: A one-hot encoded vector with shape [batch_size, num_sample_anchors, num_classes]
-    - *y_pred*: A tensor with shape [batch_size, num_sample_anchors, num_classes],
-    representing the classification logits.
+        y_true: A one-hot encoded vector with shape [batch_size, num_sample_anchors, num_classes]
+        y_pred: A tensor with shape [batch_size, num_sample_anchors, num_classes],
+            representing the classification logits.
 
     Returns:
 
-    - *accuracy*: A scalar tensor representing the accuracy with the background classes included
-    - *fg_accuracy*: A scalar tensor representing the accuracy without the background classes included
-    - *false_negative*: A scalar tensor representing the ratio of boxes predicted as background instead of
-    their respective class among the foreground example to predict.
+        accuracy: A scalar tensor representing the accuracy with the background classes included
+        fg_accuracy: A scalar tensor representing the accuracy without the background classes included
+        false_negative: A scalar tensor representing the ratio of boxes predicted as background instead of
+            their respective class among the foreground example to predict.
 
     Warning:
 
@@ -308,3 +303,5 @@ def compute_fast_rcnn_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
     fg_accuracy = tf.reduce_mean(tf.gather_nd(correct, fg_inds), name='fg_accuracy')
 
     return accuracy, fg_accuracy, false_negative
+
+remove_unwanted_doc(FastRCNN, __pdoc__)

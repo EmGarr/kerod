@@ -1,25 +1,27 @@
 import tensorflow as tf
 from kerod.core.constants import MAX_IMAGE_DIMENSION
+from kerod.utils.documentation import remove_unwanted_doc
+
+__pdoc__ = {}
 
 
 def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, max_size: int):
-    """Will generate a determistic grid based on the input images dimension. The anchors
-    will be generated once and for all on the biggest possible image.
+    """Will generate a determistic grid based on the input images dimension.
+
+    The anchors will be generated once and for all on the biggest possible image.
     At each forward according to the shape of the tensor we can extract the corresponding anchors.
 
     Arguments:
-
-    - *stride*: Downscaling ratio compared to the original image. At stride 16 your original
-        image will be 16 times bigger than your actual tensor
-    - *scales*: The scale of the anchors e.g: 8, 16, 32
-    - *ratios*: The ratios are the different shapes that you want to apply on your anchors.
+        stride: Downscaling ratio compared to the original image. At stride 16 your original
+            image will be 16 times bigger than your actual tensor
+        scales: The scale of the anchors e.g: 8, 16, 32
+        ratios: The ratios are the different shapes that you want to apply on your anchors.
             e.g: (0.5, 1, 2)
-    - *max_size*: Maximum size of the input image. The anchors will computed once and for all.
+        max_size: Maximum size of the input image. The anchors will computed once and for all.
 
     Returns:
-
-    A tensor of shape [num_scales * num_ratios * height * width, 4].
-    The anchors have the format [y_min, x_min, y_max, x_max].
+        A tensor of shape [num_scales * num_ratios * height * width, 4].
+        The anchors have the format [y_min, x_min, y_max, x_max].
     """
     ratios, scales = tf.meshgrid(ratios, scales)
     scales = tf.reshape(scales, [-1])
@@ -43,21 +45,20 @@ def generate_anchors(stride: int, scales: tf.Tensor, ratios: tf.Tensor, max_size
 
 class Anchors(tf.keras.layers.Layer):
     """Will generate a determistic grid and store it in memory to avoid recompute it at each run.
+
      At each forward according to the shape of the tensor we can extract the corresponding anchors.
 
     Arguments:
-
-    - *stride*: Downscaling ratio compared to the original image. At stride 16 your original
-        image will be 16 times bigger than your actual tensor
-    - *scales*: The scale of the anchors e.g: 8, 16, 32
-    - *ratios*: The ratios are the different shapes that you want to apply on your anchors.
+        stride: Downscaling ratio compared to the original image. At stride 16 your original
+            image will be 16 times bigger than your actual tensor
+        scales: The scale of the anchors e.g: 8, 16, 32
+        ratios: The ratios are the different shapes that you want to apply on your anchors.
             e.g: (0.5, 1, 2)
-    - *max_size*: Maximum size of the input image. The anchors will computed once and for all.
+        max_size: Maximum size of the input image. The anchors will computed once and for all.
 
-    Return:
-
-    A tensor of shape [num_scales * num_ratios * height * width, 4].
-    The anchors have the format [y_min, x_min, y_max, x_max].
+    Returns:
+        A tensor of shape [num_scales * num_ratios * height * width, 4].
+        The anchors have the format [y_min, x_min, y_max, x_max].
     """
 
     def __init__(self, stride, scales, ratios, **kwargs):
@@ -74,14 +75,12 @@ class Anchors(tf.keras.layers.Layer):
     def call(self, inputs):
         """Return anchors based on the shape of the input tensors
 
-        Argument:
+        Arguments:
+            inputs: A tensor of shape [batch_size, height, widht, channel]
 
-        - *inputs*: A tensor of shape [batch_size, height, widht, channel]
-
-        Return:
-
-        A tensor of shape [num_scales * num_ratios * height * width, 4].
-        The anchors have the format [y_min, x_min, y_max, x_max].
+        Returns:
+            A tensor of shape [num_scales * num_ratios * height * width, 4].
+            The anchors have the format [y_min, x_min, y_max, x_max].
         """
         shape = tf.shape(inputs)
         height, width = shape[1], shape[2]
@@ -94,3 +93,6 @@ class Anchors(tf.keras.layers.Layer):
         config['scales'] = self._scales
         config['ratios'] = self._ratios
         return config
+
+
+remove_unwanted_doc(Anchors, __pdoc__)
