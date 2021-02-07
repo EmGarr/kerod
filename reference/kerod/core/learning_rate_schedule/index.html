@@ -1225,6 +1225,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../../utils/documentation/" title="Documentation" class="md-nav__link">
+      Documentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../../utils/drawing/" title="Drawing" class="md-nav__link">
       Drawing
     </a>
@@ -1915,26 +1927,8 @@ be called during TRAIN mode.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict, metric results for this training epoch, and for the</td>
-<td></td>
-</tr>
-<tr>
-<td>validation epoch if validation is performed. Validation result keys</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>are prefixed with <code>val_</code>. For training epoch, the values of the</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><code>Model</code>'s metrics are returned. Example : <code>{'loss': 0.2, 'acc': 0.7}</code>.</td>
+<td>Dict, metric results for this training epoch, and for the<br>validation epoch if validation is performed. Validation result keys<br> are prefixed with <code>val_</code>. For training epoch, the values of the  <br><code>Model</code>'s metrics are returned. Example : <code>{'loss': 0.2, 'acc': 0.7}</code>.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -1997,20 +1991,8 @@ batches.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict, contains the return value of <code>model.predict_step</code>,</td>
-<td></td>
-</tr>
-<tr>
-<td>it typically returns a dict with a key 'outputs' containing</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>the model's outputs.</td>
+<td>Dict, contains the return value of <code>model.predict_step</code>,<br>it typically returns a dict with a key 'outputs' containing<br>the model's outputs.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -2131,14 +2113,8 @@ batches.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict. Currently no data is passed to this argument for this method</td>
-<td></td>
-</tr>
-<tr>
-<td>but that may change in the future.</td>
+<td>Dict. Currently no data is passed to this argument for this method<br>but that may change in the future.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -2183,14 +2159,8 @@ batches.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict. Currently no data is passed to this argument for this method</td>
-<td></td>
-</tr>
-<tr>
-<td>but that may change in the future.</td>
+<td>Dict. Currently no data is passed to this argument for this method<br>but that may change in the future.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -2247,20 +2217,8 @@ batches.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict, contains the return value of <code>model.test_step</code>. Typically,</td>
-<td></td>
-</tr>
-<tr>
-<td>the values of the <code>Model</code>'s metrics are returned.  Example:</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><code>{'loss': 0.2, 'accuracy': 0.7}</code>.</td>
+<td>Dict, contains the return value of <code>model.test_step</code>. Typically,<br>the values of the <code>Model</code>'s metrics are returned.  Example:<br><code>{'loss': 0.2, 'accuracy': 0.7}</code>.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -2391,14 +2349,8 @@ batches.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict. Currently no data is passed to this argument for this method</td>
-<td></td>
-</tr>
-<tr>
-<td>but that may change in the future.</td>
+<td>Dict. Currently no data is passed to this argument for this method<br>but that may change in the future.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -2443,20 +2395,8 @@ batches.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict. Currently the output of the last call to</td>
-<td></td>
-</tr>
-<tr>
-<td><code>on_test_batch_end()</code> is passed to this argument for this method</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>but that may change in the future.</td>
+<td>Dict. Currently the output of the last call to<br><code>on_test_batch_end()</code> is passed to this argument for this method<br>but that may change in the future.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -2591,14 +2531,8 @@ batches.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict. Currently no data is passed to this argument for this method</td>
-<td></td>
-</tr>
-<tr>
-<td>but that may change in the future.</td>
+<td>Dict. Currently no data is passed to this argument for this method<br>but that may change in the future.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -2643,20 +2577,8 @@ batches.</p>
 <tr>
 <td>logs</td>
 <td>None</td>
-<td>Dict. Currently the output of the last call to <code>on_epoch_end()</code></td>
-<td></td>
-</tr>
-<tr>
-<td>is passed to this argument for this method but that may change in</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>the future.</td>
+<td>Dict. Currently the output of the last call to <code>on_epoch_end()</code><br>is passed to this argument for this method but that may change in<br>the future.</td>
 <td>None</td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table>

@@ -1054,6 +1054,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../../../utils/documentation/" title="Documentation" class="md-nav__link">
+      Documentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../../../utils/drawing/" title="Drawing" class="md-nav__link">
       Drawing
     </a>
@@ -1214,11 +1226,11 @@
 
 <span class="sd">    Arguments:</span>
 
-<span class="sd">    - *tensor*: A 4-D tensor of shape [batch, image_height, image_width, depth].</span>
+<span class="sd">        tensor: A 4-D tensor of shape [batch, image_height, image_width, depth].</span>
 
 <span class="sd">            Both image_height and image_width need to be positive.</span>
 
-<span class="sd">    - *boxes*: A 2-D tensor of shape [num_boxes, 4].</span>
+<span class="sd">        boxes: A 2-D tensor of shape [num_boxes, 4].</span>
 
 <span class="sd">            The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is</span>
 
@@ -1236,15 +1248,15 @@
 
 <span class="sd">            image values.</span>
 
-<span class="sd">    - *box_indices*: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
+<span class="sd">        box_indices: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
 
 <span class="sd">            The value of box_ind[i] specifies the image that the i-th box refers to.</span>
 
-<span class="sd">    - *crop_size*: An int representing the ouput size of the crop.</span>
+<span class="sd">        crop_size: An int representing the ouput size of the crop.</span>
 
 <span class="sd">    Returns:</span>
 
-<span class="sd">    A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
+<span class="sd">        A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1282,11 +1294,11 @@
 
 <span class="sd">    Arguments:</span>
 
-<span class="sd">    - *inputs*: A 4-D tensor of shape [batch, height, tensor_width, depth].</span>
+<span class="sd">        inputs: A 4-D tensor of shape [batch, height, tensor_width, depth].</span>
 
 <span class="sd">            Both image_height and image_width need to be positive.</span>
 
-<span class="sd">    - *boxes*: A 2-D tensor of shape [num_boxes, 4].</span>
+<span class="sd">        boxes: A 2-D tensor of shape [num_boxes, 4].</span>
 
 <span class="sd">            The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is</span>
 
@@ -1304,17 +1316,17 @@
 
 <span class="sd">            image values.</span>
 
-<span class="sd">    - *box_indices*: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
+<span class="sd">        box_indices: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
 
 <span class="sd">            The value of box_ind[i] specifies the image that the i-th box refers to.</span>
 
-<span class="sd">    - *image_shape*: A tuple with the height and the width of the original image input image</span>
+<span class="sd">        image_shape: A tuple with the height and the width of the original image input image</span>
 
-<span class="sd">    - *crop_size*: An int representing the ouput size of the crop.</span>
+<span class="sd">        crop_size: An int representing the ouput size of the crop.</span>
 
 <span class="sd">    Returns:</span>
 
-<span class="sd">    A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
+<span class="sd">        A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1685,47 +1697,75 @@ It will be useful to reorder our boxes after the roi_align operation.</li>
 </code></pre></div>
 
 <p>RoI align like operation from the paper Mask-RCNN.</p>
-<p>Arguments:</p>
-<ul>
-<li>
-<p><em>inputs</em>: A 4-D tensor of shape [batch, height, tensor_width, depth].
-        Both image_height and image_width need to be positive.</p>
-</li>
-<li>
-<p><em>boxes</em>: A 2-D tensor of shape [num_boxes, 4].
-        The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is
-        specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is
-        mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of
-        normalized image height is mapped to [0, image_height - 1] in image height coordinates.
-        We do allow y1 &gt; y2, in which case the sampled crop is an up-down flipped version of the
-        original image. The width dimension is treated similarly. Normalized coordinates outside the
-        [0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input
-        image values.</p>
-</li>
-<li>
-<p><em>box_indices</em>: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).
-        The value of box_ind[i] specifies the image that the i-th box refers to.</p>
-</li>
-<li>
-<p><em>image_shape</em>: A tuple with the height and the width of the original image input image</p>
-</li>
-<li>
-<p><em>crop_size</em>: An int representing the ouput size of the crop.</p>
-</li>
-</ul>
-<p>Returns:</p>
-<p>A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inputs</td>
+<td>None</td>
+<td>A 4-D tensor of shape [batch, height, tensor_width, depth].<br>Both image_height and image_width need to be positive.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>boxes</td>
+<td>None</td>
+<td>A 2-D tensor of shape [num_boxes, 4].<br>The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is<br>specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is<br>mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of<br>normalized image height is mapped to [0, image_height - 1] in image height coordinates.<br>We do allow y1 &gt; y2, in which case the sampled crop is an up-down flipped version of the<br>original image. The width dimension is treated similarly. Normalized coordinates outside the<br>[0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input<br>image values.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>box_indices</td>
+<td>None</td>
+<td>A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).<br>The value of box_ind[i] specifies the image that the i-th box refers to.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>image_shape</td>
+<td>None</td>
+<td>A tuple with the height and the width of the original image input image</td>
+<td>None</td>
+</tr>
+<tr>
+<td>crop_size</td>
+<td>None</td>
+<td>An int representing the ouput size of the crop.</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None</td>
+<td>A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</td>
+</tr>
+</tbody>
+</table>
 <details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">roi_align</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span><span class="w"> </span><span class="n">boxes</span><span class="p">,</span><span class="w"> </span><span class="n">box_indices</span><span class="p">,</span><span class="w"> </span><span class="n">image_shape</span><span class="p">,</span><span class="w"> </span><span class="nl">crop_size</span><span class="p">:</span><span class="w"> </span><span class="nc">int</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
 
 <span class="w">    </span><span class="ss">&quot;&quot;&quot;RoI align like operation from the paper Mask-RCNN.</span>
 
 <span class="ss">    Arguments:</span>
 
-<span class="ss">    - *inputs*: A 4-D tensor of shape [batch, height, tensor_width, depth].</span>
+<span class="ss">        inputs: A 4-D tensor of shape [batch, height, tensor_width, depth].</span>
 
 <span class="ss">            Both image_height and image_width need to be positive.</span>
 
-<span class="ss">    - *boxes*: A 2-D tensor of shape [num_boxes, 4].</span>
+<span class="ss">        boxes: A 2-D tensor of shape [num_boxes, 4].</span>
 
 <span class="ss">            The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is</span>
 
@@ -1743,17 +1783,17 @@ It will be useful to reorder our boxes after the roi_align operation.</li>
 
 <span class="ss">            image values.</span>
 
-<span class="ss">    - *box_indices*: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
+<span class="ss">        box_indices: A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).</span>
 
 <span class="ss">            The value of box_ind[i] specifies the image that the i-th box refers to.</span>
 
-<span class="ss">    - *image_shape*: A tuple with the height and the width of the original image input image</span>
+<span class="ss">        image_shape: A tuple with the height and the width of the original image input image</span>
 
-<span class="ss">    - *crop_size*: An int representing the ouput size of the crop.</span>
+<span class="ss">        crop_size: An int representing the ouput size of the crop.</span>
 
 <span class="ss">    Returns:</span>
 
-<span class="ss">    A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
+<span class="ss">        A 4-D tensor of shape [num_boxes, crop_height, crop_width, depth].</span>
 
 <span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
 
