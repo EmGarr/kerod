@@ -17,12 +17,12 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
     This is an example of spatial weight maps from a 20 x 20 tensor and where we generated
     25 random reference points.
 
-    ![Spatial weight map](https://raw.githubusercontent.com/EmGarr/cv/master/ressources/spatial_weight_map.png)
+    ![Spatial weight map](https://raw.githubusercontent.com/EmGarr/kerod/master/ressources/spatial_weight_map.png)
 
     This spatial_weight_map is then flatten to obtain a [25, 400] matrix representing the
     the modulated co-attention.
 
-    ![Spatial weight map flatten](https://raw.githubusercontent.com/EmGarr/cv/master/ressources/flatten_weight_map.png)
+    ![Spatial weight map flatten](https://raw.githubusercontent.com/EmGarr/kerod/master/ressources/flatten_weight_map.png)
 
     Args:
         beta: Modulate the bandwidth of the Gaussian-like distribution.

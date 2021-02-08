@@ -67,7 +67,7 @@ class PositionEmbeddingSine(tf.keras.layers.Layer):
     plt.show()
     ```
 
-    ![Visualization Positional Encoding](https://raw.githubusercontent.com/EmGarr/cv/master/ressources/2d_pos_encoding.png)
+    ![Visualization Positional Encoding](https://raw.githubusercontent.com/EmGarr/kerod/master/ressources/2d_pos_encoding.png)
     """
 
     def __init__(self, output_dim=64, temperature=10000):
