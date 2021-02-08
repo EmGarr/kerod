@@ -1374,6 +1374,27 @@
 <span class="p">)</span>
 </code></pre></div>
 
+<p><a href="https://arxiv.org/pdf/2101.07448.pdf">Fast Convergence of DETR with Spatially Modulated Co-Attention</a>.</p>
+<p>Each object query first dynamically predicts the center and scale
+of its responsible object, which are then used to generate a 2-D Gaussian
+like spatial weight map.</p>
+<p>Example:</p>
+<p>This is an example of spatial weight maps from a 20 x 20 tensor and where we generated
+25 random reference points.</p>
+<p><img alt="Spatial weight map" src="https://raw.githubusercontent.com/EmGarr/cv/master/ressources/spatial_weight_map.png" /></p>
+<p>This spatial_weight_map is then flatten to obtain a [25, 400] matrix representing the
+the modulated co-attention.</p>
+<p><img alt="Spatial weight map flatten" src="https://raw.githubusercontent.com/EmGarr/cv/master/ressources/flatten_weight_map.png" /></p>
+<p>Args:
+    beta: Modulate the bandwidth of the Gaussian-like distribution.</p>
+<p>Call arguments:
+    height: The targeted height of the feature map
+    width: The targeted width of the feature map
+    ref_points: A tensor of shape [batch_size, N, heads, (y, x, h, w)] in [0, 1]</p>
+<p>Returns:
+    weight_map: A 4D tensor of float 32 and shape
+        [batch_size, heads, N, height * width] representing
+        a weight map per reference points.</p>
 <h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.engine.base_layer.Layer</li>
@@ -1425,29 +1446,21 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>height</td>
-<td>None</td>
 <td>The targeted height of the feature map</td>
-<td>None</td>
 </tr>
 <tr>
 <td>width</td>
-<td>None</td>
 <td>The targeted width of the feature map</td>
-<td>None</td>
 </tr>
 <tr>
 <td>ref_points</td>
-<td>None</td>
 <td>A tensor of shape [batch_size, N, heads, (y, x, h, w)] in [0, 1]</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

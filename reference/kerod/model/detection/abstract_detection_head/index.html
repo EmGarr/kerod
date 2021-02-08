@@ -728,8 +728,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
   </a>
   
 </li>
@@ -1204,8 +1204,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
   </a>
   
 </li>
@@ -1659,88 +1659,63 @@
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes">Attributes</h4>
+<p>The build of the detection head, the segmentation head, the post_processing.</p>
+<h4 id="arguments">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>num_classes</td>
-<td>None</td>
 <td>Number of classes of the classification head (e.g: Your n classes +<br>the background class)</td>
-<td>None</td>
 </tr>
 <tr>
 <td>classification_loss</td>
-<td>None</td>
 <td>An object tf.keras.losses usually CategoricalCrossentropy.<br>This object should have a reduction value to None and the parameter from_y_pred to True.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>localization_loss</td>
-<td>None</td>
 <td>An object tf.keras.losses usually CategoricalCrossentropy.<br>This object should have a reduction value to None and the parameter from_y_pred to True.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>segmentation_loss</td>
-<td>None</td>
 <td>An object tf.keras.losses usually CategoricalCrossentropy.<br>This object should have a reduction value to None and the parameter from_y_pred to True.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>classification_loss_weight</td>
-<td>None</td>
 <td>A float 32 representing the weight of the loss in the<br>total loss.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>localization_loss_weight</td>
-<td>None</td>
 <td>A float 32 representing the weight of the loss in the<br>total loss.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>segmentation_loss_weight</td>
-<td>None</td>
 <td>A float 32 representing the weight of the loss in the<br>total loss.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>multiples</td>
-<td>None</td>
 <td>How many time will you replicate the output of the head.<br>For a rpn multiples can be the number of anchors.<br>For a fast_rcnn multiples is 1 we just want the number of classes</td>
-<td>None</td>
 </tr>
 <tr>
 <td>kernel_initializer_classification_head</td>
-<td>None</td>
 <td>Initializer for the <code>kernel</code> weights matrix of<br>the classification head (see <a href="https://www.tensorflow.org/api_docs/python/tf/keras/initializers">initializers</a>).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>kernel_initializer_box_prediction_head</td>
-<td>None</td>
 <td>Initializer for the <code>kernel</code> weights matrix of<br>the box prediction head (see <a href="https://www.tensorflow.org/api_docs/python/tf/keras/initializers">initializers</a>).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>kernel_regularizer</td>
-<td>None</td>
 <td>Regularizer function applied to the kernel weights matrix<br>(<a href="https://www.tensorflow.org/api_docs/python/tf/keras/regularizers">see keras.regularizers</a>).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>use_mask</td>
-<td>None</td>
 <td>Boolean define if the segmentation_head will be used.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -1794,17 +1769,13 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>A tensor of shape [batch_size, H, W, C]</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -1839,17 +1810,13 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>A tensor of  shape [N, H, W, C]</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -1910,23 +1877,17 @@ method to support masking.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor, or list/tuple of input tensors.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>Additional keyword arguments. Currently unused.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -1991,29 +1952,21 @@ method to support masking.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>y_pred</td>
-<td>None</td>
 <td>A dict of tensors of shape [N, nb_boxes, num_output].</td>
-<td>None</td>
 </tr>
 <tr>
 <td>y_true</td>
-<td>None</td>
 <td>A dict of tensors of shape [N, nb_boxes, num_output].</td>
-<td>None</td>
 </tr>
 <tr>
 <td>weights</td>
-<td>None</td>
 <td>A dict of tensors ofshape [N, nb_boxes, num_output].<br>This tensor is composed of one hot vectors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

@@ -862,8 +862,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -910,8 +924,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes_1" class="md-nav__link">
-    Attributes
+  <a href="#arguments_1" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments_1" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns_1" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -958,8 +986,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes_2" class="md-nav__link">
-    Attributes
+  <a href="#arguments_2" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments_2" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns_2" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1279,8 +1321,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1327,8 +1383,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes_1" class="md-nav__link">
-    Attributes
+  <a href="#arguments_1" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments_1" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns_1" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1375,8 +1445,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes_2" class="md-nav__link">
-    Attributes
+  <a href="#arguments_2" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments_2" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns_2" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1971,76 +2055,81 @@
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes">Attributes</h4>
+<p><a href="https://arxiv.org/abs/2005.12872">End-to-End Object Detection with Transformers</a></p>
+<h4 id="arguments">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>d_model</td>
-<td>None</td>
 <td>The number of expected features in the encoder inputs</td>
-<td>None</td>
 </tr>
 <tr>
 <td>num_heads</td>
-<td>None</td>
 <td>The number of heads in the multiheadattention models.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>dim_feedforward</td>
-<td>None</td>
 <td>The dim of the feedforward neuralnetworks in the DecoderLayer.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>dropout_rate</td>
-<td>None</td>
 <td>Float between 0 and 1. Fraction of the input units to drop.<br>The same rate is shared in all the layers using dropout in the transformer.</td>
-<td>None</td>
 </tr>
+</tbody>
+</table>
+<h4 id="call-arguments">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>dec_out</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]<br>the sequence of the decoder</td>
-<td>None</td>
 </tr>
 <tr>
 <td>memory</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, N, d_model]<br>the sequence from the last layer of the encoder (memory)</td>
-<td>None</td>
 </tr>
 <tr>
 <td>pos_embed</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, N, d_model]<br>positional encoding of the encoder</td>
-<td>None</td>
 </tr>
 <tr>
 <td>object_queries</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key_padding_mask</td>
-<td>None</td>
 <td>A 2-D bool Tensor of shape [batch_size, seq_len].<br>The positions with the value of <code>True</code> will be ignored while<br>the position with the value of <code>False</code> will be unchanged.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>coattn_mask</td>
-<td>None</td>
 <td>A 4-D float tensor of shape [batch_size, num_heads, M, N, seq_len].<br>If provided, it will be added to the attention weight at<br>the coattention step (memory x self_attn).</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td>None</td>
+<td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
 </tr>
 </tbody>
 </table>
@@ -2100,47 +2189,33 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>dec_out</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, d_model] the sequence of the decoder</td>
-<td>None</td>
 </tr>
 <tr>
 <td>memory</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, N, d_model] the sequence<br>from the last layer of the encoder (memory)</td>
-<td>None</td>
 </tr>
 <tr>
 <td>pos_embed</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, N, d_model] positional encoding<br>of the encoder</td>
-<td>None</td>
 </tr>
 <tr>
 <td>object_queries</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key_padding_mask</td>
-<td>None</td>
 <td>A 2-D bool Tensor of shape [batch_size, seq_len]. the positions with the<br>value of <code>True</code> will be ignored while the position with the value of <code>False</code> will be unchanged.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>coattn_mask</td>
-<td>None</td>
 <td>A 4-D float tensor of shape [batch_size, num_heads, M, N, seq_len].<br>If provided, it will be added to the attention weight at the coattention step (memory x self_attn)</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2253,52 +2328,65 @@ True</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes_1">Attributes</h4>
+<p><a href="https://arxiv.org/abs/2005.12872">End-to-End Object Detection with Transformers</a></p>
+<h4 id="arguments_1">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>d_model</td>
-<td>None</td>
 <td>The number of expected features in the encoder inputs</td>
-<td>None</td>
 </tr>
 <tr>
 <td>num_heads</td>
-<td>None</td>
 <td>The number of heads in the multiheadattention models.<br>dim_feedforward: The dim of the feedforward neuralnetworks in the EncoderLayer.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>dropout_rate</td>
-<td>None</td>
 <td>Float between 0 and 1. Fraction of the input units to drop.<br>The same rate is shared in all the layers using dropout in the transformer.</td>
-<td>None</td>
 </tr>
+</tbody>
+</table>
+<h4 id="call-arguments_1">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>src</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, dim]<br>the sequence to the encoder layer</td>
-<td>None</td>
 </tr>
 <tr>
 <td>pos_embed</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, N, dim]<br>positional encoding of the encoder</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key_padding_mask</td>
-<td>None</td>
 <td>[Optional] A 2-D bool Tensor of shape [batch_size, seq_len_enc] where<br>False means padding and True means pixel from the original image.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns_1">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td>None</td>
+<td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
 </tr>
 </tbody>
 </table>
@@ -2355,29 +2443,21 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>src</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, dim]<br>the sequence to the encoder layer</td>
-<td>None</td>
 </tr>
 <tr>
 <td>pos_embed</td>
-<td>None</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, dim]<br>positional encoding of the encoder</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key_padding_mask</td>
-<td>None</td>
 <td>[Optional] A 2-D bool Tensor of shape [batch_size, seq_len_enc]<br>where False means padding and True means pixel from the original image.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2457,76 +2537,81 @@ True</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes_2">Attributes</h4>
+<p><a href="https://arxiv.org/pdf/2101.07448.pdf">Fast Convergence of DETR with Spatially Modulated Co-Attention</a>.</p>
+<h4 id="arguments_2">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>num_layers</td>
-<td>None</td>
 <td>the number of sub-layers in the decoder and the encoder.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>d_model</td>
-<td>None</td>
 <td>The number of expected features in the encoder/decoder inputs</td>
-<td>None</td>
 </tr>
 <tr>
 <td>num_heads</td>
-<td>None</td>
 <td>The number of heads in the multiheadattention models.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>dim_feedforward</td>
-<td>None</td>
 <td>The dim of the feedforward neuralnetworks in<br>the EncoderLayer and DecoderLayer</td>
-<td>None</td>
 </tr>
 <tr>
 <td>dropout_rate</td>
-<td>None</td>
 <td>Float between 0 and 1. Fraction of the input units to drop.<br>The same rate is shared in all the layers using dropout in the transformer.</td>
-<td>None</td>
 </tr>
+</tbody>
+</table>
+<h4 id="call-arguments_2">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>flatten_tensor</td>
-<td>None</td>
 <td>A 3-D float32 Tensor of shape<br>[batch_size, H * W, d_model].<br>It represents the flatten output tensor of the backbone.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>pos_embed</td>
-<td>None</td>
 <td>A 3-D float32 Tensor of shape [batch_size, H * W, d_model].<br>Positional spatial positional encoding matching the flatten_tensor.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>object_queries</td>
-<td>None</td>
 <td>A 3-D float32 Tensor of shape<br>[batch_size, num_object_queries, d_model] small fixed number of<br>learned positional embeddings input of the decoder.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key_padding_mask</td>
-<td>None</td>
 <td>A 2-D bool Tensor of shape [batch_size, H * W]<br>where False means padding and True means pixels<br>from the original image.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>coattn_mask</td>
-<td>None</td>
 <td>A 4-D float tensor of shape<br>[batch_size, num_heads, H*W, num_object_queries, seq_len].<br>If provided, it will be added to the attention weight<br>at the coattention step (memory x self_attn)</td>
-<td>None</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns_2">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>decoder_output</td>
+<td>3-D float32 Tensor of shape [batch_size, h, d_model]<br>where h is num_object_queries * num_layers if training is true and<br>    num_queries if training is set to False.<br>encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</td>
 </tr>
 </tbody>
 </table>
@@ -2584,41 +2669,29 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>flatten_tensor</td>
-<td>None</td>
 <td>A 3-D float32 Tensor of shape<br>[batch_size, H * W, d_model].<br>It represents the flatten output tensor of the backbone.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>pos_embed</td>
-<td>None</td>
 <td>A 3-D float32 Tensor of shape [batch_size, H * W, d_model].<br>Positional spatial positional encoding matching the flatten_tensor.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>object_queries</td>
-<td>None</td>
 <td>A 3-D float32 Tensor of shape<br>[batch_size, num_object_queries, d_model] small fixed number of<br>learned positional embeddings input of the decoder.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key_padding_mask</td>
-<td>None</td>
 <td>A 2-D bool Tensor of shape [batch_size, H * W]<br>where False means padding and True means pixels<br>from the original image.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>coattn_mask</td>
-<td>None</td>
 <td>A 4-D float tensor of shape<br>[batch_size, num_heads, H*W, num_object_queries, seq_len].<br>If provided, it will be added to the attention weight<br>at the coattention step (memory x self_attn)</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

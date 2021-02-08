@@ -826,8 +826,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1190,8 +1204,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1463,70 +1491,77 @@
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes">Attributes</h4>
+<p>See reference: <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></p>
+<h4 id="arguments">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>d_model</td>
-<td>None</td>
 <td>The number of expected features in the decoder inputs</td>
-<td>None</td>
 </tr>
 <tr>
 <td>num_heads</td>
-<td>None</td>
 <td>The number of heads in the multiheadattention models.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>dropout_rate</td>
-<td>None</td>
 <td>Float between 0 and 1. Fraction of the input units to drop.<br>The same rate is shared in all the layers using dropout in the transformer.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>attention_axes</td>
-<td>None</td>
 <td>axes over which the attention is applied. <code>None</code> means<br>attention over all axes, but batch, heads, and features.</td>
-<td>None</td>
 </tr>
+</tbody>
+</table>
+<h4 id="call-arguments">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>value</td>
-<td>None</td>
 <td>A 3-D tensor of shape [batch_size, seq_len, depth_v]</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key</td>
-<td>None</td>
 <td>A 3-D tensor of shape [batch_size, seq_len, depth]</td>
-<td>None</td>
 </tr>
 <tr>
 <td>query</td>
-<td>None</td>
 <td>A 3-D tensor of shape [batch_size, seq_len_q, depth]</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key_padding_mask</td>
-<td>None</td>
 <td>A 2-D bool Tensor of shape [batch_size, seq_len].<br>The positions with the value of <code>True</code> will be ignored while<br>the position with the value of <code>False</code> will be unchanged.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>attn_mask</td>
-<td>None</td>
 <td>A 4-D float tensor of shape [batch_size, num_heads, seq_len_q, seq_len].<br>If provided, it will be added to the attention weight.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td>None</td>
+<td>A 3-D tensor of shape [batch_size, seq_len_q, d_model]</td>
 </tr>
 </tbody>
 </table>
@@ -1584,41 +1619,29 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>value</td>
-<td>None</td>
 <td>A 3-D tensor of shape [batch_size, seq_len, depth_v]</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key</td>
-<td>None</td>
 <td>A 3-D tensor of shape [batch_size, seq_len, depth]</td>
-<td>None</td>
 </tr>
 <tr>
 <td>query</td>
-<td>None</td>
 <td>A 3-D tensor of shape [batch_size, seq_len_q, depth]</td>
-<td>None</td>
 </tr>
 <tr>
 <td>key_padding_mask</td>
-<td>None</td>
 <td>A 2-D bool Tensor of shape [batch_size, seq_len].<br>The positions with the value of <code>True</code> will be ignored while<br>the position with the value of <code>False</code> will be unchanged.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>attn_mask</td>
-<td>None</td>
 <td>A 4-D float tensor of shape [batch_size, num_heads, seq_len_q, seq_len].<br>If provided, it will be added to the attention weight.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

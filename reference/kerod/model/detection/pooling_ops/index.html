@@ -1702,41 +1702,29 @@ It will be useful to reorder our boxes after the roi_align operation.</li>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>A 4-D tensor of shape [batch, height, tensor_width, depth].<br>Both image_height and image_width need to be positive.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>boxes</td>
-<td>None</td>
 <td>A 2-D tensor of shape [num_boxes, 4].<br>The i-th row of the tensor specifies the coordinates of a box in the box_ind[i] image and is<br>specified in normalized coordinates [y1, x1, y2, x2]. A normalized coordinate value of y is<br>mapped to the image coordinate at y * (image_height - 1), so as the [0, 1] interval of<br>normalized image height is mapped to [0, image_height - 1] in image height coordinates.<br>We do allow y1 &gt; y2, in which case the sampled crop is an up-down flipped version of the<br>original image. The width dimension is treated similarly. Normalized coordinates outside the<br>[0, 1] range are allowed, in which case we use extrapolation_value to extrapolate the input<br>image values.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>box_indices</td>
-<td>None</td>
 <td>A 1-D tensor of shape [num_boxes] with int32 values in [0, batch).<br>The value of box_ind[i] specifies the image that the i-th box refers to.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>image_shape</td>
-<td>None</td>
 <td>A tuple with the height and the width of the original image input image</td>
-<td>None</td>
 </tr>
 <tr>
 <td>crop_size</td>
-<td>None</td>
 <td>An int representing the ouput size of the crop.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

@@ -909,8 +909,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1185,8 +1199,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1391,34 +1419,55 @@
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes">Attributes</h4>
+<p>Based on the object queries will create a set of reference points which will
+allow to create a <a href="./weight_map.py">spatial dynamical weight maps</a> in order to modulate
+the co-attention inside the transformer</p>
+<h4 id="arguments">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>hidden_dim</td>
-<td>None</td>
 <td>Positive integer, dimensionality of the hidden space.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>num_heads</td>
-<td>None</td>
 <td>Positive integer, each head starts from a head-shared center<br>and then predicts a head-specific center offset<br>and head specific scales.</td>
-<td>None</td>
 </tr>
+</tbody>
+</table>
+<h4 id="call-arguments">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>object_queries</td>
-<td>None</td>
 <td>A 3-D float32 Tensor of shape<br>[batch_size, num_object_queries, d_model] small fixed number of<br>learned positional embeddings input of the decoder.</td>
-<td>None</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reference_points</td>
+<td>A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].<br>embedding_reference_points: A tensor of shape [batch_size, num_object_queries, num_heads, 2].<br>The embedding of y and x without the sigmoid applied.</td>
 </tr>
 </tbody>
 </table>
@@ -1471,17 +1520,13 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>object_queries</td>
-<td>None</td>
 <td>A 3-D float32 Tensor of shape<br>[batch_size, num_object_queries, d_model] small fixed number of<br>learned positional embeddings input of the decoder.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

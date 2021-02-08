@@ -1623,6 +1623,17 @@ are as described by <code>1</code>. If set to false the boxes won't be resized.<
     <span class="n">classes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span>
 </code></pre></div>
+
+<p>by the locations in boxes. The coordinates of the each bounding box in boxes are encoded as
+[y_min, x_min, y_max, x_max]. The bounding box coordinates can be:</p>
+<ol>
+<li>floats in [0.0, 1.0] relative to the width and height of the underlying image</li>
+<li>already resized to the corresponding size</li>
+</ol>
+<p>Arguments:</p>
+<ul>
+<li><em>classes</em>: The ordered list of classes that we could display</li>
+</ul>
                 
               
               

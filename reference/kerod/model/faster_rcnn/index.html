@@ -607,8 +607,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
   </a>
   
 </li>
@@ -1174,8 +1174,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
   </a>
   
 </li>
@@ -1627,28 +1627,30 @@
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes">Attributes</h4>
+<p>You can use it as follow:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">model_faster_rcnn</span> <span class="o">=</span> <span class="n">FasterRcnnFPNResnet50</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">base_lr</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">base_lr</span><span class="p">)</span>
+<span class="n">model_faster_rcnn</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">model_faster_rcnn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds_train</span><span class="p">,</span> <span class="n">validation_data</span><span class="o">=</span><span class="n">ds_test</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">11</span><span class="p">,)</span>
+</code></pre></div>
+
+<h4 id="arguments">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>num_classes</td>
-<td>None</td>
 <td>The number of classes of your dataset<br>(<strong>do not include the background class</strong> it is handle for you)</td>
-<td>None</td>
 </tr>
 <tr>
 <td>backbone</td>
-<td>None</td>
 <td>A tensorflow Model.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2206,29 +2208,21 @@ because we cannot trace the metric result tensor back to the model's inputs.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>value</td>
-<td>None</td>
 <td>Metric tensor.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>name</td>
-<td>None</td>
 <td>String metric name.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>Additional keyword arguments for backward compatibility.<br>Accepted values:<br><code>aggregation</code> - When the <code>value</code> tensor provided is not the result of<br>calling a <code>keras.Metric</code> instance, it will be aggregated by default<br>using a <code>keras.Metric.Mean</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2469,23 +2463,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>updates</td>
-<td>None</td>
 <td>Update op, or list/tuple of update ops, or zero-arg callable<br>that returns an update op. A zero-arg callable should be passed in<br>order to disable running the updates by setting <code>trainable=False</code><br>on this Layer, when executing in Eager mode.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Deprecated, will be automatically inferred.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2603,77 +2591,53 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>name</td>
-<td>None</td>
 <td>Variable name.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>shape</td>
-<td>None</td>
 <td>Variable shape. Defaults to scalar if unspecified.</td>
-<td>scalar if unspecified</td>
 </tr>
 <tr>
 <td>dtype</td>
-<td>None</td>
 <td>The type of the variable. Defaults to <code>self.dtype</code>.</td>
-<td><code>self.dtype</code></td>
 </tr>
 <tr>
 <td>initializer</td>
-<td>None</td>
 <td>Initializer instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>regularizer</td>
-<td>None</td>
 <td>Regularizer instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>trainable</td>
-<td>None</td>
 <td>Boolean, whether the variable should be part of the layer's<br>"trainable_variables" (e.g. variables, biases)<br>or "non_trainable_variables" (e.g. BatchNorm mean and variance).<br>Note that <code>trainable</code> cannot be <code>True</code> if <code>synchronization</code><br>is set to <code>ON_READ</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>constraint</td>
-<td>None</td>
 <td>Constraint instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>use_resource</td>
-<td>None</td>
 <td>Whether to use <code>ResourceVariable</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>synchronization</td>
-<td>None</td>
 <td>Indicates when a distributed a variable will be<br>aggregated. Accepted values are constants defined in the class<br><code>tf.VariableSynchronization</code>. By default the synchronization is set to<br><code>AUTO</code> and the current <code>DistributionStrategy</code> chooses<br>when to synchronize. If <code>synchronization</code> is set to <code>ON_READ</code>,<br><code>trainable</code> must not be set to <code>True</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>aggregation</td>
-<td>None</td>
 <td>Indicates how a distributed variable will be aggregated.<br>Accepted values are constants defined in the class<br><code>tf.VariableAggregation</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>Additional keyword arguments. Accepted values are <code>getter</code>,<br><code>collections</code>, <code>experimental_autocast</code> and <code>caching_device</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -3019,29 +2983,21 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor(s).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>*args</td>
-<td>None</td>
 <td>additional positional arguments to be passed to <code>self.call</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>additional keyword arguments to be passed to <code>self.call</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -3106,23 +3062,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>A list with the following schema:<br>1. <em>features</em>:<br>1.1 <em>images</em>: A Tensor of shape [batch_size, height, width, 3]<br>1.2 <em>image_informations</em>: A float32 Tensor of shape [batch_size, 2] where<br>    the last dimension represents the original height and width of the images<br>(without the padding).<br><br>2. <em>ground_truths</em>: If the training is true, a dict with<br>    <code>python&lt;br&gt;    ground_truths = {&lt;br&gt;        BoxField.BOXES:&lt;br&gt;            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),&lt;br&gt;        BoxField.LABELS:&lt;br&gt;            tf.constant([[2,1], [2, 0]], tf.int32),&lt;br&gt;        BoxField.WEIGHTS:&lt;br&gt;            tf.constant([[1, 0], [1, 1]], tf.float32),&lt;br&gt;        BoxField.NUM_BOXES:&lt;br&gt;            tf.constant([2, 1], tf.int32)&lt;br&gt;    }&lt;br&gt;</code></td>
-<td>None</td>
 </tr>
 <tr>
 <td>training</td>
-<td>None</td>
 <td>Is automatically set to <code>True</code> in train and test mode<br>(normally test should be at false). Why? Through the call we the losses and the metrics<br>of the rpn and fast_rcnn. They are automatically added with <code>add_loss</code> and <code>add_metrics</code>.<br>In test we want to benefit from those and therefore we compute them. It is an inheritance<br>from tensorflow 2.0 and 2.1 and I'll think to move them in a more traditional way inside the<br>train_step and test_step. However for now this method benefit of the encapsulation of<br>the <code>self.compiled_loss</code> method.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -3289,23 +3239,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Tensor or list of tensors.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>mask</td>
-<td>None</td>
 <td>Tensor or list of tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -3380,17 +3324,13 @@ match the input shape provided here.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>input_shape</td>
-<td>None</td>
 <td>Shape tuple (tuple of integers)<br>or list of shape tuples (one per output tensor of the layer).<br>Shape tuples can include None for free dimensions,<br>instead of an integer.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -3514,17 +3454,13 @@ assume that the output dtype matches the input dtype.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>input_signature</td>
-<td>None</td>
 <td>Single TensorSpec or nested structure of TensorSpec<br>objects, describing a candidate input for the layer.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -3760,17 +3696,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -3849,17 +3781,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -3927,17 +3855,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -4019,17 +3943,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor or list/tuple of input tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -4089,17 +4009,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -4178,17 +4094,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -4256,17 +4168,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -4348,17 +4256,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor or list/tuple of input tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -4496,17 +4400,13 @@ b.get_weights()
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>weights</td>
-<td>None</td>
 <td>a list of Numpy arrays. The number<br>of arrays and their shape must match<br>number of the dimensions of the weights<br>of the layer (i.e. it should match the<br>output of <code>get_weights</code>).</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -4674,28 +4574,30 @@ b.get_weights()
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes_1">Attributes</h4>
+<p>You can use it as follow:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">model_faster_rcnn</span> <span class="o">=</span> <span class="n">FasterRcnnFPNResnet50</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">base_lr</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">base_lr</span><span class="p">)</span>
+<span class="n">model_faster_rcnn</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">model_faster_rcnn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds_train</span><span class="p">,</span> <span class="n">validation_data</span><span class="o">=</span><span class="n">ds_test</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">11</span><span class="p">,)</span>
+</code></pre></div>
+
+<h4 id="arguments_1">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>num_classes</td>
-<td>None</td>
 <td>The number of classes of your dataset<br>(<strong>do not include the background class</strong> it is handle for you)</td>
-<td>None</td>
 </tr>
 <tr>
 <td>backbone</td>
-<td>None</td>
 <td>A tensorflow Model.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -5249,29 +5151,21 @@ because we cannot trace the metric result tensor back to the model's inputs.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>value</td>
-<td>None</td>
 <td>Metric tensor.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>name</td>
-<td>None</td>
 <td>String metric name.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>Additional keyword arguments for backward compatibility.<br>Accepted values:<br><code>aggregation</code> - When the <code>value</code> tensor provided is not the result of<br>calling a <code>keras.Metric</code> instance, it will be aggregated by default<br>using a <code>keras.Metric.Mean</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -5512,23 +5406,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>updates</td>
-<td>None</td>
 <td>Update op, or list/tuple of update ops, or zero-arg callable<br>that returns an update op. A zero-arg callable should be passed in<br>order to disable running the updates by setting <code>trainable=False</code><br>on this Layer, when executing in Eager mode.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Deprecated, will be automatically inferred.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -5646,77 +5534,53 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>name</td>
-<td>None</td>
 <td>Variable name.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>shape</td>
-<td>None</td>
 <td>Variable shape. Defaults to scalar if unspecified.</td>
-<td>scalar if unspecified</td>
 </tr>
 <tr>
 <td>dtype</td>
-<td>None</td>
 <td>The type of the variable. Defaults to <code>self.dtype</code>.</td>
-<td><code>self.dtype</code></td>
 </tr>
 <tr>
 <td>initializer</td>
-<td>None</td>
 <td>Initializer instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>regularizer</td>
-<td>None</td>
 <td>Regularizer instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>trainable</td>
-<td>None</td>
 <td>Boolean, whether the variable should be part of the layer's<br>"trainable_variables" (e.g. variables, biases)<br>or "non_trainable_variables" (e.g. BatchNorm mean and variance).<br>Note that <code>trainable</code> cannot be <code>True</code> if <code>synchronization</code><br>is set to <code>ON_READ</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>constraint</td>
-<td>None</td>
 <td>Constraint instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>use_resource</td>
-<td>None</td>
 <td>Whether to use <code>ResourceVariable</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>synchronization</td>
-<td>None</td>
 <td>Indicates when a distributed a variable will be<br>aggregated. Accepted values are constants defined in the class<br><code>tf.VariableSynchronization</code>. By default the synchronization is set to<br><code>AUTO</code> and the current <code>DistributionStrategy</code> chooses<br>when to synchronize. If <code>synchronization</code> is set to <code>ON_READ</code>,<br><code>trainable</code> must not be set to <code>True</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>aggregation</td>
-<td>None</td>
 <td>Indicates how a distributed variable will be aggregated.<br>Accepted values are constants defined in the class<br><code>tf.VariableAggregation</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>Additional keyword arguments. Accepted values are <code>getter</code>,<br><code>collections</code>, <code>experimental_autocast</code> and <code>caching_device</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -6062,29 +5926,21 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor(s).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>*args</td>
-<td>None</td>
 <td>additional positional arguments to be passed to <code>self.call</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>additional keyword arguments to be passed to <code>self.call</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -6149,23 +6005,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>A list with the following schema:<br>1. <em>features</em>:<br>1.1 <em>images</em>: A Tensor of shape [batch_size, height, width, 3]<br>1.2 <em>image_informations</em>: A float32 Tensor of shape [batch_size, 2] where<br>    the last dimension represents the original height and width of the images<br>(without the padding).<br><br>2. <em>ground_truths</em>: If the training is true, a dict with<br>    <code>python&lt;br&gt;    ground_truths = {&lt;br&gt;        BoxField.BOXES:&lt;br&gt;            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),&lt;br&gt;        BoxField.LABELS:&lt;br&gt;            tf.constant([[2,1], [2, 0]], tf.int32),&lt;br&gt;        BoxField.WEIGHTS:&lt;br&gt;            tf.constant([[1, 0], [1, 1]], tf.float32),&lt;br&gt;        BoxField.NUM_BOXES:&lt;br&gt;            tf.constant([2, 1], tf.int32)&lt;br&gt;    }&lt;br&gt;</code></td>
-<td>None</td>
 </tr>
 <tr>
 <td>training</td>
-<td>None</td>
 <td>Is automatically set to <code>True</code> in train and test mode<br>(normally test should be at false). Why? Through the call we the losses and the metrics<br>of the rpn and fast_rcnn. They are automatically added with <code>add_loss</code> and <code>add_metrics</code>.<br>In test we want to benefit from those and therefore we compute them. It is an inheritance<br>from tensorflow 2.0 and 2.1 and I'll think to move them in a more traditional way inside the<br>train_step and test_step. However for now this method benefit of the encapsulation of<br>the <code>self.compiled_loss</code> method.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -6332,23 +6182,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Tensor or list of tensors.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>mask</td>
-<td>None</td>
 <td>Tensor or list of tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -6423,17 +6267,13 @@ match the input shape provided here.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>input_shape</td>
-<td>None</td>
 <td>Shape tuple (tuple of integers)<br>or list of shape tuples (one per output tensor of the layer).<br>Shape tuples can include None for free dimensions,<br>instead of an integer.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -6557,17 +6397,13 @@ assume that the output dtype matches the input dtype.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>input_signature</td>
-<td>None</td>
 <td>Single TensorSpec or nested structure of TensorSpec<br>objects, describing a candidate input for the layer.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -6803,17 +6639,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -6892,17 +6724,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -6970,17 +6798,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -7062,17 +6886,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor or list/tuple of input tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -7132,17 +6952,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -7221,17 +7037,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -7299,17 +7111,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -7391,17 +7199,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor or list/tuple of input tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -7539,17 +7343,13 @@ b.get_weights()
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>weights</td>
-<td>None</td>
 <td>a list of Numpy arrays. The number<br>of arrays and their shape must match<br>number of the dimensions of the weights<br>of the layer (i.e. it should match the<br>output of <code>get_weights</code>).</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -7717,28 +7517,30 @@ b.get_weights()
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes_2">Attributes</h4>
+<p>You can use it as follow:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">model_faster_rcnn</span> <span class="o">=</span> <span class="n">FasterRcnnFPNResnet50</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">base_lr</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">base_lr</span><span class="p">)</span>
+<span class="n">model_faster_rcnn</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">model_faster_rcnn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds_train</span><span class="p">,</span> <span class="n">validation_data</span><span class="o">=</span><span class="n">ds_test</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">11</span><span class="p">,)</span>
+</code></pre></div>
+
+<h4 id="arguments_2">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>num_classes</td>
-<td>None</td>
 <td>The number of classes of your dataset<br>(<strong>do not include the background class</strong> it is handle for you)</td>
-<td>None</td>
 </tr>
 <tr>
 <td>backbone</td>
-<td>None</td>
 <td>A tensorflow Model.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -8292,29 +8094,21 @@ because we cannot trace the metric result tensor back to the model's inputs.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>value</td>
-<td>None</td>
 <td>Metric tensor.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>name</td>
-<td>None</td>
 <td>String metric name.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>Additional keyword arguments for backward compatibility.<br>Accepted values:<br><code>aggregation</code> - When the <code>value</code> tensor provided is not the result of<br>calling a <code>keras.Metric</code> instance, it will be aggregated by default<br>using a <code>keras.Metric.Mean</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -8555,23 +8349,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>updates</td>
-<td>None</td>
 <td>Update op, or list/tuple of update ops, or zero-arg callable<br>that returns an update op. A zero-arg callable should be passed in<br>order to disable running the updates by setting <code>trainable=False</code><br>on this Layer, when executing in Eager mode.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Deprecated, will be automatically inferred.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -8689,77 +8477,53 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>name</td>
-<td>None</td>
 <td>Variable name.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>shape</td>
-<td>None</td>
 <td>Variable shape. Defaults to scalar if unspecified.</td>
-<td>scalar if unspecified</td>
 </tr>
 <tr>
 <td>dtype</td>
-<td>None</td>
 <td>The type of the variable. Defaults to <code>self.dtype</code>.</td>
-<td><code>self.dtype</code></td>
 </tr>
 <tr>
 <td>initializer</td>
-<td>None</td>
 <td>Initializer instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>regularizer</td>
-<td>None</td>
 <td>Regularizer instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>trainable</td>
-<td>None</td>
 <td>Boolean, whether the variable should be part of the layer's<br>"trainable_variables" (e.g. variables, biases)<br>or "non_trainable_variables" (e.g. BatchNorm mean and variance).<br>Note that <code>trainable</code> cannot be <code>True</code> if <code>synchronization</code><br>is set to <code>ON_READ</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>constraint</td>
-<td>None</td>
 <td>Constraint instance (callable).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>use_resource</td>
-<td>None</td>
 <td>Whether to use <code>ResourceVariable</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>synchronization</td>
-<td>None</td>
 <td>Indicates when a distributed a variable will be<br>aggregated. Accepted values are constants defined in the class<br><code>tf.VariableSynchronization</code>. By default the synchronization is set to<br><code>AUTO</code> and the current <code>DistributionStrategy</code> chooses<br>when to synchronize. If <code>synchronization</code> is set to <code>ON_READ</code>,<br><code>trainable</code> must not be set to <code>True</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>aggregation</td>
-<td>None</td>
 <td>Indicates how a distributed variable will be aggregated.<br>Accepted values are constants defined in the class<br><code>tf.VariableAggregation</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>Additional keyword arguments. Accepted values are <code>getter</code>,<br><code>collections</code>, <code>experimental_autocast</code> and <code>caching_device</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -9105,29 +8869,21 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor(s).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>*args</td>
-<td>None</td>
 <td>additional positional arguments to be passed to <code>self.call</code>.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>**kwargs</td>
-<td>None</td>
 <td>additional keyword arguments to be passed to <code>self.call</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -9192,23 +8948,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>A list with the following schema:<br>1. <em>features</em>:<br>1.1 <em>images</em>: A Tensor of shape [batch_size, height, width, 3]<br>1.2 <em>image_informations</em>: A float32 Tensor of shape [batch_size, 2] where<br>    the last dimension represents the original height and width of the images<br>(without the padding).<br><br>2. <em>ground_truths</em>: If the training is true, a dict with<br>    <code>python&lt;br&gt;    ground_truths = {&lt;br&gt;        BoxField.BOXES:&lt;br&gt;            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),&lt;br&gt;        BoxField.LABELS:&lt;br&gt;            tf.constant([[2,1], [2, 0]], tf.int32),&lt;br&gt;        BoxField.WEIGHTS:&lt;br&gt;            tf.constant([[1, 0], [1, 1]], tf.float32),&lt;br&gt;        BoxField.NUM_BOXES:&lt;br&gt;            tf.constant([2, 1], tf.int32)&lt;br&gt;    }&lt;br&gt;</code></td>
-<td>None</td>
 </tr>
 <tr>
 <td>training</td>
-<td>None</td>
 <td>Is automatically set to <code>True</code> in train and test mode<br>(normally test should be at false). Why? Through the call we the losses and the metrics<br>of the rpn and fast_rcnn. They are automatically added with <code>add_loss</code> and <code>add_metrics</code>.<br>In test we want to benefit from those and therefore we compute them. It is an inheritance<br>from tensorflow 2.0 and 2.1 and I'll think to move them in a more traditional way inside the<br>train_step and test_step. However for now this method benefit of the encapsulation of<br>the <code>self.compiled_loss</code> method.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -9375,23 +9125,17 @@ execution).</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Tensor or list of tensors.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>mask</td>
-<td>None</td>
 <td>Tensor or list of tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -9466,17 +9210,13 @@ match the input shape provided here.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>input_shape</td>
-<td>None</td>
 <td>Shape tuple (tuple of integers)<br>or list of shape tuples (one per output tensor of the layer).<br>Shape tuples can include None for free dimensions,<br>instead of an integer.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -9600,17 +9340,13 @@ assume that the output dtype matches the input dtype.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>input_signature</td>
-<td>None</td>
 <td>Single TensorSpec or nested structure of TensorSpec<br>objects, describing a candidate input for the layer.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -9846,17 +9582,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -9935,17 +9667,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -10013,17 +9741,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -10105,17 +9829,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor or list/tuple of input tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -10175,17 +9895,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -10264,17 +9980,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -10342,17 +10054,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>node_index</td>
-<td>None</td>
 <td>Integer, index of the node<br>from which to retrieve the attribute.<br>E.g. <code>node_index=0</code> will correspond to the<br>first time the layer was called.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -10434,17 +10142,13 @@ However, we don't want this check to be perform because our ground_truths inputs
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>Input tensor or list/tuple of input tensors.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -10582,17 +10286,13 @@ b.get_weights()
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>weights</td>
-<td>None</td>
 <td>a list of Numpy arrays. The number<br>of arrays and their shape must match<br>number of the dimensions of the weights<br>of the layer (i.e. it should match the<br>output of <code>get_weights</code>).</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

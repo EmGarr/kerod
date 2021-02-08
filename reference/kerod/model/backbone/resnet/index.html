@@ -1812,35 +1812,25 @@
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>The inputs tensor</td>
-<td>None</td>
 </tr>
 <tr>
 <td>filters</td>
-<td>None</td>
 <td>integer, filters of the bottleneck layer.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>strides</td>
-<td>None</td>
 <td>default 1, stride of the second convolution layer. In the official Keras<br>implementation the stride is performed on the first convolution. This is different in<br>the pytorch implementation.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>use_conv_shortcut</td>
-<td>None</td>
 <td>Use convolution shortcut if True, otherwise identity shortcut.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -1954,29 +1944,21 @@
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>filters</td>
-<td>None</td>
 <td>integer, filters of the bottleneck layer in a block.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>blocks</td>
-<td>None</td>
 <td>number of blocks in the stacked blocks.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>strides</td>
-<td>None</td>
 <td>Stride of the second conv layer in the first block.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2032,71 +2014,49 @@ Please see <code>applications.resnet.preprocess_input</code> for an example.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>stack_fn</td>
-<td>None</td>
 <td>a function that returns output tensor for the<br>stacked residual blocks.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>preprocessing_func</td>
-<td>None</td>
 <td>a function that returns the corresponding preprocessing of the network.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>preact</td>
-<td>None</td>
 <td>whether to use pre-activation or not<br>(True for ResNetV2, False for ResNet and ResNeXt).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>use_bias</td>
-<td>None</td>
 <td>whether to use biases for convolutional layers or not<br>(True for ResNet and ResNetV2, False for ResNeXt).</td>
-<td>None</td>
 </tr>
 <tr>
 <td>model_name</td>
-<td>None</td>
 <td>string, model name.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>include_top</td>
-<td>None</td>
 <td>whether to include the fully-connected<br>layer at the top of the network.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>weights</td>
-<td>None</td>
 <td>one of <code>None</code> (random initialization),<br>'imagenet' (pre-training on ImageNet),<br>or the path to the weights file to be loaded.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>input_tensor</td>
-<td>None</td>
 <td>optional Keras tensor<br>(i.e. output of <code>layers.Input()</code>)<br>to use as image input for the model.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>input_shape</td>
-<td>None</td>
 <td>optional shape tuple, only to be specified<br>if <code>include_top</code> is False (otherwise the input shape<br>has to be <code>(224, 224, 3)</code> (with <code>channels_last</code> data format)<br>or <code>(3, 224, 224)</code> (with <code>channels_first</code> data format).<br>It should have exactly 3 inputs channels.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>kwargs</td>
-<td>None</td>
 <td>For backwards compatibility only.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

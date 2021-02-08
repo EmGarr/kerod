@@ -1282,6 +1282,32 @@
 <span class="p">)</span>
 </code></pre></div>
 
+<p>To be implemented by subclasses:
+* <code>call()</code>: Contains the logic for loss calculation using <code>y_true</code>, <code>y_pred</code>.</p>
+<p>Example subclass implementation:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">MeanSquaredError</span><span class="p">(</span><span class="n">Loss</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor_v2</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
+    <span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">math_ops</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y_pred</span> <span class="o">-</span> <span class="n">y_true</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+<p>When used with <code>tf.distribute.Strategy</code>, outside of built-in training loops
+such as <code>tf.keras</code> <code>compile</code> and <code>fit</code>, please use 'SUM' or 'NONE' reduction
+types, and reduce losses explicitly in your training loop. Using 'AUTO' or
+'SUM_OVER_BATCH_SIZE' will raise an error.</p>
+<p>Please see this custom training <a href="https://www.tensorflow.org/tutorials/distribute/custom_training">tutorial</a> for more
+details on this.</p>
+<p>You can implement 'SUM_OVER_BATCH_SIZE' using global batch size like:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">with</span> <span class="n">strategy</span><span class="o">.</span><span class="n">scope</span><span class="p">():</span>
+  <span class="n">loss_obj</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">CategoricalCrossentropy</span><span class="p">(</span>
+      <span class="n">reduction</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">Reduction</span><span class="o">.</span><span class="n">NONE</span><span class="p">)</span>
+  <span class="o">....</span>
+  <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">loss_obj</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">))</span> <span class="o">*</span>
+          <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">global_batch_size</span><span class="p">))</span>
+</code></pre></div>
+
 <h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.losses.Loss</li>
@@ -1299,17 +1325,13 @@
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>config</td>
-<td>None</td>
 <td>Output of <code>get_config()</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

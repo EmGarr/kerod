@@ -1819,6 +1819,17 @@
 <span class="p">)</span>
 </code></pre></div>
 
+<p>a linear warmup from <code>init_lr</code> to <code>base_lr</code>. The learning rate is decreased by 10 according
+to the schedule provided by <code>epochs</code>.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>base_lr</em>: The target learning rate value after the linear warmup</li>
+<li><em>num_gpus</em>: Number of gpus used during the training</li>
+<li><em>epochs</em>: A list of epoch on which the learning rate should be reduce.</li>
+<li><em>use_warmup</em>: Perform the warmup strategy.</li>
+<li><em>init_lr</em>: Learning rate value from which the warmup will start.</li>
+<li><em>num_warmup_steps</em>: Number of training step on which the warmup will be performed.</li>
+</ul>
 <h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.callbacks.Callback</li>
@@ -1912,23 +1923,17 @@ be called during TRAIN mode.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>epoch</td>
-<td>None</td>
 <td>Integer, index of epoch.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict, metric results for this training epoch, and for the<br>validation epoch if validation is performed. Validation result keys<br> are prefixed with <code>val_</code>. For training epoch, the values of the  <br><code>Model</code>'s metrics are returned. Example : <code>{'loss': 0.2, 'acc': 0.7}</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -1976,23 +1981,17 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>batch</td>
-<td>None</td>
 <td>Integer, index of batch within the current epoch.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict, contains the return value of <code>model.predict_step</code>,<br>it typically returns a dict with a key 'outputs' containing<br>the model's outputs.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2044,23 +2043,17 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>batch</td>
-<td>None</td>
 <td>Integer, index of batch within the current epoch.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Aggregated metric results up until this batch.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2104,17 +2097,13 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Currently no data is passed to this argument for this method<br>but that may change in the future.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2150,17 +2139,13 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Currently no data is passed to this argument for this method<br>but that may change in the future.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2202,23 +2187,17 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>batch</td>
-<td>None</td>
 <td>Integer, index of batch within the current epoch.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict, contains the return value of <code>model.test_step</code>. Typically,<br>the values of the <code>Model</code>'s metrics are returned.  Example:<br><code>{'loss': 0.2, 'accuracy': 0.7}</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2276,23 +2255,17 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>batch</td>
-<td>None</td>
 <td>Integer, index of batch within the current epoch.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Aggregated metric results up until this batch.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2340,17 +2313,13 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Currently no data is passed to this argument for this method<br>but that may change in the future.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2386,17 +2355,13 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Currently the output of the last call to<br><code>on_test_batch_end()</code> is passed to this argument for this method<br>but that may change in the future.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2458,23 +2423,17 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>batch</td>
-<td>None</td>
 <td>Integer, index of batch within the current epoch.</td>
-<td>None</td>
 </tr>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Aggregated metric results up until this batch.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2522,17 +2481,13 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Currently no data is passed to this argument for this method<br>but that may change in the future.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2568,17 +2523,13 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>logs</td>
-<td>None</td>
 <td>Dict. Currently the output of the last call to <code>on_epoch_end()</code><br>is passed to this argument for this method but that may change in<br>the future.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -2637,6 +2588,44 @@ batches.</p>
 <span class="p">)</span>
 </code></pre></div>
 
+<p>This function provides fine grained control over learning rates.  One must
+specify a sequence of learning rates as well as a set of integer steps
+at which the current learning rate must transition to the next.  For example,
+if boundaries = [5, 10] and rates = [.1, .01, .001], then the learning
+rate returned by this function is .1 for step=0,...,4, .01 for
+step=5...9, and .001 for step=10 and onward.</p>
+<p>You can pass this schedule directly into a <code>tf.keras.optimizers.Optimizer</code>
+as the learning rate.</p>
+<div class="codehilite"><pre><span></span><code><span class="n">lr_schedule</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">schedules</span><span class="o">.</span><span class="n">ManualStepping</span><span class="p">(</span>
+    <span class="n">boundaries</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+    <span class="n">rates</span><span class="o">=</span><span class="p">[</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">01</span><span class="p">,</span> <span class="o">.</span><span class="mi">001</span><span class="p">],</span>
+    <span class="n">warmup</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">lr_schedule</span><span class="p">),</span>
+            <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;sparse_categorical_crossentropy&#39;</span><span class="p">,</span>
+            <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The learning rate schedule is also serializable and deserializable using
+<code>tf.keras.optimizers.schedules.serialize</code> and
+<code>tf.keras.optimizers.schedules.deserialize</code>.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>boundaries</em>: A List of scalar <code>int32</code> or <code>int64</code> or a <code>Tensor</code>. It is a
+list of global steps at which to switch learning
+rates.  This list is assumed to consist of increasing positive integers.</li>
+<li><em>rates</em>: a list of (float) learning rates corresponding to intervals between
+the boundaries.  The length of this list must be exactly
+len(boundaries) + 1.</li>
+<li><em>warmup</em>: Whether to linearly interpolate learning rate for steps in
+[0, boundaries[0]].</li>
+<li><em>name</em>: String.  Optional name of the operation.  Defaults to
+    'ExponentialDecay'.</li>
+</ul>
+<p>Return:</p>
+<p>A 1-arg callable learning rate schedule that takes the current optimizer
+step and outputs the decayed learning rate, a scalar <code>Tensor</code> of the same
+type as <code>rates</code>.</p>
 <h4 id="ancestors-in-mro_1">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.optimizer_v2.learning_rate_schedule.LearningRateSchedule</li>
@@ -2654,17 +2643,13 @@ batches.</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>config</td>
-<td>None</td>
 <td>Output of <code>get_config()</code>.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>

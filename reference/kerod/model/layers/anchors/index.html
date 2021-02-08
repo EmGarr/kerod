@@ -841,8 +841,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1237,8 +1251,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
-    Attributes
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
   </a>
   
 </li>
@@ -1390,7 +1418,11 @@
 
 <span class="sd">        max_size: Maximum size of the input image. The anchors will computed once and for all.</span>
 
-<span class="sd">    Returns:</span>
+<span class="sd">    Call arguments:</span>
+
+<span class="sd">        inputs: A tensor of shape [batch_size, height, widht, channel]</span>
+
+<span class="sd">    Call returns:</span>
 
 <span class="sd">        A tensor of shape [num_scales * num_ratios * height * width, 4].</span>
 
@@ -1478,35 +1510,25 @@ At each forward according to the shape of the tensor we can extract the correspo
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>stride</td>
-<td>None</td>
 <td>Downscaling ratio compared to the original image. At stride 16 your original<br>image will be 16 times bigger than your actual tensor</td>
-<td>None</td>
 </tr>
 <tr>
 <td>scales</td>
-<td>None</td>
 <td>The scale of the anchors e.g: 8, 16, 32</td>
-<td>None</td>
 </tr>
 <tr>
 <td>ratios</td>
-<td>None</td>
 <td>The ratios are the different shapes that you want to apply on your anchors.<br>e.g: (0.5, 1, 2)</td>
-<td>None</td>
 </tr>
 <tr>
 <td>max_size</td>
-<td>None</td>
 <td>Maximum size of the input image. The anchors will computed once and for all.</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
@@ -1595,40 +1617,61 @@ At each forward according to the shape of the tensor we can extract the correspo
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes">Attributes</h4>
+<p>At each forward according to the shape of the tensor we can extract the corresponding anchors.</p>
+<h4 id="arguments">Arguments</h4>
 <table>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>stride</td>
-<td>None</td>
 <td>Downscaling ratio compared to the original image. At stride 16 your original<br>image will be 16 times bigger than your actual tensor</td>
-<td>None</td>
 </tr>
 <tr>
 <td>scales</td>
-<td>None</td>
 <td>The scale of the anchors e.g: 8, 16, 32</td>
-<td>None</td>
 </tr>
 <tr>
 <td>ratios</td>
-<td>None</td>
 <td>The ratios are the different shapes that you want to apply on your anchors.<br>e.g: (0.5, 1, 2)</td>
-<td>None</td>
 </tr>
 <tr>
 <td>max_size</td>
-<td>None</td>
 <td>Maximum size of the input image. The anchors will computed once and for all.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-arguments">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inputs</td>
+<td>A tensor of shape [batch_size, height, widht, channel]</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td>None</td>
+<td>A tensor of shape [num_scales * num_ratios * height * width, 4].<br>The anchors have the format [y_min, x_min, y_max, x_max].</td>
 </tr>
 </tbody>
 </table>
@@ -1682,17 +1725,13 @@ True</p>
 <thead>
 <tr>
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
-<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>None</td>
 <td>A tensor of shape [batch_size, height, widht, channel]</td>
-<td>None</td>
 </tr>
 </tbody>
 </table>
