@@ -115,7 +115,6 @@ def test_detr_like_architecture(model_name, tmpdir):
 
     serving_path = os.path.join(tmpdir, 'serving')
     # Should fix that bug
-    with pytest.raises(Exception):
-        model.save(serving_path)
-    # model = tf.keras.models.load_model(serving_path)
-    # model.predict(data, batch_size=2)
+    model.save(serving_path)
+    model = tf.keras.models.load_model(serving_path)
+    model.predict(data, batch_size=2)

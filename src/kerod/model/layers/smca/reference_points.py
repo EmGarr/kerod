@@ -31,6 +31,7 @@ class SMCAReferencePoints(tf.keras.layers.Layer):
     def __init__(self, hidden_dim: int, num_heads: int, **kwargs):
         super().__init__(**kwargs)
         self.num_heads = num_heads
+        self.hidden_dim = hidden_dim
         self.xy_embed = tf.keras.models.Sequential([
             tf.keras.layers.Dense(hidden_dim, activation='relu'),
             tf.keras.layers.Dense(hidden_dim, activation='relu'),
@@ -69,6 +70,12 @@ class SMCAReferencePoints(tf.keras.layers.Layer):
 
         yxhw = tf.concat([yx, tf.zeros((batch_size, num_queries, self.num_heads, 2))], axis=-1)
         return yxhw + yx_offset_hw, yx_pre_sigmoid
+
+    def get_config(self):
+        config = super().get_config()
+        config['num_heads'] = self.num_heads
+        config['hidden_dim'] = self.hidden_dim
+        return config
 
 
 remove_unwanted_doc(SMCAReferencePoints, __pdoc__)

@@ -40,7 +40,7 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
 
     def __init__(self, beta=8., **kwargs):
         super().__init__(**kwargs)
-        self._beta = tf.cast(tf.convert_to_tensor(beta), self.dtype)
+        self._beta = beta
 
     def call(self, height: int, width: int, ref_points: tf.Tensor):
         """
@@ -71,8 +71,9 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
         y, x = y[tf.newaxis, tf.newaxis, tf.newaxis], x[tf.newaxis, tf.newaxis, tf.newaxis]
 
         # [batch_size, heads, N, height, width]
-        x_term = -(x - x_cent)**2 / (self._beta * w**2)
-        y_term = -(y - y_cent)**2 / (self._beta * h**2)
+        beta = tf.cast(tf.convert_to_tensor(self._beta), self.dtype)
+        x_term = -(x - x_cent)**2 / (beta * w**2)
+        y_term = -(y - y_cent)**2 / (beta * h**2)
         weight_map = tf.math.exp(x_term + y_term)
 
         batch_size, num_heads = tf.shape(weight_map)[0], tf.shape(weight_map)[1]

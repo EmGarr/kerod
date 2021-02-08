@@ -17,9 +17,6 @@ It aims to build a clear, reusable, tested, simple and documented codebase for t
 
 Many ideas have been based on [google object detection](https://github.com/tensorflow/models/tree/master/research/object_detection), [tensorpack](https://github.com/tensorpack/tensorpack/tree/master/examples/FasterRCNN) and [mmdetection](https://github.com/open-mmlab/mmdetection).
 
-## Warning
-
-- Currently DETR like architecture cannot be saved using `model.save(path)`. I need to investigate. Please use: `model.save_weights(path)`.
 
 ## Features
 
