@@ -862,6 +862,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    Attributes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ancestors-in-mro" class="md-nav__link">
     Ancestors (in MRO)
   </a>
@@ -901,6 +908,13 @@
   
     <nav class="md-nav" aria-label="EncoderLayer">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#attributes_1" class="md-nav__link">
+    Attributes
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ancestors-in-mro_1" class="md-nav__link">
@@ -944,7 +958,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
+  <a href="#attributes_2" class="md-nav__link">
     Attributes
   </a>
   
@@ -1265,6 +1279,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    Attributes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ancestors-in-mro" class="md-nav__link">
     Ancestors (in MRO)
   </a>
@@ -1304,6 +1325,13 @@
   
     <nav class="md-nav" aria-label="EncoderLayer">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#attributes_1" class="md-nav__link">
+    Attributes
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ancestors-in-mro_1" class="md-nav__link">
@@ -1347,7 +1375,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#attributes" class="md-nav__link">
+  <a href="#attributes_2" class="md-nav__link">
     Attributes
   </a>
   
@@ -1943,30 +1971,79 @@
 <span class="p">)</span>
 </code></pre></div>
 
-<p>Will build a TransformerDecoderLayer according to the paper
-<a href="https://arxiv.org/abs/2005.12872">End-to-End Object Detection with Transformers</a></p>
-<p>Arguments:
-    d_model: The number of expected features in the encoder inputs
-    num_heads: The number of heads in the multiheadattention models.
-    dim_feedforward: The dim of the feedforward neuralnetworks in the DecoderLayer.
-    dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
-        The same rate is shared in all the layers using dropout in the transformer.</p>
-<p>Call arguments:
-    dec_out: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
-        the sequence of the decoder
-    memory: A 3-D Tensor of float32 and shape [batch_size, N, d_model]
-        the sequence from the last layer of the encoder (memory)
-    pos_embed: A 3-D Tensor of float32 and shape [batch_size, N, d_model]
-        positional encoding of the encoder
-    object_queries: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
-    key_padding_mask: A 2-D bool Tensor of shape [batch_size, seq_len].
-        The positions with the value of <code>True</code> will be ignored while
-        the position with the value of <code>False</code> will be unchanged.
-    coattn_mask:  A 4-D float tensor of shape [batch_size, num_heads, M, N, seq_len].
-        If provided, it will be added to the attention weight at
-        the coattention step (memory x self_attn).</p>
-<p>Call returns:
-    A 3-D Tensor of float32 and shape [batch_size, M, d_model]</p>
+<h4 id="attributes">Attributes</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>d_model</td>
+<td>None</td>
+<td>The number of expected features in the encoder inputs</td>
+<td>None</td>
+</tr>
+<tr>
+<td>num_heads</td>
+<td>None</td>
+<td>The number of heads in the multiheadattention models.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>dim_feedforward</td>
+<td>None</td>
+<td>The dim of the feedforward neuralnetworks in the DecoderLayer.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>dropout_rate</td>
+<td>None</td>
+<td>Float between 0 and 1. Fraction of the input units to drop.<br>The same rate is shared in all the layers using dropout in the transformer.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>dec_out</td>
+<td>None</td>
+<td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]<br>the sequence of the decoder</td>
+<td>None</td>
+</tr>
+<tr>
+<td>memory</td>
+<td>None</td>
+<td>A 3-D Tensor of float32 and shape [batch_size, N, d_model]<br>the sequence from the last layer of the encoder (memory)</td>
+<td>None</td>
+</tr>
+<tr>
+<td>pos_embed</td>
+<td>None</td>
+<td>A 3-D Tensor of float32 and shape [batch_size, N, d_model]<br>positional encoding of the encoder</td>
+<td>None</td>
+</tr>
+<tr>
+<td>object_queries</td>
+<td>None</td>
+<td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
+<td>None</td>
+</tr>
+<tr>
+<td>key_padding_mask</td>
+<td>None</td>
+<td>A 2-D bool Tensor of shape [batch_size, seq_len].<br>The positions with the value of <code>True</code> will be ignored while<br>the position with the value of <code>False</code> will be unchanged.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>coattn_mask</td>
+<td>None</td>
+<td>A 4-D float tensor of shape [batch_size, num_heads, M, N, seq_len].<br>If provided, it will be added to the attention weight at<br>the coattention step (memory x self_attn).</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
 <h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.engine.base_layer.Layer</li>
@@ -2176,23 +2253,55 @@ True</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<p>Will build a TransformerEncoderLayer according to the paper
-<a href="https://arxiv.org/abs/2005.12872">End-to-End Object Detection with Transformers</a></p>
-<p>Arguments:
-    d_model: The number of expected features in the encoder inputs
-    num_heads: The number of heads in the multiheadattention models.
-        dim_feedforward: The dim of the feedforward neuralnetworks in the EncoderLayer.
-    dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
-        The same rate is shared in all the layers using dropout in the transformer.</p>
-<p>Call arguments:
-    src: A 3-D Tensor of float32 and shape [batch_size, M, dim]
-        the sequence to the encoder layer
-    pos_embed: A 3-D Tensor of float32 and shape [batch_size, N, dim]
-        positional encoding of the encoder
-    key_padding_mask:  [Optional] A 2-D bool Tensor of shape [batch_size, seq_len_enc] where
-        False means padding and True means pixel from the original image.</p>
-<p>Call returns:
-    A 3-D Tensor of float32 and shape [batch_size, M, d_model]</p>
+<h4 id="attributes_1">Attributes</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>d_model</td>
+<td>None</td>
+<td>The number of expected features in the encoder inputs</td>
+<td>None</td>
+</tr>
+<tr>
+<td>num_heads</td>
+<td>None</td>
+<td>The number of heads in the multiheadattention models.<br>dim_feedforward: The dim of the feedforward neuralnetworks in the EncoderLayer.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>dropout_rate</td>
+<td>None</td>
+<td>Float between 0 and 1. Fraction of the input units to drop.<br>The same rate is shared in all the layers using dropout in the transformer.</td>
+<td>None</td>
+</tr>
+<tr>
+<td>src</td>
+<td>None</td>
+<td>A 3-D Tensor of float32 and shape [batch_size, M, dim]<br>the sequence to the encoder layer</td>
+<td>None</td>
+</tr>
+<tr>
+<td>pos_embed</td>
+<td>None</td>
+<td>A 3-D Tensor of float32 and shape [batch_size, N, dim]<br>positional encoding of the encoder</td>
+<td>None</td>
+</tr>
+<tr>
+<td>key_padding_mask</td>
+<td>None</td>
+<td>[Optional] A 2-D bool Tensor of shape [batch_size, seq_len_enc] where<br>False means padding and True means pixel from the original image.</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
 <h4 id="ancestors-in-mro_1">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.engine.base_layer.Layer</li>
@@ -2348,7 +2457,7 @@ True</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<h4 id="attributes">Attributes</h4>
+<h4 id="attributes_2">Attributes</h4>
 <table>
 <thead>
 <tr>
@@ -2386,7 +2495,7 @@ True</p>
 <tr>
 <td>dropout_rate</td>
 <td>None</td>
-<td>Float between 0 and 1. Fraction of the input units to drop.<br>The same rate is shared in all the layers using dropout in the transformer.<br><br>Call arguments:</td>
+<td>Float between 0 and 1. Fraction of the input units to drop.<br>The same rate is shared in all the layers using dropout in the transformer.</td>
 <td>None</td>
 </tr>
 <tr>
@@ -2416,19 +2525,7 @@ True</p>
 <tr>
 <td>coattn_mask</td>
 <td>None</td>
-<td>A 4-D float tensor of shape<br>[batch_size, num_heads, H*W, num_object_queries, seq_len].<br>        If provided, it will be added to the attention weight<br>        at the coattention step (memory x self_attn)<br><br>Call returns:</td>
-<td>None</td>
-</tr>
-<tr>
-<td>decoder_output</td>
-<td>None</td>
-<td>3-D float32 Tensor of shape [batch_size, h, d_model]<br>where h is num_object_queries * num_layers if training is true and<br>num_queries if training is set to False.</td>
-<td>None</td>
-</tr>
-<tr>
-<td>encoder_output</td>
-<td>None</td>
-<td>3-D float32 Tensor of shape [batch_size, batch_size, d_model]</td>
+<td>A 4-D float tensor of shape<br>[batch_size, num_heads, H*W, num_object_queries, seq_len].<br>If provided, it will be added to the attention weight<br>at the coattention step (memory x self_attn)</td>
 <td>None</td>
 </tr>
 </tbody>

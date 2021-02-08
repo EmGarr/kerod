@@ -1903,7 +1903,7 @@
 <tbody>
 <tr>
 <td>accuracy</td>
-<td>A scalar tensor representing the accuracy with the background classes included<br>fg_accuracy: A scalar tensor representing the accuracy without the background classes included<br>    false_negative: A scalar tensor representing the ratio of boxes predicted as background instead of<br>        their respective class among the foreground example to predict.<br><br>Warning:<br><br>This function should be used if the ground_truths have been added to the RoIs.<br>It won't work if the there are no foreground ground_truths in the sample_boxes which isn't<br>possible if they have been added.</td>
+<td>A scalar tensor representing the accuracy with the background classes included<br>fg_accuracy: A scalar tensor representing the accuracy without the background classes included<br>false_negative: A scalar tensor representing the ratio of boxes predicted as background instead of<br>    their respective class among the foreground example to predict.</td>
 </tr>
 </tbody>
 </table>
@@ -2169,31 +2169,7 @@ True</p>
 <tr>
 <td>inputs</td>
 <td>None</td>
-<td>A list with the following schema:<br>1. <em>pyramid</em>: A List of tensors the output of the pyramid<br>        2. <em>anchors</em>: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]<br>        3. <em>ground_truths</em>: If the training is true, a dict with<br><br>Where ground_truths is:<br><br>```python<br>ground_truths = {</td>
-<td>None</td>
-</tr>
-<tr>
-<td>BoxField.BOXES</td>
-<td>None</td>
-<td>tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),</td>
-<td>None</td>
-</tr>
-<tr>
-<td>BoxField.LABELS</td>
-<td>None</td>
-<td>tf.constant([[2,1], [2, 0]], tf.int32),</td>
-<td>None</td>
-</tr>
-<tr>
-<td>BoxField.WEIGHTS</td>
-<td>None</td>
-<td>tf.constant([[1, 0], [1, 1]], tf.float32),</td>
-<td>None</td>
-</tr>
-<tr>
-<td>BoxField.NUM_BOXES</td>
-<td>None</td>
-<td>tf.constant([2, 1], tf.int32)<br>}<br><code>``&lt;br&gt;&lt;br&gt;where</code>NUM_BOXES` allows to remove the padding created by tf.Data.</td>
+<td>A list with the following schema:<br>1. <em>pyramid</em>: A List of tensors the output of the pyramid<br>2. <em>anchors</em>: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]<br>3. <em>ground_truths</em>: If the training is true, a dict with</td>
 <td>None</td>
 </tr>
 </tbody>
@@ -2209,7 +2185,7 @@ True</p>
 <tbody>
 <tr>
 <td>classification_pred</td>
-<td>A logit Tensor of shape [batch_size, num_boxes, num_classes]<br>localization_pred: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]<br>    anchors: A Tensor of shape [batch_size, num_boxes, 4]<br><br>Raw predictions from the FastRCNN head you can post_process them using:<br><br><code>python&lt;br&gt;from kerod.model.post_processing import post_process_fast_rcnn_boxes&lt;br&gt;&lt;br&gt;outputs = post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,&lt;br&gt;                            images_information, num_classes)&lt;br&gt;</code><br><br>where <code>images_information</code> is provided as input of your model and <code>num_classes</code> includes<br>the background.</td>
+<td>A logit Tensor of shape [batch_size, num_boxes, num_classes]<br>localization_pred: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]<br>anchors: A Tensor of shape [batch_size, num_boxes, 4]</td>
 </tr>
 </tbody>
 </table>

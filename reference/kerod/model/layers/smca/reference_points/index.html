@@ -1302,6 +1302,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">=</span> <span class="n">num_heads</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">xy_embed</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Sequential</span><span class="p">([</span>
 
             <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">),</span>
@@ -1366,6 +1368,16 @@
 
         <span class="k">return</span> <span class="n">yxhw</span> <span class="o">+</span> <span class="n">yx_offset_hw</span><span class="p">,</span> <span class="n">yx_pre_sigmoid</span>
 
+    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+
+        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;num_heads&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span>
+
+        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;hidden_dim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span>
+
+        <span class="k">return</span> <span class="n">config</span>
+
 <span class="n">remove_unwanted_doc</span><span class="p">(</span><span class="n">SMCAReferencePoints</span><span class="p">,</span> <span class="n">__pdoc__</span><span class="p">)</span>
 </code></pre></div>
 
@@ -1399,25 +1411,13 @@
 <tr>
 <td>num_heads</td>
 <td>None</td>
-<td>Positive integer, each head starts from a head-shared center<br>and then predicts a head-specific center offset<br>        and head specific scales.<br><br>Call arguments:</td>
+<td>Positive integer, each head starts from a head-shared center<br>and then predicts a head-specific center offset<br>and head specific scales.</td>
 <td>None</td>
 </tr>
 <tr>
 <td>object_queries</td>
 <td>None</td>
-<td>A 3-D float32 Tensor of shape<br>[batch_size, num_object_queries, d_model] small fixed number of<br>        learned positional embeddings input of the decoder.<br><br>Call returns:</td>
-<td>None</td>
-</tr>
-<tr>
-<td>reference_points</td>
-<td>None</td>
-<td>A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].</td>
-<td>None</td>
-</tr>
-<tr>
-<td>embedding_reference_points</td>
-<td>None</td>
-<td>A tensor of shape [batch_size, num_object_queries, num_heads, 2].<br>The embedding of y and x without the sigmoid applied.</td>
+<td>A 3-D float32 Tensor of shape<br>[batch_size, num_object_queries, d_model] small fixed number of<br>learned positional embeddings input of the decoder.</td>
 <td>None</td>
 </tr>
 </tbody>
