@@ -4,7 +4,7 @@ import pytest
 import tensorflow as tf
 
 from kerod.core.standard_fields import BoxField
-from kerod.model.detection.rpn import RegionProposalNetwork, compute_rpn_metrics
+from kerod.layers.detection.rpn import RegionProposalNetwork, compute_rpn_metrics
 
 
 def mocked_random_shuffle(indices):
@@ -39,10 +39,10 @@ def test_rpn(rpn_class):
 
 # We are forced to Mock the add_metric and add_loss because Keras want it to be used inside the call
 # You can see it works automatically in test_rpn
-@mock.patch('kerod.model.detection.rpn.RegionProposalNetwork.add_metric',
+@mock.patch('kerod.layers.detection.rpn.RegionProposalNetwork.add_metric',
             spec=True,
             return_value=None)
-@mock.patch('kerod.model.detection.rpn.RegionProposalNetwork.add_loss',
+@mock.patch('kerod.layers.detection.rpn.RegionProposalNetwork.add_loss',
             spec=True,
             return_value=None)
 @mock.patch('tensorflow.random.shuffle', side_effect=mocked_random_shuffle)

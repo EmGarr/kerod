@@ -5,7 +5,7 @@ import pytest
 import tensorflow as tf
 
 from kerod.core.standard_fields import BoxField
-from kerod.model.detection.fast_rcnn import FastRCNN, compute_fast_rcnn_metrics
+from kerod.layers.detection.fast_rcnn import FastRCNN, compute_fast_rcnn_metrics
 
 
 def mocked_random_shuffle(indices):
@@ -104,8 +104,8 @@ def test_fast_rcnn_sample_boxes(mock_shuffle):
 
 # We are forced to Mock the add_metric, add_loss because want it to be used inside the call
 # You can see it works automatically in test_fast_rcnn
-@mock.patch('kerod.model.detection.fast_rcnn.FastRCNN.add_metric', spec=True, return_value=None)
-@mock.patch('kerod.model.detection.fast_rcnn.FastRCNN.add_loss', spec=True, return_value=None)
+@mock.patch('kerod.layers.detection.fast_rcnn.FastRCNN.add_metric', spec=True, return_value=None)
+@mock.patch('kerod.layers.detection.fast_rcnn.FastRCNN.add_loss', spec=True, return_value=None)
 def test_fast_rcnn_compute_loss(mock_add_loss, mock_add_metric):
     localization_pred = tf.constant([
         [

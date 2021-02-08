@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-from kerod.model.layers import DynamicalWeightMaps
+from kerod.layers import DynamicalWeightMaps
 
 
 def test_weight_map():

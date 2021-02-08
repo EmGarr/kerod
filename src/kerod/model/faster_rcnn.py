@@ -2,9 +2,8 @@ import tensorflow as tf
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.model.backbone.fpn import FPN
 from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
-from kerod.model.detection.fast_rcnn import FastRCNN
-from kerod.model.detection.rpn import RegionProposalNetwork
-from kerod.model.post_processing import (post_process_fast_rcnn_boxes, post_process_rpn)
+from kerod.layers import FastRCNN, RegionProposalNetwork
+from kerod.layers.post_processing import (post_process_fast_rcnn_boxes, post_process_rpn)
 from kerod.utils.documentation import remove_unwanted_doc
 from kerod.utils.training import apply_kernel_regularization
 from tensorflow.python.keras.engine import data_adapter

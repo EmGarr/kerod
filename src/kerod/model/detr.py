@@ -1,21 +1,23 @@
 from typing import Dict
 
 import tensorflow as tf
-from kerod.core.box_ops import (convert_to_center_coordinates, convert_to_xyxy_coordinates)
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.python.keras.engine import data_adapter
+from tensorflow_addons.losses.giou_loss import GIoULoss
+
+from kerod.core.box_ops import (convert_to_center_coordinates,
+                                convert_to_xyxy_coordinates)
 from kerod.core.losses import L1Loss
 from kerod.core.matcher import hungarian_matching
 from kerod.core.similarity import DetrSimilarity
 from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.core.target_assigner import TargetAssigner
-from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
-from kerod.model.layers import PositionEmbeddingSine, Transformer
-from kerod.model.post_processing.post_processing_detr import \
+from kerod.layers import PositionEmbeddingSine, Transformer
+from kerod.layers.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
+from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
 from kerod.utils import item_assignment
 from kerod.utils.documentation import remove_unwanted_doc
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from tensorflow.python.keras.engine import data_adapter
-from tensorflow_addons.losses.giou_loss import GIoULoss
 
 __pdoc__ = {}
 

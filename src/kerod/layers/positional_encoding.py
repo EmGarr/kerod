@@ -59,7 +59,7 @@ class PositionEmbeddingSine(tf.keras.layers.Layer):
 
     ```python
     import matplotlib.pyplot as plt
-    from kerod.model.layers.positional_encoding import PositionEmbeddingSine
+    from kerod.layers.positional_encoding import PositionEmbeddingSine
 
     dim = 128
     embedding =  PositionEmbeddingSine(dim)

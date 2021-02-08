@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-from kerod.model.post_processing import post_process_fast_rcnn_boxes, post_process_rpn
+from kerod.layers.post_processing import post_process_fast_rcnn_boxes, post_process_rpn
 
 
 def test_post_process_fast_rcnn_boxes():

@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from kerod.model.layers.transformer import Transformer
+from kerod.layers.transformer import Transformer
 
 
 def test_transformer():

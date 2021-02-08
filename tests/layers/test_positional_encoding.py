@@ -1,6 +1,6 @@
 import pytest
 import tensorflow as tf
-from kerod.model.layers.positional_encoding import PositionEmbeddingLearned, PositionEmbeddingSine
+from kerod.layers.positional_encoding import PositionEmbeddingLearned, PositionEmbeddingSine
 
 
 def test_positional_embedding_learned():

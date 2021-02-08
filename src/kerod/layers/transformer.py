@@ -1,5 +1,5 @@
 import tensorflow as tf
-from kerod.model.layers import MultiHeadAttention
+from kerod.layers import MultiHeadAttention
 from kerod.utils.documentation import remove_unwanted_doc
 
 __pdoc__ = {}

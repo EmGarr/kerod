@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from kerod.model.layers.anchors import generate_anchors, Anchors
+from kerod.layers.anchors import generate_anchors, Anchors
 from kerod.core import constants
 
 

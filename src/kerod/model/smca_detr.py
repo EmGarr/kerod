@@ -10,9 +10,9 @@ from kerod.core.standard_fields import BoxField, DatasetField
 from kerod.core.target_assigner import TargetAssigner
 from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
 from kerod.model.detr import compute_detr_metrics
-from kerod.model.layers import (DynamicalWeightMaps, PositionEmbeddingSine, Transformer,
+from kerod.layers import (DynamicalWeightMaps, PositionEmbeddingSine, Transformer,
                                 SMCAReferencePoints)
-from kerod.model.post_processing.post_processing_detr import \
+from kerod.layers.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
 from kerod.utils.documentation import remove_unwanted_doc
 from tensorflow.python.keras.engine import data_adapter

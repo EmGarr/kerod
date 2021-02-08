@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from kerod.model.layers.attentions import MultiHeadAttention
+from kerod.layers.attentions import MultiHeadAttention
 
 
 def test_multihead_attention_no_mask():

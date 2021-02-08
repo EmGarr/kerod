@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from kerod.model.detection.pooling_ops import (assign_pyramid_level_to_boxes,
+from kerod.layers.detection.pooling_ops import (assign_pyramid_level_to_boxes,
                                                match_boxes_to_their_pyramid_level,
                                                multilevel_roi_align)
 

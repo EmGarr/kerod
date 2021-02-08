@@ -13,8 +13,8 @@ from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
 from kerod.core.similarity import IoUSimilarity
 from kerod.core.standard_fields import BoxField
 from kerod.core.target_assigner import TargetAssigner
-from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
-from kerod.model.detection.pooling_ops import multilevel_roi_align
+from kerod.layers.detection.abstract_detection_head import AbstractDetectionHead
+from kerod.layers.detection.pooling_ops import multilevel_roi_align
 from kerod.utils.documentation import remove_unwanted_doc
 
 __pdoc__ = {}
@@ -73,7 +73,7 @@ class FastRCNN(AbstractDetectionHead):
         It performs a raw prediction of the FastRCNN head you can post_process them using:
 
         ```python
-        from kerod.model.post_processing import post_process_fast_rcnn_boxes
+        from kerod.layers.post_processing import post_process_fast_rcnn_boxes
 
         outputs = post_process_fast_rcnn_boxes(classification_pred, localization_pred, anchors,
                                     images_information, num_classes)

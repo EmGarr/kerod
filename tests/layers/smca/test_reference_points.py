@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-from kerod.model.layers import SMCAReferencePoints
+from kerod.layers import SMCAReferencePoints
 
 
 def test_reference_points():

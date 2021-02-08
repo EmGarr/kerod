@@ -114,8 +114,7 @@ To run a training you just need to write the following.
 ```python
 import numpy as np
 from kerod.dataset.preprocessing import expand_dims_for_single_batch, preprocess
-from kerod.model import factory
-from kerod.model.factory import KerodModel
+from kerod.model import factory, KerodModel
 
 num_classes = 20
 model = factory.build_model(num_classes, name=KerodModel.faster_rcnn_resnet50_pytorch)

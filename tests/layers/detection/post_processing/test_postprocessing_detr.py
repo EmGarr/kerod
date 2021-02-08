@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from kerod.core.box_ops import convert_to_center_coordinates
-from kerod.model.post_processing.post_processing_detr import post_processing
+from kerod.layers.post_processing.post_processing_detr import post_processing
 
 
 def test_post_processing_batch_size2():

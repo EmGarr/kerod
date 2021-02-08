@@ -5,15 +5,16 @@ import tensorflow.keras.layers as KL
 from tensorflow.keras import initializers
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
-from kerod.core.matcher import Matcher
 from kerod.core.box_coder import encode_boxes_faster_rcnn
 from kerod.core.losses import L1Loss
-from kerod.core.similarity import IoUSimilarity
+from kerod.core.matcher import Matcher
 from kerod.core.sampling_ops import batch_sample_balanced_positive_negative
+from kerod.core.similarity import IoUSimilarity
 from kerod.core.standard_fields import BoxField
 from kerod.core.target_assigner import TargetAssigner
-from kerod.model.detection.abstract_detection_head import AbstractDetectionHead
-from kerod.model.layers import Anchors
+from kerod.layers import Anchors
+from kerod.layers.detection.abstract_detection_head import \
+    AbstractDetectionHead
 from kerod.utils.documentation import remove_unwanted_doc
 
 __pdoc__ = {}
