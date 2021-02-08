@@ -60,11 +60,11 @@ class SMCA(tf.keras.Model):
         training: Is automatically set to `True` in train mode
 
     Call returns:
-        logits: A Tensor of shape [batch_size, h, num_classes + 1] class logits
-        boxes: A Tensor of shape [batch_size, h, 4]
-
-    where h is num_queries * transformer_decoder.num_layers if
-    training is true and num_queries otherwise.
+        Tuple:
+            - `logits`: A Tensor of shape [batch_size, h, num_classes + 1] class logits
+            - `boxes`: A Tensor of shape [batch_size, h, 4]
+            where h is num_queries * transformer_decoder.transformer_num_layers if
+            training is true and num_queries otherwise.
     """
 
     def __init__(self, num_classes, backbone, num_queries=300, **kwargs):
@@ -145,11 +145,11 @@ class SMCA(tf.keras.Model):
             training: Is automatically set to `True` in train mode
 
         Returns:
-            logits: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
-            boxes: A Tensor of shape [batch_size, num_queries, 4]
-
-        where h is num_queries * transformer_decoder.num_layers if
-        training is true and num_queries otherwise.
+            Tuple:
+                - `logits`: A Tensor of shape [batch_size, h, num_classes + 1] class logits
+                - `boxes`: A Tensor of shape [batch_size, h, 4]
+                where h is num_queries * transformer_decoder.transformer_num_layers if
+                training is true and num_queries otherwise.
         """
         images = inputs[DatasetField.IMAGES]
         images_padding_masks = inputs[DatasetField.IMAGES_PMASK]
@@ -351,12 +351,13 @@ class SMCA(tf.keras.Model):
         Part 4. Experiments of Object Detection with Transformers
 
         Returns:
-            boxes: A Tensor of shape [batch_size, self.num_queries, (y1,x1,y2,x2)]
-                containing the boxes with the coordinates between 0 and 1.
-            scores: A Tensor of shape [batch_size, self.num_queries] containing
-                the score of the boxes.
-            classes: A Tensor of shape [batch_size, self.num_queries]
-                containing the class of the boxes [0, num_classes).
+            Tuple:
+                - `boxes`: A Tensor of shape [batch_size, self.num_queries, (y1,x1,y2,x2)]
+                    containing the boxes with the coordinates between 0 and 1.
+                - `scores`: A Tensor of shape [batch_size, self.num_queries] containing
+                    the score of the boxes.
+                - `classes`: A Tensor of shape [batch_size, self.num_queries]
+                    containing the class of the boxes [0, num_classes).
         """
         data = data_adapter.expand_1d(data)
         x, _, _ = data_adapter.unpack_x_y_sample_weight(data)

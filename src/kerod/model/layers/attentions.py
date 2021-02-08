@@ -27,7 +27,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
             If provided, it will be added to the attention weight.
 
     Call returns:
-        A 3-D tensor of shape [batch_size, seq_len_q, d_model]
+        tf.Tensor: A 3-D tensor of shape [batch_size, seq_len_q, d_model]
     """
 
     def __init__(self, d_model: int, num_heads: int, dropout_rate=0., attention_axes=-1, **kwargs):
@@ -67,7 +67,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
             attn_mask:  A 4-D float tensor of shape [batch_size, num_heads, seq_len_q, seq_len].
                 If provided, it will be added to the attention weight.
         Returns:
-            A 3-D tensor of shape [batch_size, seq_len_q, d_model]
+            tf.Tensor: A 3-D tensor of shape [batch_size, seq_len_q, d_model]
         """
 
         batch_size = tf.shape(query)[0]

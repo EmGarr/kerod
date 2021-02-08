@@ -48,26 +48,21 @@ class FasterRcnnFPN(tf.keras.Model):
         """Perform an inference in training.
 
         Arguments:
-            inputs: A list with the following schema:
-                1. *features*:
-                1.1 *images*: A Tensor of shape [batch_size, height, width, 3]
-                1.2 *image_informations*: A float32 Tensor of shape [batch_size, 2] where
-                    the last dimension represents the original height and width of the images
-                (without the padding).
+            inputs: A dict with the following schema:
+                `images`: A Tensor of shape [batch_size, height, width, 3]
+                `image_informations`: A float32 Tensor of shape [batch_size, 2] where
+                    the last dimension represents the original height and
+                    width of the images (without the padding).
 
-                2. *ground_truths*: If the training is true, a dict with
-                    ```python
-                    ground_truths = {
-                        BoxField.BOXES:
-                            tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),
-                        BoxField.LABELS:
-                            tf.constant([[2,1], [2, 0]], tf.int32),
-                        BoxField.WEIGHTS:
-                            tf.constant([[1, 0], [1, 1]], tf.float32),
-                        BoxField.NUM_BOXES:
-                            tf.constant([2, 1], tf.int32)
-                    }
-                    ```
+                `ground_truths`: A dict
+                    - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_gt, num_classes],
+                    - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)]
+                    - `BoxField.LABELS`: A 3-D tensor of int32 and shape [batch_size, num_gt]
+                    - `BoxField.WEIGHTS`: A 3-D tensor of float and shape [batch_size, num_gt]
+                    - `BoxField.NUM_BOXES`: A 2-D tensor of int32 and shape [batch_size, 1]
+                        which allows to remove the padding created by tf.Data.
+                        Example: if batch_size=2 and this field equal tf.constant([[2], [1]], tf.int32)
+                        then my second box has a padding of 1
 
             training: Is automatically set to `True` in train and test mode
                 (normally test should be at false). Why? Through the call we the losses and the metrics
@@ -78,10 +73,11 @@ class FasterRcnnFPN(tf.keras.Model):
                 the `self.compiled_loss` method.
 
         Returns:
-            classification_pred: A Tensor of shape [batch_size, num_boxes, num_classes] representig
-                the class probability.
-            localization_pred: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
-            anchors: A Tensor of shape [batch_size, num_boxes, 4]
+            Tuple:
+                - `classification_pred`: A Tensor of shape [batch_size, num_boxes, num_classes]
+                    representing the class probability.
+                - `localization_pred`: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]
+                - `anchors`: A Tensor of shape [batch_size, num_boxes, 4]
         """
         images = inputs[DatasetField.IMAGES]
         images_information = inputs[DatasetField.IMAGES_INFO]
@@ -204,6 +200,7 @@ class FasterRcnnFPN(tf.keras.Model):
 
     def export_for_serving(self, filepath):
         """Allow to bypass the save_model behavior the graph in serving mode.
+
         Currently, the issue is that in training the ground_truths are passed to the call method but
         not in inference. For the serving only the `images` and `images_information` are defined.
         It means the inputs link to the ground_truths won't be defined in serving. However, in tensorflow

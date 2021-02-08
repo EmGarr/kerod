@@ -60,8 +60,8 @@ class Anchors(tf.keras.layers.Layer):
         inputs: A tensor of shape [batch_size, height, widht, channel]
 
     Call returns:
-        A tensor of shape [num_scales * num_ratios * height * width, 4].
-        The anchors have the format [y_min, x_min, y_max, x_max].
+        tf.Tensor: A tensor of shape [num_scales * num_ratios * height * width, 4].
+            The anchors have the format [y_min, x_min, y_max, x_max].
     """
 
     def __init__(self, stride, scales, ratios, **kwargs):
@@ -82,8 +82,8 @@ class Anchors(tf.keras.layers.Layer):
             inputs: A tensor of shape [batch_size, height, widht, channel]
 
         Returns:
-            A tensor of shape [num_scales * num_ratios * height * width, 4].
-            The anchors have the format [y_min, x_min, y_max, x_max].
+            tf.Tensor: A tensor of shape [num_scales * num_ratios * height * width, 4].
+                The anchors have the format [y_min, x_min, y_max, x_max].
         """
         shape = tf.shape(inputs)
         height, width = shape[1], shape[2]

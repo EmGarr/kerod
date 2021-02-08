@@ -52,11 +52,11 @@ class DeTr(tf.keras.Model):
         training: Is automatically set to `True` in train mode
 
     Call returns:
-        logits: A Tensor of shape [batch_size, h, num_classes + 1] class logits
-        boxes: A Tensor of shape [batch_size, h, 4]
-
-    where h is num_queries * transformer_decoder.transformer_num_layers if
-    training is true and num_queries otherwise.
+        Tuple:
+            - `logits`: A Tensor of shape [batch_size, h, num_classes + 1] class logits
+            - `boxes`: A Tensor of shape [batch_size, h, 4]
+            where h is num_queries * transformer_decoder.transformer_num_layers if
+            training is true and num_queries otherwise.
     """
 
     def __init__(self, num_classes: int, backbone, num_queries=100, **kwargs):
@@ -137,11 +137,11 @@ class DeTr(tf.keras.Model):
             training: Is automatically set to `True` in train mode
 
         Returns:
-            logits: A Tensor of shape [batch_size, num_queries, num_classes + 1] class logits
-            boxes: A Tensor of shape [batch_size, num_queries, 4]
-
-        where h is num_queries * transformer_decoder.transformer_num_layers if
-        training is true and num_queries otherwise.
+            Tuple:
+                - `logits`: A Tensor of shape [batch_size, h, num_classes + 1] class logits
+                - `boxes`: A Tensor of shape [batch_size, h, 4]
+                where h is num_queries * transformer_decoder.transformer_num_layers if
+                training is true and num_queries otherwise.
         """
         images = inputs[DatasetField.IMAGES]
         images_padding_masks = inputs[DatasetField.IMAGES_PMASK]
@@ -364,7 +364,7 @@ def compute_detr_metrics(y_true: tf.Tensor, y_pred: tf.Tensor):
             representing the classification logits.
 
     Returns:
-        recall: Among all the boxes that we had to find how much did we found.
+        tf.Tensor: Recall Among all the boxes that we had to find how much did we found.
     """
     #Even if the softmax has not been applyed the argmax can be usefull
     prediction = tf.argmax(y_pred, axis=-1, name='label_prediction', output_type=tf.int32)

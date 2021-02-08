@@ -25,7 +25,7 @@ class EncoderLayer(tf.keras.layers.Layer):
             False means padding and True means pixel from the original image.
 
     Call returns:
-        A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+        tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
     """
 
     def __init__(self,
@@ -61,7 +61,7 @@ class EncoderLayer(tf.keras.layers.Layer):
                 where False means padding and True means pixel from the original image.
 
         Returns:
-            A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+            tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
         """
         x_pos_emb = src + pos_emb
         attn_output = self.mha(src,
@@ -106,7 +106,7 @@ class DecoderLayer(tf.keras.layers.Layer):
             the coattention step (memory x self_attn).
 
     Call returns:
-        A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+        tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
     """
 
     def __init__(self,
@@ -156,7 +156,7 @@ class DecoderLayer(tf.keras.layers.Layer):
                 If provided, it will be added to the attention weight at the coattention step (memory x self_attn)
 
         Returns:
-            A 3-D Tensor of float32 and shape [batch_size, M, d_model]
+            tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]
         """
         tgt_object_queries = dec_out + object_queries
         # (batch_size, M, d_model)
@@ -211,10 +211,11 @@ class Transformer(tf.keras.layers.Layer):
             at the coattention step (memory x self_attn)
 
     Call returns:
-        decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]
-            where h is num_object_queries * num_layers if training is true and
-            num_queries if training is set to False.
-        encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]
+        Tuple:
+            - `decoder_output`: 3-D float32 Tensor of shape [batch_size, h, d_model]
+                where h is num_object_queries * num_layers if training is true and
+                num_queries if training is set to False.
+            - `encoder_output`: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]
 
     """
 
@@ -267,10 +268,11 @@ class Transformer(tf.keras.layers.Layer):
                 at the coattention step (memory x self_attn)
 
         Returns:
-            decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]
-                where h is num_object_queries * num_layers if training is true and
-                num_queries if training is set to False.
-            encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]
+            Tuple:
+                - `decoder_output`: 3-D float32 Tensor of shape [batch_size, h, d_model]
+                    where h is num_object_queries * num_layers if training is true and
+                    num_queries if training is set to False.
+                - `encoder_output`: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]
         """
         memory = flatten_tensor
         for enc in self.enc_layers:

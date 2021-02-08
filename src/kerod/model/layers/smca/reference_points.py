@@ -23,9 +23,12 @@ class SMCAReferencePoints(tf.keras.layers.Layer):
             learned positional embeddings input of the decoder.
 
     Call returns:
-        reference_points: A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].
-        embedding_reference_points: A tensor of shape [batch_size, num_object_queries, num_heads, 2].
-            The embedding of y and x without the sigmoid applied.
+        Tuple:
+            - `reference_points`: A float tensor of shape
+                [batch_size, num_object_queries, num_heads, (y, x, w, h)].
+            - `embedding_reference_points`: A tensor of shape
+                [batch_size, num_object_queries, num_heads, 2].
+                The embedding of y and x without the sigmoid applied.
     """
 
     def __init__(self, hidden_dim: int, num_heads: int, **kwargs):
@@ -46,10 +49,14 @@ class SMCAReferencePoints(tf.keras.layers.Layer):
             object_queries: A 3-D float32 Tensor of shape
                 [batch_size, num_object_queries, d_model] small fixed number of
                 learned positional embeddings input of the decoder.
-        Returns:
-            reference_points: A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].
-            embedding_reference_points: A tensor of shape [batch_size, num_object_queries, num_heads, 2].
-                The embedding of y and x without the sigmoid applied.
+
+        Call returns:
+            Tuple:
+                - `reference_points`: A float tensor of shape
+                    [batch_size, num_object_queries, num_heads, (y, x, w, h)].
+                - `embedding_reference_points`: A tensor of shape
+                    [batch_size, num_object_queries, num_heads, 2].
+                    The embedding of y and x without the sigmoid applied.
         """
 
         yx_pre_sigmoid = self.xy_embed(object_queries)  # [bs, num_queries, 2]

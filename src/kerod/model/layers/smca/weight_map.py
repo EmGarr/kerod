@@ -32,10 +32,10 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
         width: The targeted width of the feature map
         ref_points: A tensor of shape [batch_size, N, heads, (y, x, h, w)] in [0, 1]
 
-    Returns:
-        weight_map: A 4D tensor of float 32 and shape
-            [batch_size, heads, N, height * width] representing
-            a weight map per reference points.
+    Call returns:
+        tf.Tensor: The weight_map per reference points
+            a 4D tensor of float 32 and shape
+            [batch_size, heads, N, height * width].
     """
 
     def __init__(self, beta=8., **kwargs):
@@ -51,9 +51,9 @@ class DynamicalWeightMaps(tf.keras.layers.Layer):
             ref_points: A tensor of shape [batch_size, N, heads, (y, x, h, w)] in [0, 1]
 
         Returns:
-            weight_map: A 4D tensor of float 32 and shape
-                [batch_size, heads, N, height * width] representing
-                a weight map per reference points.
+            tf.Tensor: The weight_map per reference points
+                a 4D tensor of float 32 and shape
+                [batch_size, heads, N, height * width].
         """
 
         x = tf.cast(tf.linspace(0, 1, width), self.dtype)

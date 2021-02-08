@@ -11,6 +11,12 @@ class PositionEmbeddingLearned(tf.keras.layers.Layer):
 
     Arguments:
         output_dim: Dimension of the dense embedding.
+
+    Call arguments:
+        inputs: A 4-D Tensor of shape [batch_size, h, w, channel]
+
+    Call returns:
+        tf.Tensor: The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]
     """
 
     def __init__(self, output_dim=512, **kwargs):
@@ -29,7 +35,7 @@ class PositionEmbeddingLearned(tf.keras.layers.Layer):
             inputs: A 4-D Tensor of shape [batch_size, h, w, channel]
 
         Returns:
-            The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]
+            tf.Tensor: The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]
         """
         batch_size, h, w = tf.shape(inputs)[0], tf.shape(inputs)[1], tf.shape(inputs)[2]
         i = tf.range(w)
@@ -68,6 +74,16 @@ class PositionEmbeddingSine(tf.keras.layers.Layer):
     ```
 
     ![Visualization Positional Encoding](https://raw.githubusercontent.com/EmGarr/kerod/master/ressources/2d_pos_encoding.png)
+
+    Arguments:
+        output_dim: Dimension of the dense embedding.
+
+    Call arguments:
+        masks: A tensor of bool and shape [batch_size, w, h] where False means
+            padding and True pixel from the image
+
+    Call returns:
+        tf.Tensor: The encoding a tensor of float and shape [batch_size, w, h, output_dim]
     """
 
     def __init__(self, output_dim=64, temperature=10000):
@@ -85,12 +101,11 @@ class PositionEmbeddingSine(tf.keras.layers.Layer):
         """From a masks tensor compute the positional encoding
 
         Arguments:
+            masks: A tensor of bool and shape [batch_size, w, h] where False means
+                padding and True pixel from the image
 
-        masks: A tensor of bool and shape [batch_size, w, h] where False means
-            padding and True pixel from the image
-
-        Return:
-            encoding: A tensor of float and shape [batch_size, w, h, output_dim]
+        Returns:
+            tf.Tensor: The encoding a tensor of float and shape [batch_size, w, h, output_dim]
         """
         masks = tf.cast(masks, self.compute_dtype)
         y_embed = tf.math.cumsum(masks, axis=1)

@@ -11,10 +11,8 @@ __pdoc__ = {}
 
 class AbstractDetectionHead(KL.Layer):
     """Abstract object detector. It encapsulates the main functions of an object detector.
-    The build of the detection head, the segmentation head, the post_processing.
 
     Arguments:
-
         num_classes: Number of classes of the classification head (e.g: Your n classes +
             the background class)
         classification_loss: An object tf.keras.losses usually CategoricalCrossentropy.
@@ -116,12 +114,10 @@ class AbstractDetectionHead(KL.Layer):
         """Build the detection head
 
         Arguments:
-
-            inputs: A tensor of  shape [N, H, W, C]
+            inputs: A tensor of float and shape [N, H, W, C]
 
         Returns:
-
-            A tensor and shape [N, H*2, W*2, num_classes - 1]
+            tf.Tensor: A tensor and shape [N, H*2, W*2, num_classes - 1]
         """
 
         x = inputs
@@ -130,11 +126,15 @@ class AbstractDetectionHead(KL.Layer):
         return x
 
     def build_detection_head(self, inputs):
-        """ Build a detection head composed 
+        """ Build a detection head composed of a classification and box_detection.
 
         Arguments:
-
             inputs: A tensor of shape [batch_size, H, W, C]
+
+        Returns:
+            Tuple:
+                classification_head: a tensor of shape [batch_size, num_anchors, 2]
+                localization_head: a tensor of shape [batch_size, num_anchors, 4]
         """
         classification_head = self._conv_classification_head(inputs)
 
@@ -145,7 +145,8 @@ class AbstractDetectionHead(KL.Layer):
     def compute_losses(self, y_true: Dict[str, tf.Tensor], y_pred: Dict[str, tf.Tensor],
                        weights: Dict[str, tf.Tensor]) -> dict:
         """Compute the losses of the object detection head.
-        Each dictionary is composed of the same key (classification, localization, segmentation)
+
+        Each dictionary is composed of the same keys (classification, localization, segmentation)
 
         Arguments:
             y_pred: A dict of tensors of shape [N, nb_boxes, num_output].
@@ -154,7 +155,7 @@ class AbstractDetectionHead(KL.Layer):
                 This tensor is composed of one hot vectors.
 
         Returns:
-            A dict of different losses
+            dict : A dict of different losses
         """
 
         def _compute_loss(loss, loss_weight, target):
