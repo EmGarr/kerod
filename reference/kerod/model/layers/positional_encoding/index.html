@@ -857,15 +857,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ancestors-in-mro" class="md-nav__link">
-    Ancestors (in MRO)
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro" class="md-nav__link">
+    Ancestors (in MRO)
   </a>
   
 </li>
@@ -898,15 +905,29 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ancestors-in-mro_1" class="md-nav__link">
-    Ancestors (in MRO)
+  <a href="#arguments_1" class="md-nav__link">
+    Arguments
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables_1" class="md-nav__link">
-    Instance variables
+  <a href="#call-arguments_1" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns_1" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro_1" class="md-nav__link">
+    Ancestors (in MRO)
   </a>
   
 </li>
@@ -1231,15 +1252,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ancestors-in-mro" class="md-nav__link">
-    Ancestors (in MRO)
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro" class="md-nav__link">
+    Ancestors (in MRO)
   </a>
   
 </li>
@@ -1272,15 +1300,29 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ancestors-in-mro_1" class="md-nav__link">
-    Ancestors (in MRO)
+  <a href="#arguments_1" class="md-nav__link">
+    Arguments
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables_1" class="md-nav__link">
-    Instance variables
+  <a href="#call-arguments_1" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns_1" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro_1" class="md-nav__link">
+    Ancestors (in MRO)
   </a>
   
 </li>
@@ -1348,6 +1390,14 @@
 
 <span class="sd">        output_dim: Dimension of the dense embedding.</span>
 
+<span class="sd">    Call arguments:</span>
+
+<span class="sd">        inputs: A 4-D Tensor of shape [batch_size, h, w, channel]</span>
+
+<span class="sd">    Call returns:</span>
+
+<span class="sd">        tf.Tensor: The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dim</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1376,7 +1426,7 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]</span>
+<span class="sd">            tf.Tensor: The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1440,6 +1490,20 @@
 
 <span class="sd">    ![Visualization Positional Encoding](https://raw.githubusercontent.com/EmGarr/kerod/master/ressources/2d_pos_encoding.png)</span>
 
+<span class="sd">    Arguments:</span>
+
+<span class="sd">        output_dim: Dimension of the dense embedding.</span>
+
+<span class="sd">    Call arguments:</span>
+
+<span class="sd">        masks: A tensor of bool and shape [batch_size, w, h] where False means</span>
+
+<span class="sd">            padding and True pixel from the image</span>
+
+<span class="sd">    Call returns:</span>
+
+<span class="sd">        tf.Tensor: The encoding a tensor of float and shape [batch_size, w, h, output_dim]</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dim</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
@@ -1468,13 +1532,13 @@
 
 <span class="sd">        Arguments:</span>
 
-<span class="sd">        masks: A tensor of bool and shape [batch_size, w, h] where False means</span>
+<span class="sd">            masks: A tensor of bool and shape [batch_size, w, h] where False means</span>
 
-<span class="sd">            padding and True pixel from the image</span>
+<span class="sd">                padding and True pixel from the image</span>
 
-<span class="sd">        Return:</span>
+<span class="sd">        Returns:</span>
 
-<span class="sd">            encoding: A tensor of float and shape [batch_size, w, h, output_dim]</span>
+<span class="sd">            tf.Tensor: The encoding a tensor of float and shape [batch_size, w, h, output_dim]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1551,6 +1615,36 @@
 </tr>
 </tbody>
 </table>
+<h4 id="call-arguments">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inputs</td>
+<td>A 4-D Tensor of shape [batch_size, h, w, channel]</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tf.Tensor</td>
+<td>The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]</td>
+</tr>
+</tbody>
+</table>
 <h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.engine.base_layer.Layer</li>
@@ -1559,34 +1653,6 @@
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods">Methods</h4>
 <h4 id="call">call</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
@@ -1621,7 +1687,7 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]</td>
 </tr>
 </tbody>
@@ -1636,7 +1702,7 @@ True</p>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]</span>
+<span class="ss">            tf.Tensor: The positional embedding a 4-D Tensor of shape [batch_size, h, w, output_dim]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span><span class="w"></span>
 
@@ -1690,6 +1756,51 @@ True</p>
 </code></pre></div>
 
 <p><img alt="Visualization Positional Encoding" src="https://raw.githubusercontent.com/EmGarr/kerod/master/ressources/2d_pos_encoding.png" /></p>
+<h4 id="arguments_1">Arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>output_dim</td>
+<td>Dimension of the dense embedding.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-arguments_1">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>masks</td>
+<td>A tensor of bool and shape [batch_size, w, h] where False means<br>padding and True pixel from the image</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns_1">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tf.Tensor</td>
+<td>The encoding a tensor of float and shape [batch_size, w, h, output_dim]</td>
+</tr>
+</tbody>
+</table>
 <h4 id="ancestors-in-mro_1">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.engine.base_layer.Layer</li>
@@ -1698,34 +1809,6 @@ True</p>
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables_1">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods_1">Methods</h4>
 <h4 id="call_1">call</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
@@ -1735,24 +1818,49 @@ True</p>
 </code></pre></div>
 
 <p>From a masks tensor compute the positional encoding</p>
-<p>Arguments:</p>
-<p>masks: A tensor of bool and shape [batch_size, w, h] where False means
-    padding and True pixel from the image</p>
-<p>Return:
-    encoding: A tensor of float and shape [batch_size, w, h, output_dim]</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>masks</td>
+<td>A tensor of bool and shape [batch_size, w, h] where False means<br>padding and True pixel from the image</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tf.Tensor</td>
+<td>The encoding a tensor of float and shape [batch_size, w, h, output_dim]</td>
+</tr>
+</tbody>
+</table>
 <details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="k">call</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="n">masks</span><span class="p">):</span>
 
         <span class="ss">&quot;&quot;&quot;From a masks tensor compute the positional encoding</span>
 
 <span class="ss">        Arguments:</span>
 
-<span class="ss">        masks: A tensor of bool and shape [batch_size, w, h] where False means</span>
+<span class="ss">            masks: A tensor of bool and shape [batch_size, w, h] where False means</span>
 
-<span class="ss">            padding and True pixel from the image</span>
+<span class="ss">                padding and True pixel from the image</span>
 
-<span class="ss">        Return:</span>
+<span class="ss">        Returns:</span>
 
-<span class="ss">            encoding: A tensor of float and shape [batch_size, w, h, output_dim]</span>
+<span class="ss">            tf.Tensor: The encoding a tensor of float and shape [batch_size, w, h, output_dim]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 

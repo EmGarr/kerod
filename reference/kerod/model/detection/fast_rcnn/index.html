@@ -767,15 +767,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ancestors-in-mro" class="md-nav__link">
-    Ancestors (in MRO)
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro" class="md-nav__link">
+    Ancestors (in MRO)
   </a>
   
 </li>
@@ -1265,15 +1272,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ancestors-in-mro" class="md-nav__link">
-    Ancestors (in MRO)
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro" class="md-nav__link">
+    Ancestors (in MRO)
   </a>
   
 </li>
@@ -1368,6 +1382,10 @@
 
 <span class="s s-Atom">import</span> <span class="s s-Atom">tensorflow</span><span class="p">.</span><span class="s s-Atom">keras</span><span class="p">.</span><span class="s s-Atom">layers</span> <span class="s s-Atom">as</span> <span class="nv">KL</span>
 
+<span class="s s-Atom">from</span> <span class="s s-Atom">tensorflow</span><span class="p">.</span><span class="s s-Atom">keras</span> <span class="s s-Atom">import</span> <span class="s s-Atom">initializers</span>
+
+<span class="s s-Atom">from</span> <span class="s s-Atom">tensorflow</span><span class="p">.</span><span class="s s-Atom">keras</span><span class="p">.</span><span class="s s-Atom">losses</span> <span class="s s-Atom">import</span> <span class="nv">SparseCategoricalCrossentropy</span>
+
 <span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">core</span><span class="p">.</span><span class="s s-Atom">box_coder</span> <span class="s s-Atom">import</span> <span class="s s-Atom">encode_boxes_faster_rcnn</span>
 
 <span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">core</span><span class="p">.</span><span class="s s-Atom">losses</span> <span class="s s-Atom">import</span> <span class="nv">L1Loss</span>
@@ -1388,10 +1406,6 @@
 
 <span class="s s-Atom">from</span> <span class="s s-Atom">kerod</span><span class="p">.</span><span class="s s-Atom">utils</span><span class="p">.</span><span class="s s-Atom">documentation</span> <span class="s s-Atom">import</span> <span class="s s-Atom">remove_unwanted_doc</span>
 
-<span class="s s-Atom">from</span> <span class="s s-Atom">tensorflow</span><span class="p">.</span><span class="s s-Atom">keras</span> <span class="s s-Atom">import</span> <span class="s s-Atom">initializers</span>
-
-<span class="s s-Atom">from</span> <span class="s s-Atom">tensorflow</span><span class="p">.</span><span class="s s-Atom">keras</span><span class="p">.</span><span class="s s-Atom">losses</span> <span class="s s-Atom">import</span> <span class="nv">SparseCategoricalCrossentropy</span>
-
 <span class="k">__</span><span class="s s-Atom">pdoc__</span> <span class="o">=</span> <span class="p">{}</span>
 
 <span class="s s-Atom">class</span> <span class="nv">FastRCNN</span><span class="p">(</span><span class="nv">AbstractDetectionHead</span><span class="p">)</span><span class="s s-Atom">:</span>
@@ -1405,6 +1419,24 @@
 <span class="s2">        num_classes: The number of classes that predict the classification head (N+1) where N</span>
 
 <span class="s2">            is the number of classes of your dataset and 1 is the background.</span>
+
+<span class="s2">    Call arguments:</span>
+
+<span class="s2">        inputs: A Tuple</span>
+
+<span class="s2">            1. `pyramid`: A List of tensors the output of the pyramid</span>
+
+<span class="s2">            2. `anchors`: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="s2">    Call returns:</span>
+
+<span class="s2">        Tuple:</span>
+
+<span class="s2">            `classification_pred`: A logit Tensor of shape [batch_size, num_boxes, num_classes]</span>
+
+<span class="s2">            `localization_pred`: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]</span>
+
+<span class="s2">            `anchors`: A Tensor of shape [batch_size, num_boxes, 4]</span>
 
 <span class="s2">    &quot;&quot;&quot;</span>
 
@@ -1460,53 +1492,7 @@
 
         <span class="s2">&quot;&quot;&quot;Build the computational graph of the fast RCNN HEAD.</span>
 
-<span class="s2">        Arguments:</span>
-
-<span class="s2">            inputs: A list with the following schema:</span>
-
-<span class="s2">                1. *pyramid*: A List of tensors the output of the pyramid</span>
-
-<span class="s2">                2. *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
-
-<span class="s2">                3. *ground_truths*: If the training is true, a dict with</span>
-
-<span class="s2">        Where ground_truths is:</span>
-
-<span class="s2">        ```python</span>
-
-<span class="s2">        ground_truths = {</span>
-
-<span class="s2">            BoxField.BOXES:</span>
-
-<span class="s2">                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),</span>
-
-<span class="s2">            BoxField.LABELS:</span>
-
-<span class="s2">                tf.constant([[2,1], [2, 0]], tf.int32),</span>
-
-<span class="s2">            BoxField.WEIGHTS:</span>
-
-<span class="s2">                tf.constant([[1, 0], [1, 1]], tf.float32),</span>
-
-<span class="s2">            BoxField.NUM_BOXES:</span>
-
-<span class="s2">                tf.constant([2, 1], tf.int32)</span>
-
-<span class="s2">        }</span>
-
-<span class="s2">        ```</span>
-
-<span class="s2">        where `NUM_BOXES` allows to remove the padding created by tf.Data.</span>
-
-<span class="s2">        Returns:</span>
-
-<span class="s2">            classification_pred: A logit Tensor of shape [batch_size, num_boxes, num_classes]</span>
-
-<span class="s2">            localization_pred: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]</span>
-
-<span class="s2">            anchors: A Tensor of shape [batch_size, num_boxes, 4]</span>
-
-<span class="s2">        Raw predictions from the FastRCNN head you can post_process them using:</span>
+<span class="s2">        It performs a raw prediction of the FastRCNN head you can post_process them using:</span>
 
 <span class="s2">        ```python</span>
 
@@ -1521,6 +1507,24 @@
 <span class="s2">        where `images_information` is provided as input of your model and `num_classes` includes</span>
 
 <span class="s2">        the background.</span>
+
+<span class="s2">        Arguments:</span>
+
+<span class="s2">            inputs: A Tuple</span>
+
+<span class="s2">                1. `pyramid`: A List of tensors the output of the pyramid</span>
+
+<span class="s2">                2. `anchors`: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="s2">        Returns:</span>
+
+<span class="s2">            Tuple:</span>
+
+<span class="s2">                `classification_pred`: A logit Tensor of shape [batch_size, num_boxes, num_classes]</span>
+
+<span class="s2">                `localization_pred`: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]</span>
+
+<span class="s2">                `anchors`: A Tensor of shape [batch_size, num_boxes, 4]</span>
 
 <span class="s2">        &quot;&quot;&quot;</span>
 
@@ -1568,9 +1572,11 @@
 
                      <span class="s s-Atom">sampling_positive_ratio:</span> <span class="s s-Atom">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">)</span><span class="s s-Atom">:</span>
 
-        <span class="s2">&quot;&quot;&quot;Perform the sampling of the target anchors. During the training a set of RoIs is</span>
+        <span class="s2">&quot;&quot;&quot;Perform the sampling of the target anchors.</span>
 
-<span class="s2">        detected by the RPN. However, you do not want to analyse all the set. You only want</span>
+<span class="s2">        During the training a set of RoIs is detected by the RPN.</span>
+
+<span class="s2">        However, you do not want to analyse all the set. You only want</span>
 
 <span class="s2">        to analyse the anchors that you sampled with this method.</span>
 
@@ -1578,63 +1584,53 @@
 
 <span class="s2">            anchors: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
 
-<span class="s2">            ground_truths: A dict with the following format:</span>
+<span class="s2">            ground_truths: A dict</span>
+
+<span class="s2">                - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_gt, num_classes],</span>
+
+<span class="s2">                - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)]</span>
+
+<span class="s2">                - `BoxField.LABELS`: A 3-D tensor of int32 and shape [batch_size, num_gt]</span>
+
+<span class="s2">                - `BoxField.WEIGHTS`: A 3-D tensor of float and shape [batch_size, num_gt]</span>
+
+<span class="s2">                - `BoxField.NUM_BOXES`: A 2-D tensor of int32 and shape [batch_size, 1]</span>
+
+<span class="s2">                    which allows to remove the padding created by tf.Data.</span>
+
+<span class="s2">                    Example: if batch_size=2 and this field equal tf.constant([[2], [1]], tf.int32)</span>
+
+<span class="s2">                    then my second box has a padding of 1</span>
 
 <span class="s2">            sampling_size: Desired sampling size. If None, keeps all positive samples and</span>
 
 <span class="s2">                randomly selects negative samples so that the positive sample fraction</span>
 
-<span class="s2">            matches positive_fraction.</span>
+<span class="s2">                matches positive_fraction.</span>
 
 <span class="s2">            sampling_positive_ratio: Desired fraction of positive examples (scalar in [0,1])</span>
 
 <span class="s2">                in the batch.</span>
 
-<span class="s2">        where ground_truths is:</span>
-
-<span class="s2">        ```python</span>
-
-<span class="s2">        ground_truths = {</span>
-
-<span class="s2">            BoxField.BOXES:</span>
-
-<span class="s2">                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),</span>
-
-<span class="s2">            BoxField.LABELS:</span>
-
-<span class="s2">                tf.constant([[8, 0], [1, 0]], tf.float32),</span>
-
-<span class="s2">            BoxField.WEIGHTS:</span>
-
-<span class="s2">                tf.constant([[1, 0], [1, 1]], tf.float32),</span>
-
-<span class="s2">            BoxField.NUM_BOXES: #  `NUM_BOXES` allows to remove the padding created by tf.Data.</span>
-
-<span class="s2">                tf.constant([[2], [1]], tf.int32)</span>
-
-<span class="s2">        }</span>
-
-<span class="s2">        ```</span>
-
 <span class="s2">        Returns:</span>
 
-<span class="s2">            y_true: A dict with :</span>
+<span class="s2">            Tuple:</span>
 
-<span class="s2">                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,</span>
+<span class="s2">                1. y_true: A dict with :</span>
 
-<span class="s2">                    num_classes],</span>
+<span class="s2">                    - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_anchors,</span>
 
-<span class="s2">                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,</span>
+<span class="s2">                        num_classes],</span>
 
-<span class="s2">                    box_code_dimension]</span>
+<span class="s2">                    - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_anchors,</span>
 
-<span class="s2">            weights: A dict with:</span>
+<span class="s2">                        box_code_dimension]</span>
 
-<span class="s2">                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,</span>
+<span class="s2">                2. weights: A dict with:</span>
 
-<span class="s2">                num_classes],</span>
+<span class="s2">                    - `BoxField.LABELS`: A 2-D tensor of shape [batch_size, num_anchors],</span>
 
-<span class="s2">                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],</span>
+<span class="s2">                    - `BoxField.BOXES`: A 2-D tensor of shape [batch_size, num_anchors]</span>
 
 <span class="s2">        Raises:</span>
 
@@ -1726,29 +1722,31 @@
 
 <span class="s2">            y_true: A dict with :</span>
 
-<span class="s2">                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors, num_classes]</span>
+<span class="s2">                - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_anchors, num_classes]</span>
 
-<span class="s2">                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors, 4]</span>
+<span class="s2">                - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_anchors, 4]</span>
 
 <span class="s2">            weights: A dict with:</span>
 
-<span class="s2">                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors, num_classes]</span>
+<span class="s2">                - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_anchors, num_classes]</span>
 
-<span class="s2">                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors]</span>
+<span class="s2">                - `BoxField.BOXES`: A 2-D tensor of shape [batch_size, num_anchors]</span>
 
-<span class="s2">            classification_pred: A tensor and shape</span>
+<span class="s2">            classification_pred: A 3-D tensor of float and shape</span>
 
 <span class="s2">                [batch_size, num_anchors, num_classes]</span>
 
-<span class="s2">            localization_pred: A tensor and shape</span>
+<span class="s2">            localization_pred: A  3-D tensor of float and shape</span>
 
 <span class="s2">                [batch_size, num_anchors, (num_classes - 1) * 4]</span>
 
 <span class="s2">        Returns:</span>
 
-<span class="s2">            classification_loss: A scalar</span>
+<span class="s2">            Tuple:</span>
 
-<span class="s2">            localization_loss: A scalar</span>
+<span class="s2">                - `classification_loss`: A scalar</span>
+
+<span class="s2">                - `localization_loss`: A scalar</span>
 
 <span class="s2">        &quot;&quot;&quot;</span>
 
@@ -1796,6 +1794,14 @@
 
     <span class="s2">&quot;&quot;&quot;Useful metrics that allows to track how behave the training of the fast rcnn head.</span>
 
+<span class="s2">    `Warning`:</span>
+
+<span class="s2">    This function should be used if the ground_truths have been added to the RoIs.</span>
+
+<span class="s2">    It won&#39;t work if the there are no foreground ground_truths in the sample_boxes which isn&#39;t</span>
+
+<span class="s2">    possible if they have been added.</span>
+
 <span class="s2">    Arguments:</span>
 
 <span class="s2">        y_true: A one-hot encoded vector with shape [batch_size, num_sample_anchors, num_classes]</span>
@@ -1806,21 +1812,21 @@
 
 <span class="s2">    Returns:</span>
 
-<span class="s2">        accuracy: A scalar tensor representing the accuracy with the background classes included</span>
+<span class="s2">        Tuple:</span>
 
-<span class="s2">        fg_accuracy: A scalar tensor representing the accuracy without the background classes included</span>
+<span class="s2">            1. `accuracy`: A scalar tensor representing the accuracy</span>
 
-<span class="s2">        false_negative: A scalar tensor representing the ratio of boxes predicted as background instead of</span>
+<span class="s2">                with the background classes included</span>
 
-<span class="s2">            their respective class among the foreground example to predict.</span>
+<span class="s2">            2. `fg_accuracy`: A scalar tensor representing the accuracy</span>
 
-<span class="s2">    Warning:</span>
+<span class="s2">                without the background classes included</span>
 
-<span class="s2">    This function should be used if the ground_truths have been added to the RoIs.</span>
+<span class="s2">            3. `false_negative`: A scalar tensor representing the ratio of</span>
 
-<span class="s2">    It won&#39;t work if the there are no foreground ground_truths in the sample_boxes which isn&#39;t</span>
+<span class="s2">                boxes predicted as background instead of their respective</span>
 
-<span class="s2">    possible if they have been added.</span>
+<span class="s2">                class among the foreground example to predict.</span>
 
 <span class="s2">    &quot;&quot;&quot;</span>
 
@@ -1867,6 +1873,10 @@
 </code></pre></div>
 
 <p>Useful metrics that allows to track how behave the training of the fast rcnn head.</p>
+<p><code>Warning</code>:</p>
+<p>This function should be used if the ground_truths have been added to the RoIs.
+It won't work if the there are no foreground ground_truths in the sample_boxes which isn't
+possible if they have been added.</p>
 <p><strong>Parameters:</strong></p>
 <table>
 <thead>
@@ -1896,70 +1906,78 @@
 </thead>
 <tbody>
 <tr>
-<td>accuracy</td>
-<td>A scalar tensor representing the accuracy with the background classes included<br>fg_accuracy: A scalar tensor representing the accuracy without the background classes included<br>false_negative: A scalar tensor representing the ratio of boxes predicted as background instead of<br>    their respective class among the foreground example to predict.</td>
+<td>Tuple</td>
+<td>1. <code>accuracy</code>: A scalar tensor representing the accuracy<br>    with the background classes included<br>2. <code>fg_accuracy</code>: A scalar tensor representing the accuracy<br>    without the background classes included<br>3. <code>false_negative</code>: A scalar tensor representing the ratio of<br>    boxes predicted as background instead of their respective<br>    class among the foreground example to predict.</td>
 </tr>
 </tbody>
 </table>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">compute_fast_rcnn_metrics</span><span class="p">(</span><span class="nl">y_true:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nl">y_pred:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span><span class="o">:</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">compute_fast_rcnn_metrics</span><span class="p">(</span><span class="n">y_true</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span><span class="o">:</span>
 
-    <span class="s">&quot;&quot;&quot;Useful metrics that allows to track how behave the training of the fast rcnn head.</span>
+    <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Useful metrics that allows to track how behave the training of the fast rcnn head.</span>
 
-    <span class="nl">Arguments:</span>
+<span class="s2">    `Warning`:</span>
 
-        <span class="nl">y_true:</span> <span class="n">A</span> <span class="n">one</span><span class="o">-</span><span class="n">hot</span> <span class="n">encoded</span> <span class="n">vector</span> <span class="n">with</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_sample_anchors</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">]</span>
+<span class="s2">    This function should be used if the ground_truths have been added to the RoIs.</span>
 
-        <span class="nl">y_pred:</span> <span class="n">A</span> <span class="n">tensor</span> <span class="n">with</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_sample_anchors</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">],</span>
+<span class="s2">    It won&#39;t work if the there are no foreground ground_truths in the sample_boxes which isn&#39;t</span>
 
-            <span class="n">representing</span> <span class="n">the</span> <span class="n">classification</span> <span class="n">logits</span><span class="p">.</span>
+<span class="s2">    possible if they have been added.</span>
 
-    <span class="nl">Returns:</span>
+<span class="s2">    Arguments:</span>
 
-        <span class="nl">accuracy:</span> <span class="n">A</span> <span class="n">scalar</span> <span class="n">tensor</span> <span class="n">representing</span> <span class="n">the</span> <span class="n">accuracy</span> <span class="n">with</span> <span class="n">the</span> <span class="n">background</span> <span class="n">classes</span> <span class="n">included</span>
+<span class="s2">        y_true: A one-hot encoded vector with shape [batch_size, num_sample_anchors, num_classes]</span>
 
-        <span class="nl">fg_accuracy:</span> <span class="n">A</span> <span class="n">scalar</span> <span class="n">tensor</span> <span class="n">representing</span> <span class="n">the</span> <span class="n">accuracy</span> <span class="n">without</span> <span class="n">the</span> <span class="n">background</span> <span class="n">classes</span> <span class="n">included</span>
+<span class="s2">        y_pred: A tensor with shape [batch_size, num_sample_anchors, num_classes],</span>
 
-        <span class="nl">false_negative:</span> <span class="n">A</span> <span class="n">scalar</span> <span class="n">tensor</span> <span class="n">representing</span> <span class="n">the</span> <span class="n">ratio</span> <span class="n">of</span> <span class="n">boxes</span> <span class="n">predicted</span> <span class="n">as</span> <span class="n">background</span> <span class="n">instead</span> <span class="n">of</span>
+<span class="s2">            representing the classification logits.</span>
 
-            <span class="n">their</span> <span class="n">respective</span> <span class="n">class</span> <span class="n">among</span> <span class="n">the</span> <span class="n">foreground</span> <span class="n">example</span> <span class="n">to</span> <span class="n">predict</span><span class="p">.</span>
+<span class="s2">    Returns:</span>
 
-    <span class="nl">Warning:</span>
+<span class="s2">        Tuple:</span>
 
-    <span class="n">This</span> <span class="k">function</span> <span class="n">should</span> <span class="n">be</span> <span class="n">used</span> <span class="k">if</span> <span class="n">the</span> <span class="n">ground_truths</span> <span class="n">have</span> <span class="n">been</span> <span class="n">added</span> <span class="n">to</span> <span class="n">the</span> <span class="n">RoIs</span><span class="p">.</span>
+<span class="s2">            1. `accuracy`: A scalar tensor representing the accuracy</span>
 
-    <span class="n">It</span> <span class="n">won</span><span class="p">&#39;</span><span class="n">t</span> <span class="n">work</span> <span class="k">if</span> <span class="n">the</span> <span class="n">there</span> <span class="n">are</span> <span class="n">no</span> <span class="n">foreground</span> <span class="n">ground_truths</span> <span class="n">in</span> <span class="n">the</span> <span class="n">sample_boxes</span> <span class="n">which</span> <span class="n">isn</span><span class="p">&#39;</span><span class="n">t</span>
+<span class="s2">                with the background classes included</span>
 
-    <span class="n">possible</span> <span class="k">if</span> <span class="n">they</span> <span class="n">have</span> <span class="n">been</span> <span class="n">added</span><span class="p">.</span>
+<span class="s2">            2. `fg_accuracy`: A scalar tensor representing the accuracy</span>
 
-    <span class="s">&quot;&quot;&quot;</span>
+<span class="s2">                without the background classes included</span>
 
-    <span class="p">#</span> <span class="n">compute</span> <span class="n">usefull</span> <span class="n">metrics</span>
+<span class="s2">            3. `false_negative`: A scalar tensor representing the ratio of</span>
 
-    <span class="p">#</span><span class="n">Even</span> <span class="k">if</span> <span class="n">the</span> <span class="n">softmax</span> <span class="n">has</span> <span class="k">not</span> <span class="n">been</span> <span class="n">applyed</span> <span class="n">the</span> <span class="n">argmax</span> <span class="n">can</span> <span class="n">be</span> <span class="n">usefull</span>
+<span class="s2">                boxes predicted as background instead of their respective</span>
 
-    <span class="n">prediction</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mh">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">&#39;</span><span class="n">label_prediction</span><span class="p">&#39;,</span> <span class="n">output_type</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="s2">                class among the foreground example to predict.</span>
 
-    <span class="n">correct</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">prediction</span> <span class="o">==</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="s2">    </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
 
-    <span class="p">#</span> <span class="n">The</span> <span class="n">accuracy</span> <span class="n">allows</span> <span class="n">to</span> <span class="n">determine</span> <span class="k">if</span> <span class="n">the</span> <span class="n">models</span> <span class="n">perform</span> <span class="n">well</span> <span class="p">(</span><span class="n">background</span> <span class="n">included</span><span class="p">)</span>
+    <span class="c1"># compute usefull metrics</span>
 
-    <span class="n">accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">&#39;</span><span class="n">accuracy</span><span class="p">&#39;)</span>
+    <span class="c1">#Even if the softmax has not been applyed the argmax can be usefull</span>
 
-    <span class="p">#</span> <span class="n">Compute</span> <span class="n">accuracy</span> <span class="k">and</span> <span class="n">false</span> <span class="n">negative</span> <span class="n">on</span> <span class="n">all</span> <span class="n">the</span> <span class="n">foreground</span> <span class="n">boxes</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;label_prediction&#39;</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span>
 
-    <span class="n">fg_inds</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_true</span> <span class="o">&gt;</span> <span class="mh">0</span><span class="p">)</span>
+    <span class="n">correct</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">prediction</span> <span class="o">==</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
 
-    <span class="n">num_fg</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">fg_inds</span><span class="p">)[</span><span class="mh">0</span><span class="p">]</span>
+    <span class="c1"># The accuracy allows to determine if the models perform well (background included)</span>
 
-    <span class="n">fg_label_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">fg_inds</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mh">1</span><span class="p">)</span>
+    <span class="n">accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">)</span>
 
-    <span class="n">num_zero</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">fg_label_pred</span><span class="p">,</span> <span class="mh">0</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="p">&#39;</span><span class="n">num_zero</span><span class="p">&#39;)</span>
+    <span class="c1"># Compute accuracy and false negative on all the foreground boxes</span>
 
-    <span class="p">#</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">example</span> <span class="n">predicted</span> <span class="n">as</span> <span class="n">background</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">one</span> <span class="n">of</span> <span class="n">our</span> <span class="n">classes</span>
+    <span class="n">fg_inds</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="k">where</span><span class="p">(</span><span class="n">y_true</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">false_negative</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">truediv</span><span class="p">(</span><span class="n">num_zero</span><span class="p">,</span> <span class="n">num_fg</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">&#39;</span><span class="n">false_negative</span><span class="p">&#39;)</span>
+    <span class="n">num_fg</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">fg_inds</span><span class="p">)</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span>
 
-    <span class="n">fg_accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">fg_inds</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="p">&#39;</span><span class="n">fg_accuracy</span><span class="p">&#39;)</span>
+    <span class="n">fg_label_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">fg_inds</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">num_zero</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">fg_label_pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;num_zero&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Number of example predicted as background instead of one of our classes</span>
+
+    <span class="n">false_negative</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">truediv</span><span class="p">(</span><span class="n">num_zero</span><span class="p">,</span> <span class="n">num_fg</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;false_negative&#39;</span><span class="p">)</span>
+
+    <span class="n">fg_accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">fg_inds</span><span class="p">),</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;fg_accuracy&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">fg_accuracy</span><span class="p">,</span> <span class="n">false_negative</span>
 </code></pre></div>
@@ -1989,6 +2007,36 @@
 </tr>
 </tbody>
 </table>
+<h4 id="call-arguments">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inputs</td>
+<td>A Tuple<br>1. <code>pyramid</code>: A List of tensors the output of the pyramid<br>2. <code>anchors</code>: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuple</td>
+<td><code>classification_pred</code>: A logit Tensor of shape [batch_size, num_boxes, num_classes]<br><code>localization_pred</code>: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]<br><code>anchors</code>: A Tensor of shape [batch_size, num_boxes, 4]</td>
+</tr>
+</tbody>
+</table>
 <h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
 <ul>
 <li>kerod.model.detection.abstract_detection_head.AbstractDetectionHead</li>
@@ -1998,34 +2046,6 @@
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods">Methods</h4>
 <h4 id="build_detection_head">build_detection_head</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">build_detection_head</span><span class="p">(</span>
@@ -2034,7 +2054,7 @@ True</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<p>Build a detection head composed </p>
+<p>Build a detection head composed of a classification and box_detection.</p>
 <p><strong>Parameters:</strong></p>
 <table>
 <thead>
@@ -2050,13 +2070,36 @@ True</p>
 </tr>
 </tbody>
 </table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuple</td>
+<td>classification_head: a tensor of shape [batch_size, num_anchors, 2]<br>localization_head: a tensor of shape [batch_size, num_anchors, 4]</td>
+</tr>
+</tbody>
+</table>
 <details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="n">build_detection_head</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
 
-        <span class="ss">&quot;&quot;&quot; Build a detection head composed</span>
+        <span class="ss">&quot;&quot;&quot; Build a detection head composed of a classification and box_detection.</span>
 
 <span class="ss">        Arguments:</span>
 
 <span class="ss">            inputs: A tensor of shape [batch_size, H, W, C]</span>
+
+<span class="ss">        Returns:</span>
+
+<span class="ss">            Tuple:</span>
+
+<span class="ss">                classification_head: a tensor of shape [batch_size, num_anchors, 2]</span>
+
+<span class="ss">                localization_head: a tensor of shape [batch_size, num_anchors, 4]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 
@@ -2087,7 +2130,7 @@ True</p>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>A tensor of  shape [N, H, W, C]</td>
+<td>A tensor of float and shape [N, H, W, C]</td>
 </tr>
 </tbody>
 </table>
@@ -2101,7 +2144,7 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A tensor and shape [N, H<em>2, W</em>2, num_classes - 1]</td>
 </tr>
 </tbody>
@@ -2112,11 +2155,11 @@ True</p>
 
 <span class="ss">        Arguments:</span>
 
-<span class="ss">            inputs: A tensor of  shape [N, H, W, C]</span>
+<span class="ss">            inputs: A tensor of float and shape [N, H, W, C]</span>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            A tensor and shape [N, H*2, W*2, num_classes - 1]</span>
+<span class="ss">            tf.Tensor: A tensor and shape [N, H*2, W*2, num_classes - 1]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 
@@ -2138,6 +2181,15 @@ True</p>
 </code></pre></div>
 
 <p>Build the computational graph of the fast RCNN HEAD.</p>
+<p>It performs a raw prediction of the FastRCNN head you can post_process them using:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">kerod.model.post_processing</span> <span class="kn">import</span> <span class="n">post_process_fast_rcnn_boxes</span>
+
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">post_process_fast_rcnn_boxes</span><span class="p">(</span><span class="n">classification_pred</span><span class="p">,</span> <span class="n">localization_pred</span><span class="p">,</span> <span class="n">anchors</span><span class="p">,</span>
+                            <span class="n">images_information</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+</code></pre></div>
+
+<p>where <code>images_information</code> is provided as input of your model and <code>num_classes</code> includes
+the background.</p>
 <p><strong>Parameters:</strong></p>
 <table>
 <thead>
@@ -2149,7 +2201,7 @@ True</p>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>A list with the following schema:<br>1. <em>pyramid</em>: A List of tensors the output of the pyramid<br>2. <em>anchors</em>: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]<br>3. <em>ground_truths</em>: If the training is true, a dict with</td>
+<td>A Tuple<br>1. <code>pyramid</code>: A List of tensors the output of the pyramid<br>2. <code>anchors</code>: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</td>
 </tr>
 </tbody>
 </table>
@@ -2163,8 +2215,8 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>classification_pred</td>
-<td>A logit Tensor of shape [batch_size, num_boxes, num_classes]<br>localization_pred: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]<br>anchors: A Tensor of shape [batch_size, num_boxes, 4]</td>
+<td>Tuple</td>
+<td><code>classification_pred</code>: A logit Tensor of shape [batch_size, num_boxes, num_classes]<br><code>localization_pred</code>: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]<br><code>anchors</code>: A Tensor of shape [batch_size, num_boxes, 4]</td>
 </tr>
 </tbody>
 </table>
@@ -2172,53 +2224,7 @@ True</p>
 
         <span class="s2">&quot;&quot;&quot;Build the computational graph of the fast RCNN HEAD.</span>
 
-<span class="s2">        Arguments:</span>
-
-<span class="s2">            inputs: A list with the following schema:</span>
-
-<span class="s2">                1. *pyramid*: A List of tensors the output of the pyramid</span>
-
-<span class="s2">                2. *anchors*: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
-
-<span class="s2">                3. *ground_truths*: If the training is true, a dict with</span>
-
-<span class="s2">        Where ground_truths is:</span>
-
-<span class="s2">        ```python</span>
-
-<span class="s2">        ground_truths = {</span>
-
-<span class="s2">            BoxField.BOXES:</span>
-
-<span class="s2">                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),</span>
-
-<span class="s2">            BoxField.LABELS:</span>
-
-<span class="s2">                tf.constant([[2,1], [2, 0]], tf.int32),</span>
-
-<span class="s2">            BoxField.WEIGHTS:</span>
-
-<span class="s2">                tf.constant([[1, 0], [1, 1]], tf.float32),</span>
-
-<span class="s2">            BoxField.NUM_BOXES:</span>
-
-<span class="s2">                tf.constant([2, 1], tf.int32)</span>
-
-<span class="s2">        }</span>
-
-<span class="s2">        ```</span>
-
-<span class="s2">        where `NUM_BOXES` allows to remove the padding created by tf.Data.</span>
-
-<span class="s2">        Returns:</span>
-
-<span class="s2">            classification_pred: A logit Tensor of shape [batch_size, num_boxes, num_classes]</span>
-
-<span class="s2">            localization_pred: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]</span>
-
-<span class="s2">            anchors: A Tensor of shape [batch_size, num_boxes, 4]</span>
-
-<span class="s2">        Raw predictions from the FastRCNN head you can post_process them using:</span>
+<span class="s2">        It performs a raw prediction of the FastRCNN head you can post_process them using:</span>
 
 <span class="s2">        ```python</span>
 
@@ -2233,6 +2239,24 @@ True</p>
 <span class="s2">        where `images_information` is provided as input of your model and `num_classes` includes</span>
 
 <span class="s2">        the background.</span>
+
+<span class="s2">        Arguments:</span>
+
+<span class="s2">            inputs: A Tuple</span>
+
+<span class="s2">                1. `pyramid`: A List of tensors the output of the pyramid</span>
+
+<span class="s2">                2. `anchors`: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
+
+<span class="s2">        Returns:</span>
+
+<span class="s2">            Tuple:</span>
+
+<span class="s2">                `classification_pred`: A logit Tensor of shape [batch_size, num_boxes, num_classes]</span>
+
+<span class="s2">                `localization_pred`: A Tensor of shape [batch_size, num_boxes, 4 * (num_classes - 1)]</span>
+
+<span class="s2">                `anchors`: A Tensor of shape [batch_size, num_boxes, 4]</span>
 
 <span class="s2">        &quot;&quot;&quot;</span>
 
@@ -2294,19 +2318,19 @@ True</p>
 <tbody>
 <tr>
 <td>y_true</td>
-<td>A dict with :<br>- <em>BoxField.LABELS</em>: a tensor with shape [batch_size, num_anchors, num_classes]<br>- <em>BoxField.BOXES</em>: a tensor with shape [batch_size, num_anchors, 4]</td>
+<td>A dict with :<br>- <code>BoxField.LABELS</code>: A 3-D tensor of shape [batch_size, num_anchors, num_classes]<br>- <code>BoxField.BOXES</code>: A 3-D tensor of shape [batch_size, num_anchors, 4]</td>
 </tr>
 <tr>
 <td>weights</td>
-<td>A dict with:<br>- <em>BoxField.LABELS</em>: a tensor with shape [batch_size, num_anchors, num_classes]<br>- <em>BoxField.BOXES</em>: a tensor with shape [batch_size, num_anchors]</td>
+<td>A dict with:<br>- <code>BoxField.LABELS</code>: A 3-D tensor of shape [batch_size, num_anchors, num_classes]<br>- <code>BoxField.BOXES</code>: A 2-D tensor of shape [batch_size, num_anchors]</td>
 </tr>
 <tr>
 <td>classification_pred</td>
-<td>A tensor and shape<br>[batch_size, num_anchors, num_classes]</td>
+<td>A 3-D tensor of float and shape<br>[batch_size, num_anchors, num_classes]</td>
 </tr>
 <tr>
 <td>localization_pred</td>
-<td>A tensor and shape<br>[batch_size, num_anchors, (num_classes - 1) * 4]</td>
+<td>A  3-D tensor of float and shape<br>[batch_size, num_anchors, (num_classes - 1) * 4]</td>
 </tr>
 </tbody>
 </table>
@@ -2320,84 +2344,86 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>classification_loss</td>
-<td>A scalar<br>localization_loss: A scalar</td>
+<td>Tuple</td>
+<td>- <code>classification_loss</code>: A scalar<br>- <code>localization_loss</code>: A scalar</td>
 </tr>
 </tbody>
 </table>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="n">compute_loss</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="nl">y_true:</span> <span class="n">dict</span><span class="p">,</span> <span class="nl">weights:</span> <span class="n">dict</span><span class="p">,</span> <span class="nl">classification_pred:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="n">compute_loss</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">y_true</span><span class="o">:</span> <span class="n">dict</span><span class="p">,</span> <span class="n">weights</span><span class="o">:</span> <span class="n">dict</span><span class="p">,</span> <span class="n">classification_pred</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
 
-                     <span class="nl">localization_pred:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span><span class="o">:</span>
+                     <span class="n">localization_pred</span><span class="o">:</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">)</span><span class="o">:</span>
 
-        <span class="s">&quot;&quot;&quot;Compute the loss of the FastRCNN</span>
+        <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Compute the loss of the FastRCNN</span>
 
-        <span class="nl">Arguments:</span>
+<span class="s2">        Arguments:</span>
 
-            <span class="nl">y_true:</span> <span class="n">A</span> <span class="n">dict</span> <span class="n">with</span> <span class="o">:</span>
+<span class="s2">            y_true: A dict with :</span>
 
-                <span class="o">-</span> <span class="o">*</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="o">*:</span> <span class="n">a</span> <span class="n">tensor</span> <span class="n">with</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">]</span>
+<span class="s2">                - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_anchors, num_classes]</span>
 
-                <span class="o">-</span> <span class="o">*</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="o">*:</span> <span class="n">a</span> <span class="n">tensor</span> <span class="n">with</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="mh">4</span><span class="p">]</span>
+<span class="s2">                - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_anchors, 4]</span>
 
-            <span class="nl">weights:</span> <span class="n">A</span> <span class="n">dict</span> <span class="nl">with:</span>
+<span class="s2">            weights: A dict with:</span>
 
-                <span class="o">-</span> <span class="o">*</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="o">*:</span> <span class="n">a</span> <span class="n">tensor</span> <span class="n">with</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">]</span>
+<span class="s2">                - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_anchors, num_classes]</span>
 
-                <span class="o">-</span> <span class="o">*</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="o">*:</span> <span class="n">a</span> <span class="n">tensor</span> <span class="n">with</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">]</span>
+<span class="s2">                - `BoxField.BOXES`: A 2-D tensor of shape [batch_size, num_anchors]</span>
 
-            <span class="nl">classification_pred:</span> <span class="n">A</span> <span class="n">tensor</span> <span class="k">and</span> <span class="n">shape</span>
+<span class="s2">            classification_pred: A 3-D tensor of float and shape</span>
 
-                <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">]</span>
+<span class="s2">                [batch_size, num_anchors, num_classes]</span>
 
-            <span class="nl">localization_pred:</span> <span class="n">A</span> <span class="n">tensor</span> <span class="k">and</span> <span class="n">shape</span>
+<span class="s2">            localization_pred: A  3-D tensor of float and shape</span>
 
-                <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="p">(</span><span class="n">num_classes</span> <span class="o">-</span> <span class="mh">1</span><span class="p">)</span> <span class="o">*</span> <span class="mh">4</span><span class="p">]</span>
+<span class="s2">                [batch_size, num_anchors, (num_classes - 1) * 4]</span>
 
-        <span class="nl">Returns:</span>
+<span class="s2">        Returns:</span>
 
-            <span class="nl">classification_loss:</span> <span class="n">A</span> <span class="n">scalar</span>
+<span class="s2">            Tuple:</span>
 
-            <span class="nl">localization_loss:</span> <span class="n">A</span> <span class="n">scalar</span>
+<span class="s2">                - `classification_loss`: A scalar</span>
 
-        <span class="s">&quot;&quot;&quot;</span>
+<span class="s2">                - `localization_loss`: A scalar</span>
 
-        <span class="n">y_true_classification</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_true</span><span class="p">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="p">],</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="s2">        </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+        <span class="n">y_true_classification</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">cast</span><span class="p">(</span><span class="n">y_true</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span>
 
         <span class="n">accuracy</span><span class="p">,</span> <span class="n">fg_accuracy</span><span class="p">,</span> <span class="n">false_negative</span> <span class="o">=</span> <span class="n">compute_fast_rcnn_metrics</span><span class="p">(</span>
 
             <span class="n">y_true_classification</span><span class="p">,</span> <span class="n">classification_pred</span><span class="p">)</span>
 
-        <span class="n">self</span><span class="p">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">&#39;</span><span class="n">accuracy</span><span class="p">&#39;,</span> <span class="n">aggregation</span><span class="o">=</span><span class="p">&#39;</span><span class="n">mean</span><span class="p">&#39;)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">accuracy</span><span class="p">,</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="n">aggregation</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 
-        <span class="n">self</span><span class="p">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">fg_accuracy</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">&#39;</span><span class="n">fg_accuracy</span><span class="p">&#39;,</span> <span class="n">aggregation</span><span class="o">=</span><span class="p">&#39;</span><span class="n">mean</span><span class="p">&#39;)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">fg_accuracy</span><span class="p">,</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;fg_accuracy&#39;</span><span class="p">,</span> <span class="n">aggregation</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 
-        <span class="n">self</span><span class="p">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">false_negative</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">&#39;</span><span class="n">false_negative</span><span class="p">&#39;,</span> <span class="n">aggregation</span><span class="o">=</span><span class="p">&#39;</span><span class="n">mean</span><span class="p">&#39;)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">false_negative</span><span class="p">,</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;false_negative&#39;</span><span class="p">,</span> <span class="n">aggregation</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 
-        <span class="p">#</span> <span class="n">y_true</span><span class="p">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="p">]</span> <span class="n">is</span> <span class="n">just</span> <span class="mh">1</span> <span class="k">and</span> <span class="mh">0</span> <span class="n">we</span> <span class="n">are</span> <span class="n">using</span> <span class="n">it</span> <span class="n">as</span> <span class="n">mask</span> <span class="n">to</span> <span class="n">extract</span>
+        <span class="c1"># y_true[BoxField.LABELS] is just 1 and 0 we are using it as mask to extract</span>
 
-        <span class="p">#</span> <span class="n">the</span> <span class="n">corresponding</span> <span class="n">target</span> <span class="n">anchors</span>
+        <span class="c1"># the corresponding target anchors</span>
 
-        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">classification_pred</span><span class="p">)[</span><span class="mh">0</span><span class="p">]</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">classification_pred</span><span class="p">)</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span>
 
-        <span class="p">#</span> <span class="n">We</span> <span class="n">create</span> <span class="n">a</span> <span class="n">boolean</span> <span class="n">mask</span> <span class="n">to</span> <span class="n">extract</span> <span class="n">the</span> <span class="n">desired</span> <span class="n">localization</span> <span class="n">prediction</span> <span class="n">to</span> <span class="n">compute</span>
+        <span class="c1"># We create a boolean mask to extract the desired localization prediction to compute</span>
 
-        <span class="p">#</span> <span class="n">the</span> <span class="n">loss</span>
+        <span class="c1"># the loss</span>
 
-        <span class="n">one_hot_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">y_true_classification</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">_num_classes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">int8</span><span class="p">)</span>
+        <span class="n">one_hot_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">y_true_classification</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">_num_classes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="kt">int8</span><span class="p">)</span>
 
-        <span class="n">one_hot_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">one_hot_targets</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mh">1</span><span class="p">])</span>
+        <span class="n">one_hot_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">one_hot_targets</span><span class="p">,</span> <span class="err">[</span><span class="o">-</span><span class="mi">1</span><span class="err">]</span><span class="p">)</span>
 
-        <span class="p">#</span> <span class="n">We</span> <span class="n">need</span> <span class="n">to</span> <span class="n">insert</span> <span class="n">a</span> <span class="n">fake</span> <span class="n">background</span> <span class="n">classes</span> <span class="n">at</span> <span class="n">the</span> <span class="n">position</span> <span class="mh">0</span>
+        <span class="c1"># We need to insert a fake background classes at the position 0</span>
 
-        <span class="n">localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">pad</span><span class="p">(</span><span class="n">localization_pred</span><span class="p">,</span> <span class="p">[[</span><span class="mh">0</span><span class="p">,</span> <span class="mh">0</span><span class="p">],</span> <span class="p">[</span><span class="mh">0</span><span class="p">,</span> <span class="mh">0</span><span class="p">],</span> <span class="p">[</span><span class="mh">4</span><span class="p">,</span> <span class="mh">0</span><span class="p">]])</span>
+        <span class="n">localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">pad</span><span class="p">(</span><span class="n">localization_pred</span><span class="p">,</span> <span class="err">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="err">]</span><span class="p">,</span> <span class="err">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="err">]</span><span class="p">,</span> <span class="err">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="err">]]</span><span class="p">)</span>
 
-        <span class="n">localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">localization_pred</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mh">1</span><span class="p">,</span> <span class="mh">4</span><span class="p">])</span>
+        <span class="n">localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">localization_pred</span><span class="p">,</span> <span class="err">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="err">]</span><span class="p">)</span>
 
-        <span class="n">extracted_localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">boolean_mask</span><span class="p">(</span><span class="n">localization_pred</span><span class="p">,</span> <span class="n">one_hot_targets</span> <span class="o">&gt;</span> <span class="mh">0</span><span class="p">)</span>
+        <span class="n">extracted_localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">boolean_mask</span><span class="p">(</span><span class="n">localization_pred</span><span class="p">,</span> <span class="n">one_hot_targets</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
 
-        <span class="n">extracted_localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">extracted_localization_pred</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mh">1</span><span class="p">,</span> <span class="mh">4</span><span class="p">))</span>
+        <span class="n">extracted_localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">extracted_localization_pred</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="p">{</span><span class="n">BoxField</span><span class="p">.</span><span class="nl">LABELS:</span> <span class="n">classification_pred</span><span class="p">,</span> <span class="n">BoxField</span><span class="p">.</span><span class="nl">BOXES:</span> <span class="n">extracted_localization_pred</span><span class="p">}</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="err">{</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="o">:</span> <span class="n">classification_pred</span><span class="p">,</span> <span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="o">:</span> <span class="n">extracted_localization_pred</span><span class="err">}</span>
 
         <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="n">compute_losses</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
 </code></pre></div>
@@ -2413,7 +2439,7 @@ True</p>
 </code></pre></div>
 
 <p>Compute the losses of the object detection head.</p>
-<p>Each dictionary is composed of the same key (classification, localization, segmentation)</p>
+<p>Each dictionary is composed of the same keys (classification, localization, segmentation)</p>
 <p><strong>Parameters:</strong></p>
 <table>
 <thead>
@@ -2448,7 +2474,7 @@ True</p>
 <tbody>
 <tr>
 <td>None</td>
-<td>A dict of different losses</td>
+<td>dict : A dict of different losses</td>
 </tr>
 </tbody>
 </table>
@@ -2458,7 +2484,7 @@ True</p>
 
 <span class="w">        </span><span class="ss">&quot;&quot;&quot;Compute the losses of the object detection head.</span>
 
-<span class="ss">        Each dictionary is composed of the same key (classification, localization, segmentation)</span>
+<span class="ss">        Each dictionary is composed of the same keys (classification, localization, segmentation)</span>
 
 <span class="ss">        Arguments:</span>
 
@@ -2472,7 +2498,7 @@ True</p>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            A dict of different losses</span>
+<span class="ss">            dict : A dict of different losses</span>
 
 <span class="ss">        &quot;&quot;&quot;</span><span class="w"></span>
 
@@ -2550,47 +2576,71 @@ True</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<p>Perform the sampling of the target anchors. During the training a set of RoIs is
-detected by the RPN. However, you do not want to analyse all the set. You only want
+<p>Perform the sampling of the target anchors.</p>
+<p>During the training a set of RoIs is detected by the RPN.
+However, you do not want to analyse all the set. You only want
 to analyse the anchors that you sampled with this method.</p>
-<p>Arguments:
-    anchors: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]
-    ground_truths: A dict with the following format:</p>
-<div class="codehilite"><pre><span></span><code><span class="n">sampling_size</span><span class="o">:</span> <span class="n">Desired</span> <span class="n">sampling</span> <span class="n">size</span><span class="o">.</span> <span class="n">If</span> <span class="n">None</span><span class="o">,</span> <span class="n">keeps</span> <span class="n">all</span> <span class="n">positive</span> <span class="n">samples</span> <span class="n">and</span>
-    <span class="n">randomly</span> <span class="n">selects</span> <span class="n">negative</span> <span class="n">samples</span> <span class="n">so</span> <span class="n">that</span> <span class="n">the</span> <span class="n">positive</span> <span class="n">sample</span> <span class="n">fraction</span>
-<span class="n">matches</span> <span class="n">positive_fraction</span><span class="o">.</span>
-<span class="n">sampling_positive_ratio</span><span class="o">:</span> <span class="n">Desired</span> <span class="n">fraction</span> <span class="n">of</span> <span class="n">positive</span> <span class="n">examples</span> <span class="o">(</span><span class="n">scalar</span> <span class="k">in</span> <span class="o">[</span><span class="mi">0</span><span class="o">,</span><span class="mi">1</span><span class="o">])</span>
-    <span class="k">in</span> <span class="n">the</span> <span class="n">batch</span><span class="o">.</span>
-</code></pre></div>
-
-<p>where ground_truths is:</p>
-<div class="codehilite"><pre><span></span><code><span class="n">ground_truths</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">:</span>
-        <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]],</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-    <span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">:</span>
-        <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-    <span class="n">BoxField</span><span class="o">.</span><span class="n">WEIGHTS</span><span class="p">:</span>
-        <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-    <span class="n">BoxField</span><span class="o">.</span><span class="n">NUM_BOXES</span><span class="p">:</span> <span class="c1">#  `NUM_BOXES` allows to remove the padding created by tf.Data.</span>
-        <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>Returns:
-    y_true: A dict with :
-        - <em>BoxField.LABELS</em>: a tensor with shape [batch_size, num_anchors,
-            num_classes],
-        - <em>BoxField.BOXES</em>: a tensor with shape [batch_size, num_anchors,
-            box_code_dimension]</p>
-<div class="codehilite"><pre><span></span><code><span class="n">weights</span><span class="o">:</span> <span class="n">A</span> <span class="n">dict</span> <span class="k">with</span><span class="o">:</span>
-    <span class="o">-</span> <span class="o">*</span><span class="n">BoxField</span><span class="o">.</span><span class="na">LABELS</span><span class="o">*:</span> <span class="n">a</span> <span class="n">tensor</span> <span class="k">with</span> <span class="n">shape</span> <span class="o">[</span><span class="n">batch_size</span><span class="o">,</span> <span class="n">num_anchors</span><span class="o">,</span>
-    <span class="n">num_classes</span><span class="o">],</span>
-    <span class="o">-</span> <span class="o">*</span><span class="n">BoxField</span><span class="o">.</span><span class="na">BOXES</span><span class="o">*:</span> <span class="n">a</span> <span class="n">tensor</span> <span class="k">with</span> <span class="n">shape</span> <span class="o">[</span><span class="n">batch_size</span><span class="o">,</span> <span class="n">num_anchors</span><span class="o">],</span>
-</code></pre></div>
-
-<p>Raises:
-    ValueError: If the batch_size is None.
-    ValueError: If the batch_size between your ground_truths and the anchors does not match.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>anchors</td>
+<td>A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</td>
+</tr>
+<tr>
+<td>ground_truths</td>
+<td>A dict<br>- <code>BoxField.LABELS</code>: A 3-D tensor of shape [batch_size, num_gt, num_classes],<br>- <code>BoxField.BOXES</code>: A 3-D tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)]<br>- <code>BoxField.LABELS</code>: A 3-D tensor of int32 and shape [batch_size, num_gt]<br>- <code>BoxField.WEIGHTS</code>: A 3-D tensor of float and shape [batch_size, num_gt]<br>- <code>BoxField.NUM_BOXES</code>: A 2-D tensor of int32 and shape [batch_size, 1]<br>    which allows to remove the padding created by tf.Data.<br>    Example: if batch_size=2 and this field equal tf.constant([[2], [1]], tf.int32)<br>    then my second box has a padding of 1</td>
+</tr>
+<tr>
+<td>sampling_size</td>
+<td>Desired sampling size. If None, keeps all positive samples and<br>randomly selects negative samples so that the positive sample fraction<br>matches positive_fraction.</td>
+</tr>
+<tr>
+<td>sampling_positive_ratio</td>
+<td>Desired fraction of positive examples (scalar in [0,1])<br>in the batch.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuple</td>
+<td>1. y_true: A dict with :<br>    - <code>BoxField.LABELS</code>: A 3-D tensor of shape [batch_size, num_anchors,<br>        num_classes],<br>    - <code>BoxField.BOXES</code>: A 3-D tensor of shape [batch_size, num_anchors,<br>        box_code_dimension]<br><br>2. weights: A dict with:<br>    - <code>BoxField.LABELS</code>: A 2-D tensor of shape [batch_size, num_anchors],<br>    - <code>BoxField.BOXES</code>: A 2-D tensor of shape [batch_size, num_anchors]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ValueError</td>
+<td>If the batch_size is None.</td>
+</tr>
+<tr>
+<td>ValueError</td>
+<td>If the batch_size between your ground_truths and the anchors does not match.</td>
+</tr>
+</tbody>
+</table>
 <details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="n">def</span><span class="w"> </span><span class="n">sample_boxes</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"></span>
 
 <span class="w">                     </span><span class="nl">anchors</span><span class="p">:</span><span class="w"> </span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span><span class="w"></span>
@@ -2601,9 +2651,11 @@ to analyse the anchors that you sampled with this method.</p>
 
 <span class="w">                     </span><span class="nl">sampling_positive_ratio</span><span class="p">:</span><span class="w"> </span><span class="nc">float</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.25</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
 
-<span class="w">        </span><span class="ss">&quot;&quot;&quot;Perform the sampling of the target anchors. During the training a set of RoIs is</span>
+<span class="w">        </span><span class="ss">&quot;&quot;&quot;Perform the sampling of the target anchors.</span>
 
-<span class="ss">        detected by the RPN. However, you do not want to analyse all the set. You only want</span>
+<span class="ss">        During the training a set of RoIs is detected by the RPN.</span>
+
+<span class="ss">        However, you do not want to analyse all the set. You only want</span>
 
 <span class="ss">        to analyse the anchors that you sampled with this method.</span>
 
@@ -2611,63 +2663,53 @@ to analyse the anchors that you sampled with this method.</p>
 
 <span class="ss">            anchors: A tensor of shape [batch_size, num_boxes, (y_min, x_min, y_max, x_max)]</span>
 
-<span class="ss">            ground_truths: A dict with the following format:</span>
+<span class="ss">            ground_truths: A dict</span>
+
+<span class="ss">                - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_gt, num_classes],</span>
+
+<span class="ss">                - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)]</span>
+
+<span class="ss">                - `BoxField.LABELS`: A 3-D tensor of int32 and shape [batch_size, num_gt]</span>
+
+<span class="ss">                - `BoxField.WEIGHTS`: A 3-D tensor of float and shape [batch_size, num_gt]</span>
+
+<span class="ss">                - `BoxField.NUM_BOXES`: A 2-D tensor of int32 and shape [batch_size, 1]</span>
+
+<span class="ss">                    which allows to remove the padding created by tf.Data.</span>
+
+<span class="ss">                    Example: if batch_size=2 and this field equal tf.constant([[2], [1]], tf.int32)</span>
+
+<span class="ss">                    then my second box has a padding of 1</span>
 
 <span class="ss">            sampling_size: Desired sampling size. If None, keeps all positive samples and</span>
 
 <span class="ss">                randomly selects negative samples so that the positive sample fraction</span>
 
-<span class="ss">            matches positive_fraction.</span>
+<span class="ss">                matches positive_fraction.</span>
 
 <span class="ss">            sampling_positive_ratio: Desired fraction of positive examples (scalar in [0,1])</span>
 
 <span class="ss">                in the batch.</span>
 
-<span class="ss">        where ground_truths is:</span>
-
-<span class="ss">        ```python</span>
-
-<span class="ss">        ground_truths = {</span>
-
-<span class="ss">            BoxField.BOXES:</span>
-
-<span class="ss">                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),</span>
-
-<span class="ss">            BoxField.LABELS:</span>
-
-<span class="ss">                tf.constant([[8, 0], [1, 0]], tf.float32),</span>
-
-<span class="ss">            BoxField.WEIGHTS:</span>
-
-<span class="ss">                tf.constant([[1, 0], [1, 1]], tf.float32),</span>
-
-<span class="ss">            BoxField.NUM_BOXES: #  `NUM_BOXES` allows to remove the padding created by tf.Data.</span>
-
-<span class="ss">                tf.constant([[2], [1]], tf.int32)</span>
-
-<span class="ss">        }</span>
-
-<span class="ss">        ```</span>
-
 <span class="ss">        Returns:</span>
 
-<span class="ss">            y_true: A dict with :</span>
+<span class="ss">            Tuple:</span>
 
-<span class="ss">                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,</span>
+<span class="ss">                1. y_true: A dict with :</span>
 
-<span class="ss">                    num_classes],</span>
+<span class="ss">                    - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_anchors,</span>
 
-<span class="ss">                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,</span>
+<span class="ss">                        num_classes],</span>
 
-<span class="ss">                    box_code_dimension]</span>
+<span class="ss">                    - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_anchors,</span>
 
-<span class="ss">            weights: A dict with:</span>
+<span class="ss">                        box_code_dimension]</span>
 
-<span class="ss">                - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors,</span>
+<span class="ss">                2. weights: A dict with:</span>
 
-<span class="ss">                num_classes],</span>
+<span class="ss">                    - `BoxField.LABELS`: A 2-D tensor of shape [batch_size, num_anchors],</span>
 
-<span class="ss">                - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],</span>
+<span class="ss">                    - `BoxField.BOXES`: A 2-D tensor of shape [batch_size, num_anchors]</span>
 
 <span class="ss">        Raises:</span>
 

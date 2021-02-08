@@ -742,13 +742,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1218,13 +1211,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1309,8 +1295,6 @@
 <span class="k">class</span> <span class="nc">AbstractDetectionHead</span><span class="p">(</span><span class="n">KL</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;Abstract object detector. It encapsulates the main functions of an object detector.</span>
-
-<span class="sd">    The build of the detection head, the segmentation head, the post_processing.</span>
 
 <span class="sd">    Arguments:</span>
 
@@ -1498,11 +1482,11 @@
 
 <span class="sd">        Arguments:</span>
 
-<span class="sd">            inputs: A tensor of  shape [N, H, W, C]</span>
+<span class="sd">            inputs: A tensor of float and shape [N, H, W, C]</span>
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            A tensor and shape [N, H*2, W*2, num_classes - 1]</span>
+<span class="sd">            tf.Tensor: A tensor and shape [N, H*2, W*2, num_classes - 1]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1516,11 +1500,19 @@
 
     <span class="k">def</span> <span class="nf">build_detection_head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
 
-        <span class="sd">&quot;&quot;&quot; Build a detection head composed</span>
+        <span class="sd">&quot;&quot;&quot; Build a detection head composed of a classification and box_detection.</span>
 
 <span class="sd">        Arguments:</span>
 
 <span class="sd">            inputs: A tensor of shape [batch_size, H, W, C]</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">            Tuple:</span>
+
+<span class="sd">                classification_head: a tensor of shape [batch_size, num_anchors, 2]</span>
+
+<span class="sd">                localization_head: a tensor of shape [batch_size, num_anchors, 4]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1536,7 +1528,7 @@
 
         <span class="sd">&quot;&quot;&quot;Compute the losses of the object detection head.</span>
 
-<span class="sd">        Each dictionary is composed of the same key (classification, localization, segmentation)</span>
+<span class="sd">        Each dictionary is composed of the same keys (classification, localization, segmentation)</span>
 
 <span class="sd">        Arguments:</span>
 
@@ -1550,7 +1542,7 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            A dict of different losses</span>
+<span class="sd">            dict : A dict of different losses</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1659,7 +1651,6 @@
 <span class="p">)</span>
 </code></pre></div>
 
-<p>The build of the detection head, the segmentation head, the post_processing.</p>
 <h4 id="arguments">Arguments</h4>
 <table>
 <thead>
@@ -1727,34 +1718,6 @@
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods">Methods</h4>
 <h4 id="build_detection_head">build_detection_head</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">build_detection_head</span><span class="p">(</span>
@@ -1763,7 +1726,7 @@ True</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<p>Build a detection head composed </p>
+<p>Build a detection head composed of a classification and box_detection.</p>
 <p><strong>Parameters:</strong></p>
 <table>
 <thead>
@@ -1779,13 +1742,36 @@ True</p>
 </tr>
 </tbody>
 </table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuple</td>
+<td>classification_head: a tensor of shape [batch_size, num_anchors, 2]<br>localization_head: a tensor of shape [batch_size, num_anchors, 4]</td>
+</tr>
+</tbody>
+</table>
 <details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="n">build_detection_head</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
 
-        <span class="ss">&quot;&quot;&quot; Build a detection head composed</span>
+        <span class="ss">&quot;&quot;&quot; Build a detection head composed of a classification and box_detection.</span>
 
 <span class="ss">        Arguments:</span>
 
 <span class="ss">            inputs: A tensor of shape [batch_size, H, W, C]</span>
+
+<span class="ss">        Returns:</span>
+
+<span class="ss">            Tuple:</span>
+
+<span class="ss">                classification_head: a tensor of shape [batch_size, num_anchors, 2]</span>
+
+<span class="ss">                localization_head: a tensor of shape [batch_size, num_anchors, 4]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 
@@ -1816,7 +1802,7 @@ True</p>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>A tensor of  shape [N, H, W, C]</td>
+<td>A tensor of float and shape [N, H, W, C]</td>
 </tr>
 </tbody>
 </table>
@@ -1830,7 +1816,7 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A tensor and shape [N, H<em>2, W</em>2, num_classes - 1]</td>
 </tr>
 </tbody>
@@ -1841,11 +1827,11 @@ True</p>
 
 <span class="ss">        Arguments:</span>
 
-<span class="ss">            inputs: A tensor of  shape [N, H, W, C]</span>
+<span class="ss">            inputs: A tensor of float and shape [N, H, W, C]</span>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            A tensor and shape [N, H*2, W*2, num_classes - 1]</span>
+<span class="ss">            tf.Tensor: A tensor and shape [N, H*2, W*2, num_classes - 1]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 
@@ -1946,7 +1932,7 @@ method to support masking.</p>
 </code></pre></div>
 
 <p>Compute the losses of the object detection head.</p>
-<p>Each dictionary is composed of the same key (classification, localization, segmentation)</p>
+<p>Each dictionary is composed of the same keys (classification, localization, segmentation)</p>
 <p><strong>Parameters:</strong></p>
 <table>
 <thead>
@@ -1981,7 +1967,7 @@ method to support masking.</p>
 <tbody>
 <tr>
 <td>None</td>
-<td>A dict of different losses</td>
+<td>dict : A dict of different losses</td>
 </tr>
 </tbody>
 </table>
@@ -1991,7 +1977,7 @@ method to support masking.</p>
 
 <span class="w">        </span><span class="ss">&quot;&quot;&quot;Compute the losses of the object detection head.</span>
 
-<span class="ss">        Each dictionary is composed of the same key (classification, localization, segmentation)</span>
+<span class="ss">        Each dictionary is composed of the same keys (classification, localization, segmentation)</span>
 
 <span class="ss">        Arguments:</span>
 
@@ -2005,7 +1991,7 @@ method to support masking.</p>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            A dict of different losses</span>
+<span class="ss">            dict : A dict of different losses</span>
 
 <span class="ss">        &quot;&quot;&quot;</span><span class="w"></span>
 

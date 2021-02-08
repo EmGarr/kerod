@@ -937,13 +937,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1227,13 +1220,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1316,11 +1302,17 @@
 
 <span class="sd">    Call returns:</span>
 
-<span class="sd">        reference_points: A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
+<span class="sd">        Tuple:</span>
 
-<span class="sd">        embedding_reference_points: A tensor of shape [batch_size, num_object_queries, num_heads, 2].</span>
+<span class="sd">            - `reference_points`: A float tensor of shape</span>
 
-<span class="sd">            The embedding of y and x without the sigmoid applied.</span>
+<span class="sd">                [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
+
+<span class="sd">            - `embedding_reference_points`: A tensor of shape</span>
+
+<span class="sd">                [batch_size, num_object_queries, num_heads, 2].</span>
+
+<span class="sd">                The embedding of y and x without the sigmoid applied.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1358,13 +1350,19 @@
 
 <span class="sd">                learned positional embeddings input of the decoder.</span>
 
-<span class="sd">        Returns:</span>
+<span class="sd">        Call returns:</span>
 
-<span class="sd">            reference_points: A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
+<span class="sd">            Tuple:</span>
 
-<span class="sd">            embedding_reference_points: A tensor of shape [batch_size, num_object_queries, num_heads, 2].</span>
+<span class="sd">                - `reference_points`: A float tensor of shape</span>
 
-<span class="sd">                The embedding of y and x without the sigmoid applied.</span>
+<span class="sd">                    [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
+
+<span class="sd">                - `embedding_reference_points`: A tensor of shape</span>
+
+<span class="sd">                    [batch_size, num_object_queries, num_heads, 2].</span>
+
+<span class="sd">                    The embedding of y and x without the sigmoid applied.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1466,8 +1464,8 @@ the co-attention inside the transformer</p>
 </thead>
 <tbody>
 <tr>
-<td>reference_points</td>
-<td>A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].<br>embedding_reference_points: A tensor of shape [batch_size, num_object_queries, num_heads, 2].<br>The embedding of y and x without the sigmoid applied.</td>
+<td>Tuple</td>
+<td>- <code>reference_points</code>: A float tensor of shape<br>    [batch_size, num_object_queries, num_heads, (y, x, w, h)].<br>- <code>embedding_reference_points</code>: A tensor of shape<br>    [batch_size, num_object_queries, num_heads, 2].<br>    The embedding of y and x without the sigmoid applied.</td>
 </tr>
 </tbody>
 </table>
@@ -1479,34 +1477,6 @@ the co-attention inside the transformer</p>
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods">Methods</h4>
 <h4 id="call">call</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
@@ -1530,68 +1500,59 @@ True</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>reference_points</td>
-<td>A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].<br>embedding_reference_points: A tensor of shape [batch_size, num_object_queries, num_heads, 2].<br>The embedding of y and x without the sigmoid applied.</td>
-</tr>
-</tbody>
-</table>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="k">call</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="n">object_queries</span><span class="p">):</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="k">call</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">object_queries</span><span class="p">)</span><span class="o">:</span>
 
-        <span class="ss">&quot;&quot;&quot;</span>
+        <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2"></span>
 
-<span class="ss">        Args:</span>
+<span class="s2">        Args:</span>
 
-<span class="ss">            object_queries: A 3-D float32 Tensor of shape</span>
+<span class="s2">            object_queries: A 3-D float32 Tensor of shape</span>
 
-<span class="ss">                [batch_size, num_object_queries, d_model] small fixed number of</span>
+<span class="s2">                [batch_size, num_object_queries, d_model] small fixed number of</span>
 
-<span class="ss">                learned positional embeddings input of the decoder.</span>
+<span class="s2">                learned positional embeddings input of the decoder.</span>
 
-<span class="ss">        Returns:</span>
+<span class="s2">        Call returns:</span>
 
-<span class="ss">            reference_points: A float tensor of shape [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
+<span class="s2">            Tuple:</span>
 
-<span class="ss">            embedding_reference_points: A tensor of shape [batch_size, num_object_queries, num_heads, 2].</span>
+<span class="s2">                - `reference_points`: A float tensor of shape</span>
 
-<span class="ss">                The embedding of y and x without the sigmoid applied.</span>
+<span class="s2">                    [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
 
-<span class="ss">        &quot;&quot;&quot;</span>
+<span class="s2">                - `embedding_reference_points`: A tensor of shape</span>
 
-        <span class="n">yx_pre_sigmoid</span> <span class="o">=</span> <span class="k">self</span><span class="p">.</span><span class="n">xy_embed</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>  <span class="o">#</span> <span class="p">[</span><span class="n">bs</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="s2">                    [batch_size, num_object_queries, num_heads, 2].</span>
+
+<span class="s2">                    The embedding of y and x without the sigmoid applied.</span>
+
+<span class="s2">        </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+        <span class="n">yx_pre_sigmoid</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">xy_embed</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>  <span class="c1"># [bs, num_queries, 2]</span>
 
         <span class="n">yx</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">yx_pre_sigmoid</span><span class="p">)</span>
 
-        <span class="o">#</span> <span class="k">Where</span> <span class="n">y</span> <span class="k">and</span> <span class="n">x</span> <span class="k">are</span> <span class="n">offsets</span> <span class="n">predictions</span> <span class="k">for</span> <span class="s1">&#39;yx&#39;</span> <span class="p">(</span><span class="n">above</span><span class="p">)</span>
+        <span class="c1"># Where y and x are offsets predictions for &#39;yx&#39; (above)</span>
 
-        <span class="o">#</span> <span class="n">h</span> <span class="k">and</span> <span class="n">w</span> <span class="k">are</span> <span class="n">the</span> <span class="n">scales</span> <span class="n">predictions</span>
+        <span class="c1"># h and w are the scales predictions</span>
 
-        <span class="n">yx_offset_hw</span> <span class="o">=</span> <span class="k">self</span><span class="p">.</span><span class="n">yx_offset_hw_embed</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>  <span class="o">#</span> <span class="p">[</span><span class="n">bs</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">,</span> <span class="n">head</span> <span class="o">*</span> <span class="mi">4</span><span class="p">]</span>
+        <span class="n">yx_offset_hw</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">yx_offset_hw_embed</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>  <span class="c1"># [bs, num_queries, head * 4]</span>
 
-        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span>
 
-        <span class="n">num_queries</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">num_queries</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span><span class="err">[</span><span class="mi">1</span><span class="err">]</span>
 
-        <span class="o">#</span> <span class="k">Add</span> <span class="k">offset</span> <span class="n">coordinates</span> <span class="k">to</span> <span class="n">yx</span> <span class="k">and</span> <span class="n">concatenate</span> <span class="k">with</span> <span class="k">scale</span> <span class="n">predictions</span>
+        <span class="c1"># Add offset coordinates to yx and concatenate with scale predictions</span>
 
-        <span class="o">#</span> <span class="n">yx</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="n">bs</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># yx =&gt; [bs, num_queries, head, 2]</span>
 
-        <span class="n">yx</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">yx</span><span class="p">[:,</span> <span class="p">:,</span> <span class="k">None</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="k">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">yx</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">yx</span><span class="err">[</span><span class="o">:</span><span class="p">,</span> <span class="o">:</span><span class="p">,</span> <span class="k">None</span><span class="err">]</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
-        <span class="o">#</span> <span class="n">yx_offset_hw</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="n">bs</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+        <span class="c1"># yx_offset_hw =&gt; [bs, num_queries, head, 4]</span>
 
-        <span class="n">yx_offset_hw</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">yx_offset_hw</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="k">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="n">yx_offset_hw</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">yx_offset_hw</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
-        <span class="n">yxhw</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">yx</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">,</span> <span class="k">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">2</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">yxhw</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="err">[</span><span class="n">yx</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="err">]</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">yxhw</span> <span class="o">+</span> <span class="n">yx_offset_hw</span><span class="p">,</span> <span class="n">yx_pre_sigmoid</span>
 </code></pre></div>

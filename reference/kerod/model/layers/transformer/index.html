@@ -890,13 +890,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -952,13 +945,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables_1" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods_1" class="md-nav__link">
     Methods
   </a>
@@ -1009,13 +995,6 @@
           <li class="md-nav__item">
   <a href="#ancestors-in-mro_2" class="md-nav__link">
     Ancestors (in MRO)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#instance-variables_2" class="md-nav__link">
-    Instance variables
   </a>
   
 </li>
@@ -1349,13 +1328,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1411,13 +1383,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables_1" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods_1" class="md-nav__link">
     Methods
   </a>
@@ -1468,13 +1433,6 @@
           <li class="md-nav__item">
   <a href="#ancestors-in-mro_2" class="md-nav__link">
     Ancestors (in MRO)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#instance-variables_2" class="md-nav__link">
-    Instance variables
   </a>
   
 </li>
@@ -1568,7 +1526,7 @@
 
 <span class="sd">    Call returns:</span>
 
-<span class="sd">        A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
+<span class="sd">        tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1626,7 +1584,7 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
+<span class="sd">            tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1702,7 +1660,7 @@
 
 <span class="sd">    Call returns:</span>
 
-<span class="sd">        A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
+<span class="sd">        tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1788,7 +1746,7 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
+<span class="sd">            tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1884,13 +1842,15 @@
 
 <span class="sd">    Call returns:</span>
 
-<span class="sd">        decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]</span>
+<span class="sd">        Tuple:</span>
 
-<span class="sd">            where h is num_object_queries * num_layers if training is true and</span>
+<span class="sd">            - `decoder_output`: 3-D float32 Tensor of shape [batch_size, h, d_model]</span>
 
-<span class="sd">            num_queries if training is set to False.</span>
+<span class="sd">                where h is num_object_queries * num_layers if training is true and</span>
 
-<span class="sd">        encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</span>
+<span class="sd">                num_queries if training is set to False.</span>
+
+<span class="sd">            - `encoder_output`: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1980,13 +1940,15 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]</span>
+<span class="sd">            Tuple:</span>
 
-<span class="sd">                where h is num_object_queries * num_layers if training is true and</span>
+<span class="sd">                - `decoder_output`: 3-D float32 Tensor of shape [batch_size, h, d_model]</span>
 
-<span class="sd">                num_queries if training is set to False.</span>
+<span class="sd">                    where h is num_object_queries * num_layers if training is true and</span>
 
-<span class="sd">            encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</span>
+<span class="sd">                    num_queries if training is set to False.</span>
+
+<span class="sd">                - `encoder_output`: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2128,7 +2090,7 @@
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
 </tr>
 </tbody>
@@ -2141,34 +2103,6 @@
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods">Methods</h4>
 <h4 id="call">call</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
@@ -2229,7 +2163,7 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
 </tr>
 </tbody>
@@ -2276,7 +2210,7 @@ True</p>
 
 <span class="s2">        Returns:</span>
 
-<span class="s2">            A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
+<span class="s2">            tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
 
 <span class="s2">        </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
 
@@ -2385,7 +2319,7 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
 </tr>
 </tbody>
@@ -2398,34 +2332,6 @@ True</p>
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables_1">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods_1">Methods</h4>
 <h4 id="call_1">call</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
@@ -2471,7 +2377,7 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A 3-D Tensor of float32 and shape [batch_size, M, d_model]</td>
 </tr>
 </tbody>
@@ -2496,7 +2402,7 @@ True</p>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
+<span class="ss">            tf.Tensor: A 3-D Tensor of float32 and shape [batch_size, M, d_model]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span><span class="w"></span>
 
@@ -2610,8 +2516,8 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>decoder_output</td>
-<td>3-D float32 Tensor of shape [batch_size, h, d_model]<br>where h is num_object_queries * num_layers if training is true and<br>    num_queries if training is set to False.<br>encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</td>
+<td>Tuple</td>
+<td>- <code>decoder_output</code>: 3-D float32 Tensor of shape [batch_size, h, d_model]<br>    where h is num_object_queries * num_layers if training is true and<br>    num_queries if training is set to False.<br>- <code>encoder_output</code>: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</td>
 </tr>
 </tbody>
 </table>
@@ -2623,34 +2529,6 @@ True</p>
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables_2">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods_2">Methods</h4>
 <h4 id="call_2">call</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
@@ -2705,12 +2583,12 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>decoder_output</td>
-<td>3-D float32 Tensor of shape [batch_size, h, d_model]<br>where h is num_object_queries * num_layers if training is true and<br>    num_queries if training is set to False.<br>encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</td>
+<td>Tuple</td>
+<td>- <code>decoder_output</code>: 3-D float32 Tensor of shape [batch_size, h, d_model]<br>    where h is num_object_queries * num_layers if training is true and<br>    num_queries if training is set to False.<br>- <code>encoder_output</code>: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</td>
 </tr>
 </tbody>
 </table>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="k">call</span><span class="p">(</span><span class="k">self</span><span class="p">,</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="k">call</span><span class="p">(</span><span class="n">self</span><span class="p">,</span>
 
              <span class="n">flatten_tensor</span><span class="p">,</span>
 
@@ -2722,77 +2600,79 @@ True</p>
 
              <span class="n">coattn_mask</span><span class="o">=</span><span class="k">None</span><span class="p">,</span>
 
-             <span class="n">training</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
+             <span class="n">training</span><span class="o">=</span><span class="k">None</span><span class="p">)</span><span class="o">:</span>
 
-        <span class="ss">&quot;&quot;&quot;</span>
+        <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2"></span>
 
-<span class="ss">        Args:</span>
+<span class="s2">        Args:</span>
 
-<span class="ss">            flatten_tensor: A 3-D float32 Tensor of shape</span>
+<span class="s2">            flatten_tensor: A 3-D float32 Tensor of shape</span>
 
-<span class="ss">                [batch_size, H * W, d_model].</span>
+<span class="s2">                [batch_size, H * W, d_model].</span>
 
-<span class="ss">                It represents the flatten output tensor of the backbone.</span>
+<span class="s2">                It represents the flatten output tensor of the backbone.</span>
 
-<span class="ss">            pos_embed: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].</span>
+<span class="s2">            pos_embed: A 3-D float32 Tensor of shape [batch_size, H * W, d_model].</span>
 
-<span class="ss">                Positional spatial positional encoding matching the flatten_tensor.</span>
+<span class="s2">                Positional spatial positional encoding matching the flatten_tensor.</span>
 
-<span class="ss">            object_queries: A 3-D float32 Tensor of shape</span>
+<span class="s2">            object_queries: A 3-D float32 Tensor of shape</span>
 
-<span class="ss">                [batch_size, num_object_queries, d_model] small fixed number of</span>
+<span class="s2">                [batch_size, num_object_queries, d_model] small fixed number of</span>
 
-<span class="ss">                learned positional embeddings input of the decoder.</span>
+<span class="s2">                learned positional embeddings input of the decoder.</span>
 
-<span class="ss">            key_padding_mask:  A 2-D bool Tensor of shape [batch_size, H * W]</span>
+<span class="s2">            key_padding_mask:  A 2-D bool Tensor of shape [batch_size, H * W]</span>
 
-<span class="ss">                where False means padding and True means pixels</span>
+<span class="s2">                where False means padding and True means pixels</span>
 
-<span class="ss">                from the original image.</span>
+<span class="s2">                from the original image.</span>
 
-<span class="ss">            coattn_mask:  A 4-D float tensor of shape</span>
+<span class="s2">            coattn_mask:  A 4-D float tensor of shape</span>
 
-<span class="ss">                [batch_size, num_heads, H*W, num_object_queries, seq_len].</span>
+<span class="s2">                [batch_size, num_heads, H*W, num_object_queries, seq_len].</span>
 
-<span class="ss">                If provided, it will be added to the attention weight</span>
+<span class="s2">                If provided, it will be added to the attention weight</span>
 
-<span class="ss">                at the coattention step (memory x self_attn)</span>
+<span class="s2">                at the coattention step (memory x self_attn)</span>
 
-<span class="ss">        Returns:</span>
+<span class="s2">        Returns:</span>
 
-<span class="ss">            decoder_output: 3-D float32 Tensor of shape [batch_size, h, d_model]</span>
+<span class="s2">            Tuple:</span>
 
-<span class="ss">                where h is num_object_queries * num_layers if training is true and</span>
+<span class="s2">                - `decoder_output`: 3-D float32 Tensor of shape [batch_size, h, d_model]</span>
 
-<span class="ss">                num_queries if training is set to False.</span>
+<span class="s2">                    where h is num_object_queries * num_layers if training is true and</span>
 
-<span class="ss">            encoder_output: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</span>
+<span class="s2">                    num_queries if training is set to False.</span>
 
-<span class="ss">        &quot;&quot;&quot;</span>
+<span class="s2">                - `encoder_output`: 3-D float32 Tensor of shape [batch_size, batch_size, d_model]</span>
 
-        <span class="n">memory</span> <span class="o">=</span> <span class="n">flatten_tensor</span>
+<span class="s2">        </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
 
-        <span class="k">for</span> <span class="n">enc</span> <span class="k">in</span> <span class="k">self</span><span class="p">.</span><span class="n">enc_layers</span><span class="p">:</span>
+        <span class="k">memory</span> <span class="o">=</span> <span class="n">flatten_tensor</span>
 
-            <span class="o">#</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">enc</span> <span class="k">in</span> <span class="n">self</span><span class="p">.</span><span class="n">enc_layers</span><span class="o">:</span>
 
-            <span class="n">memory</span> <span class="o">=</span> <span class="n">enc</span><span class="p">(</span><span class="n">memory</span><span class="p">,</span> <span class="n">pos_embed</span><span class="p">,</span> <span class="n">key_padding_mask</span><span class="o">=</span><span class="n">key_padding_mask</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">training</span><span class="p">)</span>
+            <span class="c1"># (batch_size, seq_len, d_model)</span>
 
-        <span class="o">#</span> <span class="k">At</span> <span class="n">the</span> <span class="n">beginning</span> <span class="n">we</span> <span class="k">set</span> <span class="n">target</span> <span class="k">to</span> <span class="mi">0</span>
+            <span class="k">memory</span> <span class="o">=</span> <span class="n">enc</span><span class="p">(</span><span class="k">memory</span><span class="p">,</span> <span class="n">pos_embed</span><span class="p">,</span> <span class="n">key_padding_mask</span><span class="o">=</span><span class="n">key_padding_mask</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">training</span><span class="p">)</span>
 
-        <span class="o">#</span> <span class="k">In</span> <span class="n">the</span> <span class="k">first</span> <span class="n">decoder</span> <span class="n">layer</span> <span class="n">Q</span> <span class="k">and</span> <span class="n">K</span> <span class="n">will</span> <span class="n">be</span> <span class="n">equal</span>
+        <span class="c1"># At the beginning we set target to 0</span>
 
-        <span class="o">#</span> <span class="k">to</span> <span class="n">dec_out</span> <span class="o">+</span> <span class="n">object_queries</span><span class="o">=</span><span class="n">object_queries</span>
+        <span class="c1"># In the first decoder layer Q and K will be equal</span>
+
+        <span class="c1"># to dec_out + object_queries=object_queries</span>
 
         <span class="n">dec_out</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>
 
-        <span class="n">layers_output</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">layers_output</span> <span class="o">=</span> <span class="err">[]</span>
 
-        <span class="k">for</span> <span class="n">layer</span> <span class="k">in</span> <span class="k">self</span><span class="p">.</span><span class="n">dec_layers</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="k">in</span> <span class="n">self</span><span class="p">.</span><span class="n">dec_layers</span><span class="o">:</span>
 
             <span class="n">dec_out</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">dec_out</span><span class="p">,</span>
 
-                            <span class="n">memory</span><span class="p">,</span>
+                            <span class="k">memory</span><span class="p">,</span>
 
                             <span class="n">pos_embed</span><span class="p">,</span>
 
@@ -2804,17 +2684,17 @@ True</p>
 
                             <span class="n">training</span><span class="o">=</span><span class="n">training</span><span class="p">)</span>
 
-            <span class="n">dec_out</span> <span class="o">=</span> <span class="k">self</span><span class="p">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">dec_out</span><span class="p">)</span>
+            <span class="n">dec_out</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">dec_out</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">training</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">training</span><span class="o">:</span>
 
                 <span class="n">layers_output</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">dec_out</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">training</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">training</span><span class="o">:</span>
 
-            <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="n">layers_output</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">memory</span>
+            <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="n">layers_output</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="k">memory</span>
 
-        <span class="k">return</span> <span class="n">dec_out</span><span class="p">,</span> <span class="n">memory</span>
+        <span class="k">return</span> <span class="n">dec_out</span><span class="p">,</span> <span class="k">memory</span>
 </code></pre></div>
 
 </details>

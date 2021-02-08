@@ -869,13 +869,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1279,13 +1272,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1424,9 +1410,9 @@
 
 <span class="sd">    Call returns:</span>
 
-<span class="sd">        A tensor of shape [num_scales * num_ratios * height * width, 4].</span>
+<span class="sd">        tf.Tensor: A tensor of shape [num_scales * num_ratios * height * width, 4].</span>
 
-<span class="sd">        The anchors have the format [y_min, x_min, y_max, x_max].</span>
+<span class="sd">            The anchors have the format [y_min, x_min, y_max, x_max].</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1458,9 +1444,9 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            A tensor of shape [num_scales * num_ratios * height * width, 4].</span>
+<span class="sd">            tf.Tensor: A tensor of shape [num_scales * num_ratios * height * width, 4].</span>
 
-<span class="sd">            The anchors have the format [y_min, x_min, y_max, x_max].</span>
+<span class="sd">                The anchors have the format [y_min, x_min, y_max, x_max].</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1670,7 +1656,7 @@ At each forward according to the shape of the tensor we can extract the correspo
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A tensor of shape [num_scales * num_ratios * height * width, 4].<br>The anchors have the format [y_min, x_min, y_max, x_max].</td>
 </tr>
 </tbody>
@@ -1683,34 +1669,6 @@ At each forward according to the shape of the tensor we can extract the correspo
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods">Methods</h4>
 <h4 id="call">call</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
@@ -1745,7 +1703,7 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A tensor of shape [num_scales * num_ratios * height * width, 4].<br>The anchors have the format [y_min, x_min, y_max, x_max].</td>
 </tr>
 </tbody>
@@ -1760,9 +1718,9 @@ True</p>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            A tensor of shape [num_scales * num_ratios * height * width, 4].</span>
+<span class="ss">            tf.Tensor: A tensor of shape [num_scales * num_ratios * height * width, 4].</span>
 
-<span class="ss">            The anchors have the format [y_min, x_min, y_max, x_max].</span>
+<span class="ss">                The anchors have the format [y_min, x_min, y_max, x_max].</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 

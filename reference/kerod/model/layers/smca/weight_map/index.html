@@ -928,13 +928,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1185,13 +1178,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     Methods
   </a>
@@ -1282,13 +1268,13 @@
 
 <span class="sd">        ref_points: A tensor of shape [batch_size, N, heads, (y, x, h, w)] in [0, 1]</span>
 
-<span class="sd">    Returns:</span>
+<span class="sd">    Call returns:</span>
 
-<span class="sd">        weight_map: A 4D tensor of float 32 and shape</span>
+<span class="sd">        tf.Tensor: The weight_map per reference points</span>
 
-<span class="sd">            [batch_size, heads, N, height * width] representing</span>
+<span class="sd">            a 4D tensor of float 32 and shape</span>
 
-<span class="sd">            a weight map per reference points.</span>
+<span class="sd">            [batch_size, heads, N, height * width].</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1312,11 +1298,11 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            weight_map: A 4D tensor of float 32 and shape</span>
+<span class="sd">            tf.Tensor: The weight_map per reference points</span>
 
-<span class="sd">                [batch_size, heads, N, height * width] representing</span>
+<span class="sd">                a 4D tensor of float 32 and shape</span>
 
-<span class="sd">                a weight map per reference points.</span>
+<span class="sd">                [batch_size, heads, N, height * width].</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1391,10 +1377,10 @@ the modulated co-attention.</p>
     height: The targeted height of the feature map
     width: The targeted width of the feature map
     ref_points: A tensor of shape [batch_size, N, heads, (y, x, h, w)] in [0, 1]</p>
-<p>Returns:
-    weight_map: A 4D tensor of float 32 and shape
-        [batch_size, heads, N, height * width] representing
-        a weight map per reference points.</p>
+<p>Call returns:
+    tf.Tensor: The weight_map per reference points
+        a 4D tensor of float 32 and shape
+        [batch_size, heads, N, height * width].</p>
 <h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
 <ul>
 <li>tensorflow.python.keras.engine.base_layer.Layer</li>
@@ -1403,34 +1389,6 @@ the modulated co-attention.</p>
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods">Methods</h4>
 <h4 id="call">call</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
@@ -1474,8 +1432,8 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>weight_map</td>
-<td>A 4D tensor of float 32 and shape<br>[batch_size, heads, N, height * width] representing<br>a weight map per reference points.</td>
+<td>tf.Tensor</td>
+<td>The weight_map per reference points<br>a 4D tensor of float 32 and shape<br>[batch_size, heads, N, height * width].</td>
 </tr>
 </tbody>
 </table>
@@ -1493,11 +1451,11 @@ True</p>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            weight_map: A 4D tensor of float 32 and shape</span>
+<span class="ss">            tf.Tensor: The weight_map per reference points</span>
 
-<span class="ss">                [batch_size, heads, N, height * width] representing</span>
+<span class="ss">                a 4D tensor of float 32 and shape</span>
 
-<span class="ss">                a weight map per reference points.</span>
+<span class="ss">                [batch_size, heads, N, height * width].</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 

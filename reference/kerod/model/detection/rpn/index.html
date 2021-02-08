@@ -810,15 +810,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ancestors-in-mro" class="md-nav__link">
-    Ancestors (in MRO)
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro" class="md-nav__link">
+    Ancestors (in MRO)
   </a>
   
 </li>
@@ -1279,15 +1286,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ancestors-in-mro" class="md-nav__link">
-    Ancestors (in MRO)
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance-variables" class="md-nav__link">
-    Instance variables
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro" class="md-nav__link">
+    Ancestors (in MRO)
   </a>
   
 </li>
@@ -1422,6 +1436,24 @@
 
 <span class="sd">            e.g: (0.5, 1, 2)</span>
 
+<span class="sd">    Call arguments:</span>
+
+<span class="sd">        inputs: A List of tensors the output of the pyramid</span>
+
+<span class="sd">    Call returns:</span>
+
+<span class="sd">        Tuple:</span>
+
+<span class="sd">            - `localization_pred`: A list of logits 3-D tensor</span>
+
+<span class="sd">            of shape [batch_size, num_anchors, 4]</span>
+
+<span class="sd">            - `classification_pred`: A lost of logits 3-D tensor</span>
+
+<span class="sd">            of shape [batch_size, num_anchors, 2]</span>
+
+<span class="sd">            - `anchors`: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anchor_ratios</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1496,7 +1528,11 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            A tuple of tensors of shape ([batch_size, num_anchors, 2], [batch_size, num_anchors, 4])</span>
+<span class="sd">            Tuple:</span>
+
+<span class="sd">                classification_head: a tensor of shape [batch_size, num_anchors, 2]</span>
+
+<span class="sd">                localization_head: a tensor of shape [batch_size, num_anchors, 4]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1522,11 +1558,17 @@
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            localization_pred: A list of logits 3-D tensor of shape [batch_size, num_anchors, 4]</span>
+<span class="sd">            Tuple:</span>
 
-<span class="sd">            classification_pred: A lost of logits 3-D tensor of shape [batch_size, num_anchors, 2]</span>
+<span class="sd">                - `localization_pred`: A list of logits 3-D tensor</span>
 
-<span class="sd">            anchors: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]</span>
+<span class="sd">                of shape [batch_size, num_anchors, 4]</span>
+
+<span class="sd">                - `classification_pred`: A lost of logits 3-D tensor</span>
+
+<span class="sd">                of shape [batch_size, num_anchors, 2]</span>
+
+<span class="sd">                - `anchors`: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1552,39 +1594,31 @@
 
 <span class="sd">            anchors: A list of tensors of shape [num_anchors, (y_min, x_min, y_max, x_max)]</span>
 
-<span class="sd">            ground_truths: A dict with BoxField as key and a tensor as value.</span>
+<span class="sd">            ground_truths: A dict</span>
 
-<span class="sd">        where ground_truths looks like the following:</span>
+<span class="sd">                - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_gt, num_classes],</span>
 
-<span class="sd">        ```python</span>
+<span class="sd">                - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)]</span>
 
-<span class="sd">        ground_truths = {</span>
+<span class="sd">                - `BoxField.LABELS`: A 3-D tensor of int32 and shape [batch_size, num_gt]</span>
 
-<span class="sd">            BoxField.BOXES:</span>
+<span class="sd">                - `BoxField.WEIGHTS`: A 3-D tensor of float and shape [batch_size, num_gt]</span>
 
-<span class="sd">                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),</span>
+<span class="sd">                - `BoxField.NUM_BOXES`: A 2-D tensor of int32 and shape [batch_size, 1]</span>
 
-<span class="sd">            BoxField.LABELS:</span>
+<span class="sd">                    which allows to remove the padding created by tf.Data.</span>
 
-<span class="sd">                tf.constant([[1, 0], [1, 0]], tf.float32),</span>
+<span class="sd">                    Example: if batch_size=2 and this field equal tf.constant([[2], [1]], tf.int32)</span>
 
-<span class="sd">            BoxField.WEIGHTS:</span>
-
-<span class="sd">                tf.constant([[1, 0], [1, 1]], tf.float32),</span>
-
-<span class="sd">            BoxField.NUM_BOXES: # `NUM_BOXES` allows to remove the padding created by tf.Data.</span>
-
-<span class="sd">                tf.constant([[2], [1]], tf.int32)</span>
-
-<span class="sd">        }</span>
-
-<span class="sd">        ```</span>
+<span class="sd">                    then my second box has a padding of 1</span>
 
 <span class="sd">        Returns:</span>
 
-<span class="sd">            classification_loss: A scalar in tf.float32</span>
+<span class="sd">            Tuple:</span>
 
-<span class="sd">            localization_loss: A scalar in tf.float32</span>
+<span class="sd">                - `classification_loss`: A scalar in tf.float32</span>
+
+<span class="sd">                - `localization_loss`: A scalar in tf.float32</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1682,7 +1716,7 @@
 
 <span class="sd">    Returns:</span>
 
-<span class="sd">        recall: Among all the boxes that we had to find how much did we found.</span>
+<span class="sd">        tf.Tensor: Recall, among all the boxes that we had to find how much did we found.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1768,8 +1802,8 @@
 </thead>
 <tbody>
 <tr>
-<td>recall</td>
-<td>Among all the boxes that we had to find how much did we found.</td>
+<td>tf.Tensor</td>
+<td>Recall, among all the boxes that we had to find how much did we found.</td>
 </tr>
 </tbody>
 </table>
@@ -1791,7 +1825,7 @@
 
     <span class="nl">Returns:</span>
 
-        <span class="nl">recall:</span> <span class="n">Among</span> <span class="n">all</span> <span class="n">the</span> <span class="n">boxes</span> <span class="n">that</span> <span class="n">we</span> <span class="n">had</span> <span class="n">to</span> <span class="n">find</span> <span class="n">how</span> <span class="n">much</span> <span class="n">did</span> <span class="n">we</span> <span class="n">found</span><span class="p">.</span>
+        <span class="n">tf</span><span class="p">.</span><span class="nl">Tensor:</span> <span class="n">Recall</span><span class="p">,</span> <span class="n">among</span> <span class="n">all</span> <span class="n">the</span> <span class="n">boxes</span> <span class="n">that</span> <span class="n">we</span> <span class="n">had</span> <span class="n">to</span> <span class="n">find</span> <span class="n">how</span> <span class="n">much</span> <span class="n">did</span> <span class="n">we</span> <span class="n">found</span><span class="p">.</span>
 
     <span class="s">&quot;&quot;&quot;</span>
 
@@ -1849,6 +1883,36 @@
 </tr>
 </tbody>
 </table>
+<h4 id="call-arguments">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inputs</td>
+<td>A List of tensors the output of the pyramid</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuple</td>
+<td>- <code>localization_pred</code>: A list of logits 3-D tensor<br>of shape [batch_size, num_anchors, 4]<br>- <code>classification_pred</code>: A lost of logits 3-D tensor<br>of shape [batch_size, num_anchors, 2]<br>- <code>anchors</code>: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]</td>
+</tr>
+</tbody>
+</table>
 <h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
 <ul>
 <li>kerod.model.detection.abstract_detection_head.AbstractDetectionHead</li>
@@ -1858,34 +1922,6 @@
 <li>tensorflow.python.training.tracking.base.Trackable</li>
 <li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
-<h4 id="instance-variables">Instance variables</h4>
-<div class="codehilite"><pre><span></span><code><span class="n">name_scope</span>
-</code></pre></div>
-
-<p>Returns a <code>tf.name_scope</code> instance for this class.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">submodules</span>
-</code></pre></div>
-
-<p>Sequence of all sub-modules.</p>
-<p>Submodules are modules which are properties of this module, or found as
-properties of modules which are properties of this module (and so on).</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = tf.Module()
-b = tf.Module()
-c = tf.Module()
-a.b = b
-b.c = c
-list(a.submodules) == [b, c]
-True
-list(b.submodules) == [c]
-True
-list(c.submodules) == []
-True</p>
-</blockquote>
-</blockquote>
-</blockquote>
 <h4 id="methods">Methods</h4>
 <h4 id="build_detection_head">build_detection_head</h4>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">build_detection_head</span><span class="p">(</span>
@@ -1894,7 +1930,7 @@ True</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<p>Build a detection head composed </p>
+<p>Build a detection head composed of a classification and box_detection.</p>
 <p><strong>Parameters:</strong></p>
 <table>
 <thead>
@@ -1910,13 +1946,36 @@ True</p>
 </tr>
 </tbody>
 </table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuple</td>
+<td>classification_head: a tensor of shape [batch_size, num_anchors, 2]<br>localization_head: a tensor of shape [batch_size, num_anchors, 4]</td>
+</tr>
+</tbody>
+</table>
 <details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="n">build_detection_head</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
 
-        <span class="ss">&quot;&quot;&quot; Build a detection head composed</span>
+        <span class="ss">&quot;&quot;&quot; Build a detection head composed of a classification and box_detection.</span>
 
 <span class="ss">        Arguments:</span>
 
 <span class="ss">            inputs: A tensor of shape [batch_size, H, W, C]</span>
+
+<span class="ss">        Returns:</span>
+
+<span class="ss">            Tuple:</span>
+
+<span class="ss">                classification_head: a tensor of shape [batch_size, num_anchors, 2]</span>
+
+<span class="ss">                localization_head: a tensor of shape [batch_size, num_anchors, 4]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 
@@ -1961,8 +2020,8 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
-<td>A tuple of tensors of shape ([batch_size, num_anchors, 2], [batch_size, num_anchors, 4])</td>
+<td>Tuple</td>
+<td>classification_head: a tensor of shape [batch_size, num_anchors, 2]<br>localization_head: a tensor of shape [batch_size, num_anchors, 4]</td>
 </tr>
 </tbody>
 </table>
@@ -1976,7 +2035,11 @@ True</p>
 
         <span class="nl">Returns:</span>
 
-            <span class="n">A</span> <span class="n">tuple</span> <span class="n">of</span> <span class="n">tensors</span> <span class="n">of</span> <span class="n">shape</span> <span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="mh">2</span><span class="p">],</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="mh">4</span><span class="p">])</span>
+            <span class="nl">Tuple:</span>
+
+                <span class="nl">classification_head:</span> <span class="n">a</span> <span class="n">tensor</span> <span class="n">of</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="mh">2</span><span class="p">]</span>
+
+                <span class="nl">localization_head:</span> <span class="n">a</span> <span class="n">tensor</span> <span class="n">of</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_anchors</span><span class="p">,</span> <span class="mh">4</span><span class="p">]</span>
 
         <span class="s">&quot;&quot;&quot;</span>
 
@@ -2013,7 +2076,7 @@ True</p>
 <tbody>
 <tr>
 <td>inputs</td>
-<td>A tensor of  shape [N, H, W, C]</td>
+<td>A tensor of float and shape [N, H, W, C]</td>
 </tr>
 </tbody>
 </table>
@@ -2027,7 +2090,7 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>None</td>
+<td>tf.Tensor</td>
 <td>A tensor and shape [N, H<em>2, W</em>2, num_classes - 1]</td>
 </tr>
 </tbody>
@@ -2038,11 +2101,11 @@ True</p>
 
 <span class="ss">        Arguments:</span>
 
-<span class="ss">            inputs: A tensor of  shape [N, H, W, C]</span>
+<span class="ss">            inputs: A tensor of float and shape [N, H, W, C]</span>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            A tensor and shape [N, H*2, W*2, num_classes - 1]</span>
+<span class="ss">            tf.Tensor: A tensor and shape [N, H*2, W*2, num_classes - 1]</span>
 
 <span class="ss">        &quot;&quot;&quot;</span>
 
@@ -2089,36 +2152,42 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>localization_pred</td>
-<td>A list of logits 3-D tensor of shape [batch_size, num_anchors, 4]<br>classification_pred: A lost of logits 3-D tensor of shape [batch_size, num_anchors, 2]<br>anchors: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]</td>
+<td>Tuple</td>
+<td>- <code>localization_pred</code>: A list of logits 3-D tensor<br>of shape [batch_size, num_anchors, 4]<br>- <code>classification_pred</code>: A lost of logits 3-D tensor<br>of shape [batch_size, num_anchors, 2]<br>- <code>anchors</code>: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]</td>
 </tr>
 </tbody>
 </table>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="k">call</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">]):</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="k">call</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">inputs</span><span class="o">:</span> <span class="k">List</span><span class="err">[</span><span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="err">]</span><span class="p">)</span><span class="o">:</span>
 
-        <span class="ss">&quot;&quot;&quot;Create the computation graph for the rpn inference</span>
+        <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Create the computation graph for the rpn inference</span>
 
-<span class="ss">        Arguments:</span>
+<span class="s2">        Arguments:</span>
 
-<span class="ss">            inputs: A List of tensors the output of the pyramid</span>
+<span class="s2">            inputs: A List of tensors the output of the pyramid</span>
 
-<span class="ss">        Returns:</span>
+<span class="s2">        Returns:</span>
 
-<span class="ss">            localization_pred: A list of logits 3-D tensor of shape [batch_size, num_anchors, 4]</span>
+<span class="s2">            Tuple:</span>
 
-<span class="ss">            classification_pred: A lost of logits 3-D tensor of shape [batch_size, num_anchors, 2]</span>
+<span class="s2">                - `localization_pred`: A list of logits 3-D tensor</span>
 
-<span class="ss">            anchors: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]</span>
+<span class="s2">                of shape [batch_size, num_anchors, 4]</span>
 
-<span class="ss">        &quot;&quot;&quot;</span>
+<span class="s2">                - `classification_pred`: A lost of logits 3-D tensor</span>
 
-        <span class="n">anchors</span> <span class="o">=</span> <span class="p">[</span><span class="n">anchors</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span> <span class="k">for</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">anchors</span> <span class="k">in</span> <span class="n">zip</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="k">self</span><span class="p">.</span><span class="n">_anchors</span><span class="p">)]</span>
+<span class="s2">                of shape [batch_size, num_anchors, 2]</span>
 
-        <span class="n">rpn_predictions</span> <span class="o">=</span> <span class="p">[</span><span class="k">self</span><span class="p">.</span><span class="n">build_rpn_head</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span> <span class="k">for</span> <span class="n">tensor</span> <span class="k">in</span> <span class="n">inputs</span><span class="p">]</span>
+<span class="s2">                - `anchors`: A list of tensors of shape [batch_size, num_anchors, (y_min, x_min, y_max, x_max)]</span>
 
-        <span class="n">localization_pred</span> <span class="o">=</span> <span class="p">[</span><span class="n">prediction</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">prediction</span> <span class="k">in</span> <span class="n">rpn_predictions</span><span class="p">]</span>
+<span class="s2">        </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
 
-        <span class="n">classification_pred</span> <span class="o">=</span> <span class="p">[</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">prediction</span> <span class="k">in</span> <span class="n">rpn_predictions</span><span class="p">]</span>
+        <span class="n">anchors</span> <span class="o">=</span> <span class="err">[</span><span class="n">anchors</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span> <span class="k">for</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">anchors</span> <span class="k">in</span> <span class="n">zip</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">_anchors</span><span class="p">)</span><span class="err">]</span>
+
+        <span class="n">rpn_predictions</span> <span class="o">=</span> <span class="err">[</span><span class="n">self</span><span class="p">.</span><span class="n">build_rpn_head</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span> <span class="k">for</span> <span class="n">tensor</span> <span class="k">in</span> <span class="n">inputs</span><span class="err">]</span>
+
+        <span class="n">localization_pred</span> <span class="o">=</span> <span class="err">[</span><span class="n">prediction</span><span class="err">[</span><span class="mi">1</span><span class="err">]</span> <span class="k">for</span> <span class="n">prediction</span> <span class="k">in</span> <span class="n">rpn_predictions</span><span class="err">]</span>
+
+        <span class="n">classification_pred</span> <span class="o">=</span> <span class="err">[</span><span class="n">prediction</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span> <span class="k">for</span> <span class="n">prediction</span> <span class="k">in</span> <span class="n">rpn_predictions</span><span class="err">]</span>
 
         <span class="k">return</span> <span class="n">localization_pred</span><span class="p">,</span> <span class="n">classification_pred</span><span class="p">,</span> <span class="n">anchors</span>
 </code></pre></div>
@@ -2158,7 +2227,7 @@ True</p>
 </tr>
 <tr>
 <td>ground_truths</td>
-<td>A dict with BoxField as key and a tensor as value.</td>
+<td>A dict<br>- <code>BoxField.LABELS</code>: A 3-D tensor of shape [batch_size, num_gt, num_classes],<br>- <code>BoxField.BOXES</code>: A 3-D tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)]<br>- <code>BoxField.LABELS</code>: A 3-D tensor of int32 and shape [batch_size, num_gt]<br>- <code>BoxField.WEIGHTS</code>: A 3-D tensor of float and shape [batch_size, num_gt]<br>- <code>BoxField.NUM_BOXES</code>: A 2-D tensor of int32 and shape [batch_size, 1]<br>    which allows to remove the padding created by tf.Data.<br>    Example: if batch_size=2 and this field equal tf.constant([[2], [1]], tf.int32)<br>    then my second box has a padding of 1</td>
 </tr>
 </tbody>
 </table>
@@ -2172,110 +2241,102 @@ True</p>
 </thead>
 <tbody>
 <tr>
-<td>classification_loss</td>
-<td>A scalar in tf.float32<br>localization_loss: A scalar in tf.float32</td>
+<td>Tuple</td>
+<td>- <code>classification_loss</code>: A scalar in tf.float32<br>- <code>localization_loss</code>: A scalar in tf.float32</td>
 </tr>
 </tbody>
 </table>
-<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="n">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">localization_pred</span><span class="p">,</span> <span class="n">classification_pred</span><span class="p">,</span> <span class="n">anchors</span><span class="p">,</span> <span class="n">ground_truths</span><span class="p">):</span>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="n">compute_loss</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">localization_pred</span><span class="p">,</span> <span class="n">classification_pred</span><span class="p">,</span> <span class="n">anchors</span><span class="p">,</span> <span class="n">ground_truths</span><span class="p">)</span><span class="o">:</span>
 
-        <span class="sd">&quot;&quot;&quot;Compute the loss</span>
+        <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2">Compute the loss</span>
 
-<span class="sd">        Arguments:</span>
+<span class="s2">        Arguments:</span>
 
-<span class="sd">            localization_pred: A list of tensors of shape [batch_size, num_anchors, 4].</span>
+<span class="s2">            localization_pred: A list of tensors of shape [batch_size, num_anchors, 4].</span>
 
-<span class="sd">            classification_pred: A list of tensors of shape [batch_size, num_anchors, 2]</span>
+<span class="s2">            classification_pred: A list of tensors of shape [batch_size, num_anchors, 2]</span>
 
-<span class="sd">            anchors: A list of tensors of shape [num_anchors, (y_min, x_min, y_max, x_max)]</span>
+<span class="s2">            anchors: A list of tensors of shape [num_anchors, (y_min, x_min, y_max, x_max)]</span>
 
-<span class="sd">            ground_truths: A dict with BoxField as key and a tensor as value.</span>
+<span class="s2">            ground_truths: A dict</span>
 
-<span class="sd">        where ground_truths looks like the following:</span>
+<span class="s2">                - `BoxField.LABELS`: A 3-D tensor of shape [batch_size, num_gt, num_classes],</span>
 
-<span class="sd">        ```python</span>
+<span class="s2">                - `BoxField.BOXES`: A 3-D tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)]</span>
 
-<span class="sd">        ground_truths = {</span>
+<span class="s2">                - `BoxField.LABELS`: A 3-D tensor of int32 and shape [batch_size, num_gt]</span>
 
-<span class="sd">            BoxField.BOXES:</span>
+<span class="s2">                - `BoxField.WEIGHTS`: A 3-D tensor of float and shape [batch_size, num_gt]</span>
 
-<span class="sd">                tf.constant([[[0, 0, 1, 1], [0, 0, 2, 2]], [[0, 0, 3, 3], [0, 0, 0, 0]]], tf.float32),</span>
+<span class="s2">                - `BoxField.NUM_BOXES`: A 2-D tensor of int32 and shape [batch_size, 1]</span>
 
-<span class="sd">            BoxField.LABELS:</span>
+<span class="s2">                    which allows to remove the padding created by tf.Data.</span>
 
-<span class="sd">                tf.constant([[1, 0], [1, 0]], tf.float32),</span>
+<span class="s2">                    Example: if batch_size=2 and this field equal tf.constant([[2], [1]], tf.int32)</span>
 
-<span class="sd">            BoxField.WEIGHTS:</span>
+<span class="s2">                    then my second box has a padding of 1</span>
 
-<span class="sd">                tf.constant([[1, 0], [1, 1]], tf.float32),</span>
+<span class="s2">        Returns:</span>
 
-<span class="sd">            BoxField.NUM_BOXES: # `NUM_BOXES` allows to remove the padding created by tf.Data.</span>
+<span class="s2">            Tuple:</span>
 
-<span class="sd">                tf.constant([[2], [1]], tf.int32)</span>
+<span class="s2">                - `classification_loss`: A scalar in tf.float32</span>
 
-<span class="sd">        }</span>
+<span class="s2">                - `localization_loss`: A scalar in tf.float32</span>
 
-<span class="sd">        ```</span>
+<span class="s2">        </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
 
-<span class="sd">        Returns:</span>
+        <span class="n">localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="n">localization_pred</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="sd">            classification_loss: A scalar in tf.float32</span>
+        <span class="n">classification_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="n">classification_pred</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="sd">            localization_loss: A scalar in tf.float32</span>
+        <span class="n">anchors</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="n">anchors</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">localization_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">localization_pred</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-        <span class="n">classification_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">classification_pred</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-        <span class="n">anchors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">anchors</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-        <span class="n">ground_truths</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">ground_truths</span> <span class="o">=</span> <span class="err">{</span>
 
             <span class="c1"># We add one because the background is not counted in ground_truths[BoxField.LABELS]</span>
 
-            <span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">:</span>
+            <span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="o">:</span>
 
-                <span class="n">ground_truths</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">ground_truths</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
 
-            <span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">:</span>
+            <span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="o">:</span>
 
-                <span class="n">ground_truths</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">],</span>
+                <span class="n">ground_truths</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="err">]</span><span class="p">,</span>
 
-            <span class="n">BoxField</span><span class="o">.</span><span class="n">WEIGHTS</span><span class="p">:</span>
+            <span class="n">BoxField</span><span class="p">.</span><span class="n">WEIGHTS</span><span class="o">:</span>
 
-                <span class="n">ground_truths</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">WEIGHTS</span><span class="p">],</span>
+                <span class="n">ground_truths</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">WEIGHTS</span><span class="err">]</span><span class="p">,</span>
 
-            <span class="n">BoxField</span><span class="o">.</span><span class="n">NUM_BOXES</span><span class="p">:</span>
+            <span class="n">BoxField</span><span class="p">.</span><span class="n">NUM_BOXES</span><span class="o">:</span>
 
-                <span class="n">ground_truths</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">NUM_BOXES</span><span class="p">]</span>
+                <span class="n">ground_truths</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">NUM_BOXES</span><span class="err">]</span>
 
-        <span class="p">}</span>
+        <span class="err">}</span>
 
         <span class="c1"># anchors are deterministic duplicate them to create a batch</span>
 
-        <span class="n">anchors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">anchors</span><span class="p">[</span><span class="n">None</span><span class="p">],</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ground_truths</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">anchors</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">anchors</span><span class="err">[</span><span class="k">None</span><span class="err">]</span><span class="p">,</span> <span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ground_truths</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="err">]</span><span class="p">)</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
-        <span class="n">y_true</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_assigner</span><span class="o">.</span><span class="n">assign</span><span class="p">({</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">:</span> <span class="n">anchors</span><span class="p">},</span> <span class="n">ground_truths</span><span class="p">)</span>
+        <span class="n">y_true</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">target_assigner</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="err">{</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="o">:</span> <span class="n">anchors</span><span class="err">}</span><span class="p">,</span> <span class="n">ground_truths</span><span class="p">)</span>
 
-        <span class="n">y_true</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">y_true</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y_true</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">y_true</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="c1">## Compute metrics</span>
 
-        <span class="n">recall</span> <span class="o">=</span> <span class="n">compute_rpn_metrics</span><span class="p">(</span><span class="n">y_true</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">],</span> <span class="n">classification_pred</span><span class="p">,</span>
+        <span class="n">recall</span> <span class="o">=</span> <span class="n">compute_rpn_metrics</span><span class="p">(</span><span class="n">y_true</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span><span class="p">,</span> <span class="n">classification_pred</span><span class="p">,</span>
 
-                                     <span class="n">weights</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">])</span>
+                                     <span class="n">weights</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">recall</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;rpn_recall&#39;</span><span class="p">,</span> <span class="n">aggregation</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">recall</span><span class="p">,</span> <span class="k">name</span><span class="o">=</span><span class="s1">&#39;rpn_recall&#39;</span><span class="p">,</span> <span class="n">aggregation</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 
         <span class="c1"># All the boxes which are not -1 can be sampled</span>
 
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">y_true</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">y_true</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
         <span class="n">sample_idx</span> <span class="o">=</span> <span class="n">batch_sample_balanced_positive_negative</span><span class="p">(</span>
 
-            <span class="n">weights</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">],</span>
+            <span class="n">weights</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span><span class="p">,</span>
 
             <span class="n">SAMPLING_SIZE</span><span class="p">,</span>
 
@@ -2283,15 +2344,15 @@ True</p>
 
             <span class="n">positive_fraction</span><span class="o">=</span><span class="n">SAMPLING_POSITIVE_RATIO</span><span class="p">,</span>
 
-            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_compute_dtype</span><span class="p">)</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">self</span><span class="p">.</span><span class="n">_compute_dtype</span><span class="p">)</span>
 
-        <span class="n">weights</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_idx</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">]</span>
+        <span class="n">weights</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span> <span class="o">=</span> <span class="n">sample_idx</span> <span class="o">*</span> <span class="n">weights</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="err">]</span>
 
-        <span class="n">weights</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_idx</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">]</span>
+        <span class="n">weights</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="err">]</span> <span class="o">=</span> <span class="n">sample_idx</span> <span class="o">*</span> <span class="n">weights</span><span class="err">[</span><span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="err">]</span>
 
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="p">{</span><span class="n">BoxField</span><span class="o">.</span><span class="n">LABELS</span><span class="p">:</span> <span class="n">classification_pred</span><span class="p">,</span> <span class="n">BoxField</span><span class="o">.</span><span class="n">BOXES</span><span class="p">:</span> <span class="n">localization_pred</span><span class="p">}</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="err">{</span><span class="n">BoxField</span><span class="p">.</span><span class="n">LABELS</span><span class="o">:</span> <span class="n">classification_pred</span><span class="p">,</span> <span class="n">BoxField</span><span class="p">.</span><span class="n">BOXES</span><span class="o">:</span> <span class="n">localization_pred</span><span class="err">}</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_losses</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="n">compute_losses</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
 </code></pre></div>
 
 </details>
@@ -2305,7 +2366,7 @@ True</p>
 </code></pre></div>
 
 <p>Compute the losses of the object detection head.</p>
-<p>Each dictionary is composed of the same key (classification, localization, segmentation)</p>
+<p>Each dictionary is composed of the same keys (classification, localization, segmentation)</p>
 <p><strong>Parameters:</strong></p>
 <table>
 <thead>
@@ -2340,7 +2401,7 @@ True</p>
 <tbody>
 <tr>
 <td>None</td>
-<td>A dict of different losses</td>
+<td>dict : A dict of different losses</td>
 </tr>
 </tbody>
 </table>
@@ -2350,7 +2411,7 @@ True</p>
 
 <span class="w">        </span><span class="ss">&quot;&quot;&quot;Compute the losses of the object detection head.</span>
 
-<span class="ss">        Each dictionary is composed of the same key (classification, localization, segmentation)</span>
+<span class="ss">        Each dictionary is composed of the same keys (classification, localization, segmentation)</span>
 
 <span class="ss">        Arguments:</span>
 
@@ -2364,7 +2425,7 @@ True</p>
 
 <span class="ss">        Returns:</span>
 
-<span class="ss">            A dict of different losses</span>
+<span class="ss">            dict : A dict of different losses</span>
 
 <span class="ss">        &quot;&quot;&quot;</span><span class="w"></span>
 
