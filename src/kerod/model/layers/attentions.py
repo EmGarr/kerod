@@ -25,6 +25,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
             the position with the value of ``False`` will be unchanged.
         attn_mask:  A 4-D float tensor of shape [batch_size, num_heads, seq_len_q, seq_len].
             If provided, it will be added to the attention weight.
+
     Call returns:
         A 3-D tensor of shape [batch_size, seq_len_q, d_model]
     """

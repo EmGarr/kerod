@@ -56,7 +56,10 @@ class Anchors(tf.keras.layers.Layer):
             e.g: (0.5, 1, 2)
         max_size: Maximum size of the input image. The anchors will computed once and for all.
 
-    Returns:
+    Call arguments:
+        inputs: A tensor of shape [batch_size, height, widht, channel]
+
+    Call returns:
         A tensor of shape [num_scales * num_ratios * height * width, 4].
         The anchors have the format [y_min, x_min, y_max, x_max].
     """
