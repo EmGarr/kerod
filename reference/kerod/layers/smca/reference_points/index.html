@@ -1,0 +1,1654 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="shortcut icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.14">
+    
+    
+      
+        <title>Reference Points - kerod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.d3202873.min.css">
+      
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ff0a5ce4.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#4cae4f">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="green" data-md-color-accent="lightgreen">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#module-kerodlayerssmcareference_points" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../../../../.." title="kerod" class="md-header-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            kerod
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Reference Points
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="kerod" class="md-nav__button md-logo" aria-label="kerod">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    kerod
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/EmGarr/kerod/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kerod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../CONTRIBUTING/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../docs/BENCHMARKS/" title="Benchmarks" class="md-nav__link">
+      Benchmarks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      Reference
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Reference" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" type="checkbox" id="nav-4-1" checked>
+    
+    <label class="md-nav__link" for="nav-4-1">
+      Kerod
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Kerod" data-md-level="2">
+      <label class="md-nav__title" for="nav-4-1">
+        <span class="md-nav__icon md-icon"></span>
+        Kerod
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-2" type="checkbox" id="nav-4-1-2">
+    
+    <label class="md-nav__link" for="nav-4-1-2">
+      Core
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        Core
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/box_coder/" title="Box Coder" class="md-nav__link">
+      Box Coder
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/box_ops/" title="Box Ops" class="md-nav__link">
+      Box Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/constants/" title="Constants" class="md-nav__link">
+      Constants
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/learning_rate_schedule/" title="Learning Rate Schedule" class="md-nav__link">
+      Learning Rate Schedule
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/losses/" title="Losses" class="md-nav__link">
+      Losses
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/matcher/" title="Matcher" class="md-nav__link">
+      Matcher
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/sampling_ops/" title="Sampling Ops" class="md-nav__link">
+      Sampling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/similarity/" title="Similarity" class="md-nav__link">
+      Similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/standard_fields/" title="Standard Fields" class="md-nav__link">
+      Standard Fields
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../core/target_assigner/" title="Target Assigner" class="md-nav__link">
+      Target Assigner
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-3" type="checkbox" id="nav-4-1-3">
+    
+    <label class="md-nav__link" for="nav-4-1-3">
+      Dataset
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Dataset" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        Dataset
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/augmentation/" title="Augmentation" class="md-nav__link">
+      Augmentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/preprocessing/" title="Preprocessing" class="md-nav__link">
+      Preprocessing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../dataset/utils/" title="Utils" class="md-nav__link">
+      Utils
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4" type="checkbox" id="nav-4-1-4" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-4">
+      Layers
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Layers" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-4">
+        <span class="md-nav__icon md-icon"></span>
+        Layers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../anchors/" title="Anchors" class="md-nav__link">
+      Anchors
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../attentions/" title="Attentions" class="md-nav__link">
+      Attentions
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../patches/" title="Patches" class="md-nav__link">
+      Patches
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../positional_encoding/" title="Positional Encoding" class="md-nav__link">
+      Positional Encoding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../transformer/" title="Transformer" class="md-nav__link">
+      Transformer
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-7" type="checkbox" id="nav-4-1-4-7">
+    
+    <label class="md-nav__link" for="nav-4-1-4-7">
+      Detection
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Detection" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-7">
+        <span class="md-nav__icon md-icon"></span>
+        Detection
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/abstract_detection_head/" title="Abstract Detection Head" class="md-nav__link">
+      Abstract Detection Head
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/fast_rcnn/" title="Fast Rcnn" class="md-nav__link">
+      Fast Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/pooling_ops/" title="Pooling Ops" class="md-nav__link">
+      Pooling Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../detection/rpn/" title="Rpn" class="md-nav__link">
+      Rpn
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-8" type="checkbox" id="nav-4-1-4-8">
+    
+    <label class="md-nav__link" for="nav-4-1-4-8">
+      Post Processing
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Post Processing" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-8">
+        <span class="md-nav__icon md-icon"></span>
+        Post Processing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../post_processing/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../post_processing/non_maximum_suppression/" title="Non Maximum Suppression" class="md-nav__link">
+      Non Maximum Suppression
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../post_processing/post_processing_detr/" title="Post Processing Detr" class="md-nav__link">
+      Post Processing Detr
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-4-9" type="checkbox" id="nav-4-1-4-9" checked>
+    
+    <label class="md-nav__link" for="nav-4-1-4-9">
+      Smca
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Smca" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-4-9">
+        <span class="md-nav__icon md-icon"></span>
+        Smca
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Reference Points
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" title="Reference Points" class="md-nav__link md-nav__link--active">
+      Reference Points
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#classes" class="md-nav__link">
+    Classes
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#smcareferencepoints" class="md-nav__link">
+    SMCAReferencePoints
+  </a>
+  
+    <nav class="md-nav" aria-label="SMCAReferencePoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro" class="md-nav__link">
+    Ancestors (in MRO)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call" class="md-nav__link">
+    call
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../weight_map/" title="Weight Map" class="md-nav__link">
+      Weight Map
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" type="checkbox" id="nav-4-1-5">
+    
+    <label class="md-nav__link" for="nav-4-1-5">
+      Model
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Model" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-5">
+        <span class="md-nav__icon md-icon"></span>
+        Model
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../model/detr/" title="Detr" class="md-nav__link">
+      Detr
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../model/factory/" title="Factory" class="md-nav__link">
+      Factory
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../model/faster_rcnn/" title="Faster Rcnn" class="md-nav__link">
+      Faster Rcnn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../model/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../model/smca_detr/" title="Smca Detr" class="md-nav__link">
+      Smca Detr
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5-6" type="checkbox" id="nav-4-1-5-6">
+    
+    <label class="md-nav__link" for="nav-4-1-5-6">
+      Backbone
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Backbone" data-md-level="4">
+      <label class="md-nav__title" for="nav-4-1-5-6">
+        <span class="md-nav__icon md-icon"></span>
+        Backbone
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../model/backbone/fpn/" title="Fpn" class="md-nav__link">
+      Fpn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../model/backbone/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../model/backbone/resnet/" title="Resnet" class="md-nav__link">
+      Resnet
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-6" type="checkbox" id="nav-4-1-6">
+    
+    <label class="md-nav__link" for="nav-4-1-6">
+      Utils
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Utils" data-md-level="3">
+      <label class="md-nav__title" for="nav-4-1-6">
+        <span class="md-nav__icon md-icon"></span>
+        Utils
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/documentation/" title="Documentation" class="md-nav__link">
+      Documentation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/drawing/" title="Drawing" class="md-nav__link">
+      Drawing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/ops/" title="Ops" class="md-nav__link">
+      Ops
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../utils/training/" title="Training" class="md-nav__link">
+      Training
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#classes" class="md-nav__link">
+    Classes
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#smcareferencepoints" class="md-nav__link">
+    SMCAReferencePoints
+  </a>
+  
+    <nav class="md-nav" aria-label="SMCAReferencePoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arguments" class="md-nav__link">
+    Arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments" class="md-nav__link">
+    Call arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-returns" class="md-nav__link">
+    Call returns
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ancestors-in-mro" class="md-nav__link">
+    Ancestors (in MRO)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call" class="md-nav__link">
+    call
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/EmGarr/kerod/edit/master/reference/kerod/layers/smca/reference_points.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="module-kerodlayerssmcareference_points">Module kerod.layers.smca.reference_points</h1>
+<p>None</p>
+<p>None</p>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+
+<span class="kn">from</span> <span class="nn">kerod.utils.documentation</span> <span class="kn">import</span> <span class="n">remove_unwanted_doc</span>
+
+<span class="n">__pdoc__</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">class</span> <span class="nc">SMCAReferencePoints</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Multi head reference points from the paper [Fast Convergence of DETR with Spatially Modulated Co-Attention](https://arxiv.org/pdf/2101.07448.pdf).</span>
+
+<span class="sd">    Based on the object queries will create a set of reference points which will</span>
+
+<span class="sd">    allow to create a [spatial dynamical weight maps](./weight_map.py) in order to modulate</span>
+
+<span class="sd">    the co-attention inside the transformer</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">        hidden_dim: Positive integer, dimensionality of the hidden space.</span>
+
+<span class="sd">        num_heads: Positive integer, each head starts from a head-shared center</span>
+
+<span class="sd">            and then predicts a head-specific center offset</span>
+
+<span class="sd">            and head specific scales.</span>
+
+<span class="sd">    Call arguments:</span>
+
+<span class="sd">        object_queries: A 3-D float32 Tensor of shape</span>
+
+<span class="sd">            [batch_size, num_object_queries, d_model] small fixed number of</span>
+
+<span class="sd">            learned positional embeddings input of the decoder.</span>
+
+<span class="sd">    Call returns:</span>
+
+<span class="sd">        Tuple:</span>
+
+<span class="sd">            - `reference_points`: A float tensor of shape</span>
+
+<span class="sd">                [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
+
+<span class="sd">            - `embedding_reference_points`: A tensor of shape</span>
+
+<span class="sd">                [batch_size, num_object_queries, num_heads, 2].</span>
+
+<span class="sd">                The embedding of y and x without the sigmoid applied.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">=</span> <span class="n">num_heads</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">xy_embed</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Sequential</span><span class="p">([</span>
+
+            <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">),</span>
+
+            <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">),</span>
+
+            <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># (y_cent, x_cent)</span>
+
+        <span class="p">])</span>
+
+        <span class="c1"># Each head will have its proper focus weight and width</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">yx_offset_hw_embed</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">num_heads</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_queries</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            object_queries: A 3-D float32 Tensor of shape</span>
+
+<span class="sd">                [batch_size, num_object_queries, d_model] small fixed number of</span>
+
+<span class="sd">                learned positional embeddings input of the decoder.</span>
+
+<span class="sd">        Call returns:</span>
+
+<span class="sd">            Tuple:</span>
+
+<span class="sd">                - `reference_points`: A float tensor of shape</span>
+
+<span class="sd">                    [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
+
+<span class="sd">                - `embedding_reference_points`: A tensor of shape</span>
+
+<span class="sd">                    [batch_size, num_object_queries, num_heads, 2].</span>
+
+<span class="sd">                    The embedding of y and x without the sigmoid applied.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">yx_pre_sigmoid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xy_embed</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>  <span class="c1"># [bs, num_queries, 2]</span>
+
+        <span class="n">yx</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">yx_pre_sigmoid</span><span class="p">)</span>
+
+        <span class="c1"># Where y and x are offsets predictions for &#39;yx&#39; (above)</span>
+
+        <span class="c1"># h and w are the scales predictions</span>
+
+        <span class="n">yx_offset_hw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yx_offset_hw_embed</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>  <span class="c1"># [bs, num_queries, head * 4]</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">num_queries</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Add offset coordinates to yx and concatenate with scale predictions</span>
+
+        <span class="c1"># yx =&gt; [bs, num_queries, head, 2]</span>
+
+        <span class="n">yx</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">yx</span><span class="p">[:,</span> <span class="p">:,</span> <span class="bp">None</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># yx_offset_hw =&gt; [bs, num_queries, head, 4]</span>
+
+        <span class="n">yx_offset_hw</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">yx_offset_hw</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+        <span class="n">yxhw</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">yx</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">2</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">yxhw</span> <span class="o">+</span> <span class="n">yx_offset_hw</span><span class="p">,</span> <span class="n">yx_pre_sigmoid</span>
+
+    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+
+        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;num_heads&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span>
+
+        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;hidden_dim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span>
+
+        <span class="k">return</span> <span class="n">config</span>
+
+<span class="n">remove_unwanted_doc</span><span class="p">(</span><span class="n">SMCAReferencePoints</span><span class="p">,</span> <span class="n">__pdoc__</span><span class="p">)</span>
+</code></pre></div>
+
+</details>
+<h2 id="classes">Classes</h2>
+<h3 id="smcareferencepoints">SMCAReferencePoints</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">SMCAReferencePoints</span><span class="p">(</span>
+    <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Based on the object queries will create a set of reference points which will
+allow to create a <a href="./weight_map.py">spatial dynamical weight maps</a> in order to modulate
+the co-attention inside the transformer</p>
+<h4 id="arguments">Arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hidden_dim</td>
+<td>Positive integer, dimensionality of the hidden space.</td>
+</tr>
+<tr>
+<td>num_heads</td>
+<td>Positive integer, each head starts from a head-shared center<br>and then predicts a head-specific center offset<br>and head specific scales.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-arguments">Call arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>object_queries</td>
+<td>A 3-D float32 Tensor of shape<br>[batch_size, num_object_queries, d_model] small fixed number of<br>learned positional embeddings input of the decoder.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="call-returns">Call returns</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tuple</td>
+<td>- <code>reference_points</code>: A float tensor of shape<br>    [batch_size, num_object_queries, num_heads, (y, x, w, h)].<br>- <code>embedding_reference_points</code>: A tensor of shape<br>    [batch_size, num_object_queries, num_heads, 2].<br>    The embedding of y and x without the sigmoid applied.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ancestors-in-mro">Ancestors (in MRO)</h4>
+<ul>
+<li>tensorflow.python.keras.engine.base_layer.Layer</li>
+<li>tensorflow.python.module.module.Module</li>
+<li>tensorflow.python.training.tracking.tracking.AutoTrackable</li>
+<li>tensorflow.python.training.tracking.base.Trackable</li>
+<li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
+</ul>
+<h4 id="methods">Methods</h4>
+<h4 id="call">call</h4>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">object_queries</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>object_queries</td>
+<td>A 3-D float32 Tensor of shape<br>[batch_size, num_object_queries, d_model] small fixed number of<br>learned positional embeddings input of the decoder.</td>
+</tr>
+</tbody>
+</table>
+<details class="example"><summary>View Source</summary><div class="codehilite"><pre><span></span><code>    <span class="n">def</span> <span class="k">call</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">object_queries</span><span class="p">)</span><span class="o">:</span>
+
+        <span class="s2">&quot;</span><span class="se">&quot;&quot;</span><span class="s2"></span>
+
+<span class="s2">        Args:</span>
+
+<span class="s2">            object_queries: A 3-D float32 Tensor of shape</span>
+
+<span class="s2">                [batch_size, num_object_queries, d_model] small fixed number of</span>
+
+<span class="s2">                learned positional embeddings input of the decoder.</span>
+
+<span class="s2">        Call returns:</span>
+
+<span class="s2">            Tuple:</span>
+
+<span class="s2">                - `reference_points`: A float tensor of shape</span>
+
+<span class="s2">                    [batch_size, num_object_queries, num_heads, (y, x, w, h)].</span>
+
+<span class="s2">                - `embedding_reference_points`: A tensor of shape</span>
+
+<span class="s2">                    [batch_size, num_object_queries, num_heads, 2].</span>
+
+<span class="s2">                    The embedding of y and x without the sigmoid applied.</span>
+
+<span class="s2">        </span><span class="se">&quot;&quot;</span><span class="s2">&quot;</span>
+
+        <span class="n">yx_pre_sigmoid</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">xy_embed</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>  <span class="c1"># [bs, num_queries, 2]</span>
+
+        <span class="n">yx</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">yx_pre_sigmoid</span><span class="p">)</span>
+
+        <span class="c1"># Where y and x are offsets predictions for &#39;yx&#39; (above)</span>
+
+        <span class="c1"># h and w are the scales predictions</span>
+
+        <span class="n">yx_offset_hw</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">yx_offset_hw_embed</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span>  <span class="c1"># [bs, num_queries, head * 4]</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span>
+
+        <span class="n">num_queries</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">object_queries</span><span class="p">)</span><span class="err">[</span><span class="mi">1</span><span class="err">]</span>
+
+        <span class="c1"># Add offset coordinates to yx and concatenate with scale predictions</span>
+
+        <span class="c1"># yx =&gt; [bs, num_queries, head, 2]</span>
+
+        <span class="n">yx</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">tile</span><span class="p">(</span><span class="n">yx</span><span class="err">[</span><span class="o">:</span><span class="p">,</span> <span class="o">:</span><span class="p">,</span> <span class="k">None</span><span class="err">]</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># yx_offset_hw =&gt; [bs, num_queries, head, 4]</span>
+
+        <span class="n">yx_offset_hw</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">yx_offset_hw</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+        <span class="n">yxhw</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="err">[</span><span class="n">yx</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="err">]</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">yxhw</span> <span class="o">+</span> <span class="n">yx_offset_hw</span><span class="p">,</span> <span class="n">yx_pre_sigmoid</span>
+</code></pre></div>
+
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../" title="Index" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Index
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../weight_map/" title="Weight Map" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Weight Map
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Powered by
+        <a href="http://timothycrosley.github.io/portray">portray.</a>
+        You too can
+        <a href="http://timothycrosley.github.io/portray">
+          portray</a>
+        your Python project well using automatic documentation.
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../../assets/javascripts/vendor.2d1db4bd.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../../../assets/javascripts/worker/search.5eca75d3.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>
