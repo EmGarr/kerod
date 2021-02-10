@@ -5,8 +5,7 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.python.keras.engine import data_adapter
 from tensorflow_addons.losses.giou_loss import GIoULoss
 
-from kerod.core.box_ops import (convert_to_center_coordinates,
-                                convert_to_xyxy_coordinates)
+from kerod.core.box_ops import (convert_to_center_coordinates, convert_to_xyxy_coordinates)
 from kerod.core.losses import L1Loss
 from kerod.core.matcher import hungarian_matching
 from kerod.core.similarity import DetrSimilarity
@@ -87,7 +86,10 @@ class DeTr(tf.keras.Model):
         # Will create a learnable embedding matrix for all our queries
         # It is a matrix of [num_queries, self.hidden_dim]
         # The embedding layers
-        self.query_embed = tf.keras.layers.Embedding(num_queries, self.hidden_dim)
+        self.query_embed = tf.keras.layers.Embedding(
+            num_queries,
+            self.hidden_dim,
+            embeddings_initializer=tf.keras.initializers.RandomNormal(mean=0., stddev=1.))
         self.all_the_queries = tf.range(num_queries)
 
         # Loss computation

@@ -11,7 +11,7 @@ from kerod.core.target_assigner import TargetAssigner
 from kerod.model.backbone.resnet import ResNet50, ResNet50PytorchStyle
 from kerod.model.detr import compute_detr_metrics
 from kerod.layers import (DynamicalWeightMaps, PositionEmbeddingSine, Transformer,
-                                SMCAReferencePoints)
+                          SMCAReferencePoints)
 from kerod.layers.post_processing.post_processing_detr import \
     post_processing as detr_postprocessing
 from kerod.utils.documentation import remove_unwanted_doc
@@ -98,7 +98,11 @@ class SMCA(tf.keras.Model):
         # Will create a learnable embedding matrix for all our queries
         # It is a matrix of [num_queries, self.hidden_dim]
         # The embedding layers
-        self.query_embed = tf.keras.layers.Embedding(num_queries, self.hidden_dim)
+        self.query_embed = tf.keras.layers.Embedding(
+            num_queries,
+            self.hidden_dim,
+            embeddings_initializer=tf.keras.initializers.RandomNormal(mean=0., stddev=1.))
+
         self.all_the_queries = tf.range(num_queries)
 
         # Loss computation

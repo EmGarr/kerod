@@ -17,7 +17,7 @@ class KerodModel(str, Enum):
 
 def build_model(num_classes: int,
                 name: str = KerodModel.faster_rcnn_resnet50_pytorch.value) -> tf.keras.Model:
-    """Build a FasterRcnnFPNResnet50 with all the `tf.keras.layers.BatchNormalization` frozen and
+    """Build a localization model with all the `tf.keras.layers.BatchNormalization` frozen and
     all the layers before second residual block.
 
     Args:
