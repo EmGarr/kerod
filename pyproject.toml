@@ -1,0 +1,4 @@
+[tool.portray.mkdocs.theme]
+name = "material"
+palette = {scheme = "slate", primary = "pink", accent = "amber"}
+features = ["header.autohide"]
