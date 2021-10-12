@@ -73,7 +73,7 @@ class PositionEmbeddingSine(tf.keras.layers.Layer):
     plt.show()
     ```
 
-    ![Visualization Positional Encoding](https://raw.githubusercontent.com/EmGarr/kerod/master/ressources/2d_pos_encoding.png)
+    ![Visualization Positional Encoding](https://raw.githubusercontent.com/EmGarr/kerod/master/docs/img/2d_pos_encoding.png)
 
     Arguments:
         output_dim: Dimension of the dense embedding.

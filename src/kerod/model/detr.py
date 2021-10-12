@@ -44,11 +44,11 @@ class DeTr(tf.keras.Model):
             DETR can detect in a single image. For COCO, we recommend 100 queries.
 
     Call arguments:
-        inputs: Tuple
-            1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
-            2. image_informations: A 1D tensor of float32 and shape [(height, width),].
+        inputs: Dict with the following keys:
+            - `images`: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
+            - `image_informations`: A 1D tensor of float32 and shape [(height, width),].
                 It contains the shape of the image without any padding.
-            3. images_padding_mask: A 3D tensor of int8 and shape [batch_size, None, None]
+            - `images_padding_mask`: A 3D tensor of int8 and shape [batch_size, None, None]
                 composed of 0 and 1 which allows to know where a padding has been applied.
         training: Is automatically set to `True` in train mode
 
@@ -131,13 +131,12 @@ class DeTr(tf.keras.Model):
         """Perform an inference in training.
 
         Arguments:
-            inputs: Tuple
-                1. images: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
-                2. image_informations: A 1D tensor of float32 and shape [(height, width),]. It contains the shape
-                of the image without any padding.
-                3. images_padding_mask: A 3D tensor of int8 and shape
-                    [batch_size, None, None] composed of 0 and 1 which
-                    allows to know where a padding has been applied.
+            inputs: Dict with the following keys:
+                - `images`: A 4-D tensor of float32 and shape [batch_size, None, None, 3]
+                - `image_informations`: A 1D tensor of float32 and shape [(height, width),].
+                    It contains the shape of the image without any padding.
+                - `images_padding_mask`: A 3D tensor of int8 and shape [batch_size, None, None]
+                    composed of 0 and 1 which allows to know where a padding has been applied.
             training: Is automatically set to `True` in train mode
 
         Returns:
@@ -191,7 +190,7 @@ class DeTr(tf.keras.Model):
         ground_truths: Dict[str, tf.Tensor],
         y_pred: Dict[str, tf.Tensor],
         input_shape: tf.Tensor,
-    ) -> int:
+    ) -> tf.Tensor:
         """Apply the GIoU, L1 and SCC to each layers of the transformer decoder
 
         Arguments:
@@ -202,6 +201,9 @@ class DeTr(tf.keras.Model):
             input_shape: [height, width] of the input tensor.
                 It is the shape of the images will all the padding included.
                 It is used to normalize the ground_truths boxes.
+
+        Returns:
+            tf.Tensor: Scalar for the loss
         """
         normalized_boxes = ground_truths[BoxField.BOXES] / tf.tile(input_shape[None], [1, 2])
         centered_normalized_boxes = convert_to_center_coordinates(normalized_boxes)
@@ -242,7 +244,7 @@ class DeTr(tf.keras.Model):
         ground_truths: Dict[str, tf.Tensor],
         num_boxes: int,
         compute_metrics=False,
-    ):
+    ) -> tf.Tensor:
         y_true, weights = self.target_assigner.assign(y_pred, ground_truths)
 
         # Reduce the class imbalanced by applying to the weights

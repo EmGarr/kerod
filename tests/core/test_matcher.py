@@ -27,13 +27,15 @@ def test_matcher_low_quality_matcher():
         [0,  0.2, 0.49, 0.1,  0.3],
         [2,   -1,  0.2,   4, 0.38],
         [1, 0.25,  0.3,   5, 0.37],
-        [0,    0,    0,   0, 0.50], # This line is not valid and should be discarded (num_valid_boxes = 3)
+        # This line is not valid and should be discarded (num_valid_boxes = 3)
+        [0,    0,    0,   0, 0.50],
     ], [
         [1, 0.3,   1,   3,    0],
         [8, 0.4,   2,   0,  0.2],
         [0,  -1, 0.2, 0.1, 0.39],
-        [0,   0,   0,   0,    0], # This line is not valid and should be discarded (num_valid_boxes = 3)
-    ]]) # yapf: disable
+        # This line is not valid and should be discarded (num_valid_boxes = 3)
+        [0,   0,   0,   0,    0],
+    ]])  # yapf: disable
 
     matcher = Matcher([0.3, 0.5], [0, -1, 1], allow_low_quality_matches=True)
 
@@ -60,7 +62,7 @@ def test_matcher_low_quality_matcher_when_the_best_box_is_undefined():
         [8, 0.4,   2,   0,  0.2],
         [0,  -1, 0.2, 0.1, 0.39],
         [0,   0,   0,   0, 0.31],
-    ]]) # yapf: disable
+    ]])  # yapf: disable
 
     expected_matched = np.array([[1, 0, 2, 0, 3], [1, 1, 1, 0, 2]])
 

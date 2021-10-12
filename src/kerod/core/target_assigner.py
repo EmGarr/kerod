@@ -27,7 +27,18 @@ from kerod.utils import item_assignment, get_full_indices
 
 
 class TargetAssigner:
-    """Target assigner to compute classification and regression targets."""
+    """Target assigner to compute classification and regression targets.
+
+        Arguments:
+            similarity_calc: a method wich allow to compute a similarity between two batch of boxes
+            matcher: an od.core.Matcher used to match groundtruth to anchors.
+            box_encoder: a method which allow to encode matching
+                groundtruth oxes with respect to anchors.
+            negative_class_weight: A negative_class can be an unmatched anchors or a padded boxes.
+                All egative classes will have a associated set to this corresponding value
+                for he classification target.
+            positive_class_weight: A positive_class is a matched foreground object
+        """
 
     def __init__(self,
                  similarity_calc: Callable,
@@ -36,19 +47,7 @@ class TargetAssigner:
                  negative_class_weight=0.,
                  positive_class_weight=1.,
                  dtype=None):
-        """Construct Object Detection Target Assigner.
 
-        Arguments:
-
-        - *similarity_calc*: a method wich allow to compute a similarity between two batch of boxes
-        - *matcher*: an od.core.Matcher used to match groundtruth to anchors.
-        - *box_encoder*: a method which allow to encode matching
-            groundtruth boxes with respect to anchors.
-        - *negative_class_weight*: A negative_class can be an unmatched anchors or a padded boxes.
-            All negative classes will have a associated set to this corresponding value
-            for the classification target.
-        - *positive_class_weight*: A positive_class is a matched foreground object
-        """
         self._similarity_calc = similarity_calc
         self._matcher = matcher
         self._box_encoder = box_encoder
@@ -74,27 +73,27 @@ class TargetAssigner:
         of self._unmatched_cls_target which can be specified via the constructor.
 
         Arguments:
-
-        - *anchors*: a dict representing a batch of M anchors
-            1. BoxField.BOXES: A tensor of shape [batch_size, num_anchors, (y1, x1, y2, x2)] representing the boxes and resized to the image shape.
-        - *groundtruth*: a dict representing a batch of M groundtruth boxes
-            1. BoxField.BOXES: A tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)] representing
-            the boxes and resized to the image shape
-            2. BoxField.LABELS: A tensor of shape [batch_size, num_gt, ]
-            3. BoxField.NUM_BOXES: A tensor of shape [batch_size].
-            It is usefull to unpad the data in case of a batched training
-            4. BoxField.WEIGHTS: A tensor of shape [batch_size, num_gt]
+            anchors: a dict representing a batch of M anchors
+                1. BoxField.BOXES: A tensor of shape
+                [batch_size, num_anchors, (y1, x1, y2, x2)]
+                representing the boxes and resized to the image shape.
+            groundtruth: a dict representing a batch of M groundtruth boxes
+                1. BoxField.BOXES: A tensor of shape [batch_size, num_gt, (y1, x1, y2, x2)]
+                    representing the boxes and resized to the image shape
+                2. BoxField.LABELS: A tensor of shape [batch_size, num_gt, ]
+                3. BoxField.NUM_BOXES: A tensor of shape [batch_size].
+                It is usefull to unpad the data in case of a batched training
+                4. BoxField.WEIGHTS: A tensor of shape [batch_size, num_gt]
 
         Returns:
+            Tuple:
+                - `y_true`: A dict with :
+                    - *BoxField.LABELS*: A tensor with shape [batch_size, num_anchors]
+                    - *BoxField.BOXES*: A tensor with shape [batch_size, num_anchors, box_code_dimension]
 
-        - *y_true*: A dict with :
-            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors]
-            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors,
-            box_code_dimension]
-
-        - *weights*: A dict with:
-            - *BoxField.LABELS*: a tensor with shape [batch_size, num_anchors],
-            - *BoxField.BOXES*: a tensor with shape [batch_size, num_anchors],
+                - `weights`: A dict with:
+                    - *BoxField.LABELS*: A tensor with shape [batch_size, num_anchors]
+                    - *BoxField.BOXES*: A tensor with shape [batch_size, num_anchors]
         """
         shape = tf.shape(groundtruth[BoxField.BOXES])
         batch_size = shape[0]
