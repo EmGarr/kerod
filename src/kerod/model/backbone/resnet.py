@@ -30,19 +30,17 @@ from tensorflow.python.keras.engine import training
 from tensorflow.python.keras.utils import data_utils, layer_utils
 
 OFFICIAL_WEIGHTS_PATH = ('https://storage.googleapis.com/tensorflow/keras-applications/resnet/')
-CUSTOM_WEIGHTS_PATH = ('https://files.heuritech.com/raw_files/')
 
 WEIGHTS_HASHES = {
-    'resnet50': ('4d473c1dd8becc155b73f8504c6f6626', OFFICIAL_WEIGHTS_PATH, None),
-    'resnet50_pytorch': ('3ffd584081cc56435a3689d12afd7cf9', CUSTOM_WEIGHTS_PATH,
-                         'resnet50_tensorpack_conversion.h5'),
-    'resnet101': ('88cf7a10940856eca736dc7b7e228a21', OFFICIAL_WEIGHTS_PATH, None),
-    'resnet152': ('ee4c566cf9a93f14d82f913c2dc6dd0c', OFFICIAL_WEIGHTS_PATH, None),
-    'resnet50v2': ('fac2f116257151a9d068a22e544a4917', OFFICIAL_WEIGHTS_PATH, None),
-    'resnet101v2': ('c0ed64b8031c3730f411d2eb4eea35b5', OFFICIAL_WEIGHTS_PATH, None),
-    'resnet152v2': ('ed17cf2e0169df9d443503ef94b23b33', OFFICIAL_WEIGHTS_PATH, None),
-    'resnext50': ('62527c363bdd9ec598bed41947b379fc', OFFICIAL_WEIGHTS_PATH, None),
-    'resnext101': ('0f678c91647380debd923963594981b3', OFFICIAL_WEIGHTS_PATH, None)
+    'resnet50': ('4d473c1dd8becc155b73f8504c6f6626', OFFICIAL_WEIGHTS_PATH),
+    'resnet50_pytorch': ('3ffd584081cc56435a3689d12afd7cf9', "https://drive.google.com/uc?export=download&id=11QKe1WD4s0IdAPh6hJXJozeqSO7QD0ZU"),
+    'resnet101': ('88cf7a10940856eca736dc7b7e228a21', OFFICIAL_WEIGHTS_PATH),
+    'resnet152': ('ee4c566cf9a93f14d82f913c2dc6dd0c', OFFICIAL_WEIGHTS_PATH),
+    'resnet50v2': ('fac2f116257151a9d068a22e544a4917', OFFICIAL_WEIGHTS_PATH),
+    'resnet101v2': ('c0ed64b8031c3730f411d2eb4eea35b5', OFFICIAL_WEIGHTS_PATH),
+    'resnet152v2': ('ed17cf2e0169df9d443503ef94b23b33', OFFICIAL_WEIGHTS_PATH),
+    'resnext50': ('62527c363bdd9ec598bed41947b379fc', OFFICIAL_WEIGHTS_PATH),
+    'resnext101': ('0f678c91647380debd923963594981b3', OFFICIAL_WEIGHTS_PATH)
 }
 
 
@@ -165,14 +163,16 @@ def ResNet(stack_fn: Callable,
 
     # Load weights.
     if (weights == 'imagenet') and (model_name in WEIGHTS_HASHES):
-        file_hash, base_weight_path, file_name = WEIGHTS_HASHES[model_name]
-        if file_name is None:
-            file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_notop.h5'
+        file_hash, base_weight_path = WEIGHTS_HASHES[model_name]
 
-        weights_path = data_utils.get_file(file_name,
-                                           base_weight_path + file_name,
-                                           cache_subdir='models',
-                                           file_hash=file_hash)
+        if model_name == "resnet50_pytorch":
+            file_name = 'resnet50_tensorpack_conversion.h5'
+            url = base_weight_path
+        else:
+            file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_notop.h5'
+            url = base_weight_path + file_name
+
+        weights_path = data_utils.get_file(file_name, url, cache_subdir='models', file_hash=file_hash)
         model.load_weights(weights_path)
     elif weights is not None:
         model.load_weights(weights)
