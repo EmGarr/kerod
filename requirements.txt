@@ -1,4 +1,4 @@
-tensorflow==2.4.0
+tensorflow==2.9.3
 tensorflow-addons==0.14.0
 scipy
 matplotlib
